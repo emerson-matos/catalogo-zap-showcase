@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle, Phone, Mail, MapPin, Clock } from "lucide-react";
 
 const Contact = () => {
-  const whatsappMessage = "Olá! Gostaria de entrar em contato para saber mais sobre seus produtos.";
+  const whatsappMessage =
+    "Olá! Gostaria de entrar em contato para saber mais sobre seus produtos.";
   const whatsappNumber = "5511999999999"; // Substitua pelo número real
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
@@ -13,7 +14,8 @@ const Contact = () => {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Entre em Contato</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Estamos aqui para ajudar! Entre em contato conosco através do WhatsApp ou outros canais
+            Estamos aqui para ajudar! Entre em contato conosco através do
+            WhatsApp ou outros canais
           </p>
         </div>
 
@@ -31,10 +33,7 @@ const Contact = () => {
                     <p className="text-muted-foreground mb-4">
                       Atendimento rápido e personalizado via WhatsApp
                     </p>
-                    <Button 
-                      variant="whatsapp" 
-                      onClick={() => window.open(whatsappUrl, '_blank')}
-                    >
+                    <Button onClick={() => window.open(whatsappUrl, "_blank")}>
                       <MessageCircle className="w-4 h-4" />
                       Iniciar Conversa
                     </Button>
@@ -51,9 +50,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Telefone</h3>
-                    <p className="text-muted-foreground">
-                      (11) 99999-9999
-                    </p>
+                    <p className="text-muted-foreground">(11) 99999-9999</p>
                   </div>
                 </div>
               </CardContent>
@@ -85,7 +82,9 @@ const Contact = () => {
                     <Clock className="w-6 h-6 text-accent" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Horário de Atendimento</h3>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Horário de Atendimento
+                    </h3>
                     <div className="space-y-1 text-muted-foreground">
                       <p>Segunda a Sexta: 8h às 18h</p>
                       <p>Sábado: 8h às 14h</p>
@@ -105,7 +104,8 @@ const Contact = () => {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Localização</h3>
                     <p className="text-muted-foreground">
-                      São Paulo, SP - Brasil<br />
+                      São Paulo, SP - Brasil
+                      <br />
                       Atendimento presencial sob agendamento
                     </p>
                   </div>
@@ -119,10 +119,9 @@ const Contact = () => {
                 <p className="mb-6 opacity-90">
                   Clique no botão abaixo e fale conosco agora mesmo!
                 </p>
-                <Button 
-                  variant="whatsapp" 
+                <Button
                   size="lg"
-                  onClick={() => window.open(whatsappUrl, '_blank')}
+                  onClick={() => window.open(whatsappUrl, "_blank")}
                   className="bg-whatsapp hover:bg-whatsapp-hover"
                 >
                   <MessageCircle className="w-5 h-5" />
@@ -138,3 +137,4 @@ const Contact = () => {
 };
 
 export default Contact;
+

@@ -22,7 +22,7 @@ const Header = () => {
           <div className="flex items-center space-x-2">
             <Package className="size-8 text-primary" />
             <span className="text-xl font-bold bg-gradient-primary bg-clip-text">
-              CatálogoPlus
+              Dunga Store
             </span>
           </div>
 
@@ -111,4 +111,3 @@ const Header = () => {
 };
 
 export default Header;
-
