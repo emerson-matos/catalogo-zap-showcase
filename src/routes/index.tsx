@@ -1,3 +1,4 @@
+import { createFileRoute } from '@tanstack/react-router'
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
@@ -5,7 +6,7 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 
-const Index = () => {
+function Index() {
   return (
     <div className="min-h-screen">
       <Header />
@@ -20,6 +21,8 @@ const Index = () => {
       <WhatsAppFloat />
     </div>
   );
-};
+}
 
-export default Index;
+export const Route = createFileRoute('/')({
+  component: Index,
+})
