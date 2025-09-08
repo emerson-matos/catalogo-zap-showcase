@@ -27,8 +27,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
     <Card className="group h-full bg-gradient-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 border-0">
       <CardContent className="p-0">
         <div className="relative overflow-hidden rounded-t-lg">
-          <img 
-            src={product.image} 
+          <img
+            src={product.image}
             alt={product.name}
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
           />
@@ -41,7 +41,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {product.category}
           </Badge>
         </div>
-        
+
         <div className="p-6">
           <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
             {product.name}
@@ -49,7 +49,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <p className="text-muted-foreground mb-4 line-clamp-2">
             {product.description}
           </p>
-          
+
           <div className="flex items-center justify-between mb-4">
             <span className="text-2xl font-bold text-primary">
               {product.price}
@@ -63,14 +63,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </div>
       </CardContent>
-      
+
       <CardFooter className="p-6 pt-0">
-        <Button 
-          variant="whatsapp" 
-          className="w-full" 
-          onClick={() => window.open(whatsappUrl, '_blank')}
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={() => window.open(whatsappUrl, "_blank")}
         >
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle className="size-4" />
           Consultar Produto
         </Button>
       </CardFooter>
@@ -79,3 +79,4 @@ const ProductCard = ({ product }: ProductCardProps) => {
 };
 
 export default ProductCard;
+

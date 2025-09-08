@@ -1,7 +1,6 @@
 import { useState } from "react";
 import ProductCard from "./ProductCard";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import produtoSmartphone from "@/assets/produto-smartphone.jpg";
 import produtoHeadphones from "@/assets/produto-headphones.jpg";
 import produtoCosmetico from "@/assets/produto-cosmetico.jpg";
@@ -12,7 +11,8 @@ const products = [
   {
     id: "1",
     name: "Smartphone Premium",
-    description: "Smartphone de última geração com câmera profissional e desempenho excepcional.",
+    description:
+      "Smartphone de última geração com câmera profissional e desempenho excepcional.",
     price: "R$ 2.999,00",
     image: produtoSmartphone,
     category: "Eletrônicos",
@@ -22,7 +22,8 @@ const products = [
   {
     id: "2",
     name: "Fones Bluetooth Pro",
-    description: "Fones de ouvido sem fio com cancelamento de ruído e qualidade de áudio superior.",
+    description:
+      "Fones de ouvido sem fio com cancelamento de ruído e qualidade de áudio superior.",
     price: "R$ 899,00",
     image: produtoHeadphones,
     category: "Eletrônicos",
@@ -31,7 +32,8 @@ const products = [
   {
     id: "3",
     name: "Creme Anti-Idade Premium",
-    description: "Creme facial com ingredientes naturais para rejuvenescimento da pele.",
+    description:
+      "Creme facial com ingredientes naturais para rejuvenescimento da pele.",
     price: "R$ 189,00",
     image: produtoCosmetico,
     category: "Cosméticos",
@@ -41,7 +43,8 @@ const products = [
   {
     id: "4",
     name: "Café Especial Gourmet",
-    description: "Café premium torrado artesanalmente com grãos selecionados especiais.",
+    description:
+      "Café premium torrado artesanalmente com grãos selecionados especiais.",
     price: "R$ 45,00",
     image: produtoCafe,
     category: "Bebidas",
@@ -54,9 +57,10 @@ const categories = ["Todos", "Eletrônicos", "Cosméticos", "Bebidas"];
 const ProductGrid = () => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
 
-  const filteredProducts = selectedCategory === "Todos" 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+  const filteredProducts =
+    selectedCategory === "Todos"
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
 
   return (
     <section id="produtos" className="py-20 bg-background">
@@ -110,3 +114,4 @@ const ProductGrid = () => {
 };
 
 export default ProductGrid;
+

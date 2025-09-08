@@ -1,4 +1,5 @@
 import { Package, MessageCircle, Phone, Mail } from "lucide-react";
+import { Button } from "./ui/button";
 
 const Footer = () => {
   const whatsappNumber = "5511999999999"; // Substitua pelo número real
@@ -15,7 +16,8 @@ const Footer = () => {
               <span className="text-xl font-bold">CatálogoPlus</span>
             </div>
             <p className="text-primary-foreground/80 leading-relaxed">
-              Sua loja digital completa com os melhores produtos e atendimento personalizado via WhatsApp.
+              Sua loja digital completa com os melhores produtos e atendimento
+              personalizado via WhatsApp.
             </p>
           </div>
 
@@ -24,28 +26,40 @@ const Footer = () => {
             <h3 className="font-semibold text-lg mb-4">Links Rápidos</h3>
             <ul className="space-y-2 text-primary-foreground/80">
               <li>
-                <button 
-                  onClick={() => document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })}
+                <Button
+                  onClick={() =>
+                    document
+                      .getElementById("hero")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
                   className="hover:text-primary-foreground transition-colors"
                 >
                   Início
-                </button>
+                </Button>
               </li>
               <li>
-                <button 
-                  onClick={() => document.getElementById('produtos')?.scrollIntoView({ behavior: 'smooth' })}
+                <Button
+                  onClick={() =>
+                    document
+                      .getElementById("produtos")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
                   className="hover:text-primary-foreground transition-colors"
                 >
                   Produtos
-                </button>
+                </Button>
               </li>
               <li>
-                <button 
-                  onClick={() => document.getElementById('contato')?.scrollIntoView({ behavior: 'smooth' })}
+                <Button
+                  onClick={() =>
+                    document
+                      .getElementById("contato")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
                   className="hover:text-primary-foreground transition-colors"
                 >
                   Contato
-                </button>
+                </Button>
               </li>
             </ul>
           </div>
@@ -55,8 +69,8 @@ const Footer = () => {
             <h3 className="font-semibold text-lg mb-4">Contato</h3>
             <div className="space-y-3 text-primary-foreground/80">
               <div className="flex items-center space-x-2">
-                <MessageCircle className="w-4 h-4" />
-                <a 
+                <MessageCircle className="size-4" />
+                <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -66,11 +80,11 @@ const Footer = () => {
                 </a>
               </div>
               <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4" />
+                <Phone className="size-4" />
                 <span>(11) 99999-9999</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4" />
+                <Mail className="size-4" />
                 <span>contato@catalogoplus.com</span>
               </div>
             </div>
@@ -86,3 +100,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
