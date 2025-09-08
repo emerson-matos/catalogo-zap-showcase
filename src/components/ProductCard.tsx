@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Star } from "lucide-react";
+import { createProductWhatsAppUrl } from "@/lib/whatsapp";
 
 interface Product {
   id: string;
@@ -19,9 +20,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const whatsappMessage = `Olá! Tenho interesse no produto "${product.name}". Poderia me enviar mais informações?`;
-  const whatsappNumber = "5511999999999"; // Substitua pelo número real
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = createProductWhatsAppUrl(product.name);
 
   return (
     <Card className="group h-full bg-gradient-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 border-0">

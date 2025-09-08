@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle, Phone, Mail, MapPin, Clock } from "lucide-react";
+import { createWhatsAppUrl } from "@/lib/whatsapp";
 
 const Contact = () => {
-  const whatsappMessage =
-    "Olá! Gostaria de entrar em contato para saber mais sobre seus produtos.";
-  const whatsappNumber = "5511999999999"; // Substitua pelo número real
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = createWhatsAppUrl({
+    message:
+      "Olá! Gostaria de entrar em contato para saber mais sobre seus produtos.",
+  });
 
   return (
     <section id="contato" className="py-20 bg-muted/30">

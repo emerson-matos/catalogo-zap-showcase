@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import heroImage from "@/assets/hero-catalog.jpg";
+import { createWhatsAppUrl } from "@/lib/whatsapp";
 
 const Hero = () => {
-  const whatsappMessage =
-    "Olá! Gostaria de conhecer seus produtos. Poderia me ajudar?";
-  const whatsappNumber = "5511999999999"; // Substitua pelo número real
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = createWhatsAppUrl({
+    message: "Olá! Gostaria de conhecer seus produtos. Poderia me ajudar?",
+  });
 
   return (
     <section className="relative bg-gradient-hero overflow-hidden">
