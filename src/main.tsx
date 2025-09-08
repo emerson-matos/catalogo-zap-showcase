@@ -1,5 +1,15 @@
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./index.css";
+import { App } from "@/App";
+import "@/index.css";
+import { StrictMode } from "react";
+import ReactDOM from "react-dom/client";
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Render the app
+const rootElement = document.getElementById("app");
+if (rootElement && !rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+}

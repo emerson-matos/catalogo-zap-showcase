@@ -1,27 +1,16 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Star } from "lucide-react";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  image: string;
-  category: string;
-  rating?: number;
-  isNew?: boolean;
-}
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
+import { Star } from "lucide-react";
+import type { Product } from "@/types/product";
+import { createWhatsAppUrl } from "@/constants/whatsapp";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const whatsappMessage = `Olá! Tenho interesse no produto "${product.name}". Poderia me enviar mais informações?`;
-  const whatsappNumber = "5511999999999"; // Substitua pelo número real
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = createWhatsAppUrl(product.name);
 
   return (
     <Card className="group h-full bg-gradient-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 border-0">
@@ -65,14 +54,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="p-6 pt-0">
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={() => window.open(whatsappUrl, "_blank")}
-        >
-          <MessageCircle className="size-4" />
+        <WhatsAppButton >
           Consultar Produto
-        </Button>
+        </WhatsAppButton>
       </CardFooter>
     </Card>
   );

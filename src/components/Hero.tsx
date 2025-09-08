@@ -1,15 +1,15 @@
-import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import heroImage from "@/assets/hero-catalog.jpg";
+import { Button } from "@/components/ui/button";
 
-const Hero = () => {
+const Hero = ({ sectionId }: { sectionId: string }) => {
   const whatsappMessage =
     "Olá! Gostaria de conhecer seus produtos. Poderia me ajudar?";
   const whatsappNumber = "5511999999999"; // Substitua pelo número real
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
-    <section className="relative bg-gradient-hero overflow-hidden">
+    <section id={sectionId} className="relative bg-gradient-hero overflow-hidden">
       <div className="absolute inset-0 bg-secondary-foreground/20"></div>
       <div className="relative container mx-auto px-4 py-20 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
