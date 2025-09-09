@@ -13,7 +13,9 @@ export const useProducts = () => {
       if (!isMounted) return;
       if (Array.isArray(list) && list.length > 0) {
         setAllProducts(list as Product[]);
-        setCategories(Array.from(new Set(list.map((i) => i.category))));
+        // Sempre incluir "todos" como primeira opção, seguido pelas categorias únicas dos produtos
+        const uniqueCategories = Array.from(new Set(list.map((i) => i.category).filter(Boolean)));
+        setCategories(["todos", ...uniqueCategories]);
       }
     });
     return () => {
@@ -26,9 +28,9 @@ export const useProducts = () => {
       return allProducts;
     }
 
-    const categoryName = categories.find((it) => it === selectedCategory);
+    const categoryName = categories.find((it: string) => it === selectedCategory);
 
-    return allProducts.filter((product) => product.category === categoryName);
+    return allProducts.filter((product: Product) => product.category === categoryName);
   }, [selectedCategory, allProducts, categories]);
 
   return {
