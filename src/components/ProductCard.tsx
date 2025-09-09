@@ -20,13 +20,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
           />
           {product.isNew && (
-            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-accent to-accent/90 text-accent-foreground font-bold shadow-lg border border-accent/20 backdrop-blur-sm">
+            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-accent to-accent/90 text-black dark:text-white font-bold shadow-lg border border-accent/20 backdrop-blur-sm">
               Novo
             </Badge>
           )}
           <Badge 
             variant="secondary" 
-            className="absolute top-3 right-3 bg-background/90 text-foreground font-semibold shadow-md border border-border backdrop-blur-sm hover:bg-background/95 transition-colors"
+            className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 font-semibold shadow-md border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm hover:bg-white/95 dark:hover:bg-gray-800/95 transition-colors"
           >
             {product.category}
           </Badge>
@@ -45,9 +45,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
               {formatPriceBRL(product.price)}
             </span>
             {product.rating && (
-              <div className="flex items-center gap-1 bg-accent/10 px-2 py-1 rounded-full">
+              <div className="flex items-center gap-1 bg-accent/10 dark:bg-accent/20 px-2 py-1 rounded-full">
                 <Star className="w-4 h-4 fill-accent text-accent" />
-                <span className="text-sm font-medium text-accent-foreground">{product.rating}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{product.rating}</span>
               </div>
             )}
           </div>
