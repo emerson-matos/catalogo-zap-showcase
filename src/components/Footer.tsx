@@ -1,5 +1,4 @@
 import { Package, MessageCircle, Phone, Mail } from "lucide-react";
-import { Button } from "./ui/button";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 const Footer = () => {
@@ -14,7 +13,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Package className="w-8 h-8" />
-              <span className="text-xl font-bold">CatálogoPlus</span>
+              <span className="text-xl font-bold">DungaStore</span>
             </div>
             <p className="text-primary-foreground/80 leading-relaxed">
               Sua loja digital completa com os melhores produtos e atendimento
@@ -27,40 +26,40 @@ const Footer = () => {
             <h3 className="font-semibold text-lg mb-4">Links Rápidos</h3>
             <ul className="space-y-2 text-primary-foreground/80">
               <li>
-                <Button
+                <button
                   onClick={() =>
                     document
                       .getElementById("hero")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
-                  className="hover:text-primary-foreground transition-colors"
+                  className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
                 >
                   Início
-                </Button>
+                </button>
               </li>
               <li>
-                <Button
+                <button
                   onClick={() =>
                     document
                       .getElementById("produtos")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
-                  className="hover:text-primary-foreground transition-colors"
+                  className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
                 >
                   Produtos
-                </Button>
+                </button>
               </li>
               <li>
-                <Button
+                <button
                   onClick={() =>
                     document
                       .getElementById("contato")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
-                  className="hover:text-primary-foreground transition-colors"
+                  className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
                 >
                   Contato
-                </Button>
+                </button>
               </li>
             </ul>
           </div>
@@ -82,18 +81,18 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="size-4" />
-                <span>(11) 99999-9999</span>
+                <span>{whatsappNumber ? `+${whatsappNumber.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+$1 ($2) $3-$4')}` : '(11) 99999-9999'}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="size-4" />
-                <span>contato@catalogoplus.com</span>
+                <span>contato@dungastore.com</span>
               </div>
             </div>
           </div>
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center text-primary-foreground/60">
-          <p>&copy; 2024 CatálogoPlus. Todos os direitos reservados.</p>
+          <p>&copy; 2024 DungaStore. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

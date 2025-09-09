@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { WhatsAppButton } from "./ui/whatsapp-button";
+import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 const Contact = ({ sectionId }: { sectionId: string }) => {
+  const whatsappNumber = getWhatsAppNumber();
 
   return (
     <section id={sectionId} className="py-20 bg-muted/30">
@@ -30,7 +32,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                     <p className="text-muted-foreground mb-4">
                       Atendimento rápido e personalizado via WhatsApp
                     </p>
-                    <WhatsAppButton>
+                    <WhatsAppButton className="w-full sm:w-auto px-6 py-2">
                       Iniciar Conversa
                     </WhatsAppButton>
                   </div>
@@ -46,7 +48,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Telefone</h3>
-                    <p className="text-muted-foreground">(11) 99999-9999</p>
+                    <p className="text-muted-foreground">{whatsappNumber ? `+${whatsappNumber.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+$1 ($2) $3-$4')}` : '(11) 99999-9999'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -61,7 +63,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">E-mail</h3>
                     <p className="text-muted-foreground">
-                      contato@catalogoplus.com
+                      contato@dungastore.com
                     </p>
                   </div>
                 </div>
@@ -115,7 +117,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                 <p className="mb-6 opacity-90">
                   Clique no botão abaixo e fale conosco agora mesmo!
                 </p>
-                <WhatsAppButton>
+                <WhatsAppButton className="w-full sm:w-auto px-6 py-2">
                   Falar no WhatsApp
                 </WhatsAppButton>
               </CardContent>

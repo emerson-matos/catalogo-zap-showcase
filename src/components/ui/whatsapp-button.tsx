@@ -34,12 +34,12 @@ export const WhatsAppButton = ({
     <Button
       asChild={asChild}
       onClick={() => window.open(whatsappUrl, "_blank")}
-      size={size ?? "icon"}
+      size={size ?? "default"}
       variant={variant}
       className={cn(
         getVariantClasses(),
         "transition-all duration-200",
-        isIconOnly && size === "icon" ? "p-2" : "",
+        isIconOnly && size === "icon" ? "p-2" : "min-w-fit whitespace-nowrap",
         className,
       )}
     >
@@ -48,7 +48,7 @@ export const WhatsAppButton = ({
       ) : (
         <>
           <MessageCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-          {children}
+          <span className="flex-shrink-0">{children}</span>
         </>
       )}
     </Button>
