@@ -18,6 +18,18 @@ export const WhatsAppButton = ({
   
   const isIconOnly = !children || size === "icon";
   
+  // Define base colors based on variant
+  const getVariantClasses = () => {
+    switch (variant) {
+      case "ghost":
+        return "bg-transparent text-whatsapp hover:bg-whatsapp/10 hover:text-whatsapp";
+      case "outline":
+        return "border-whatsapp text-whatsapp hover:bg-whatsapp hover:text-whatsapp-foreground";
+      default:
+        return "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover";
+    }
+  };
+  
   return (
     <Button
       asChild={asChild}
@@ -25,8 +37,9 @@ export const WhatsAppButton = ({
       size={size ?? "icon"}
       variant={variant}
       className={cn(
-        "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover transition-all duration-200",
-        isIconOnly ? "p-2" : "px-4 py-2",
+        getVariantClasses(),
+        "transition-all duration-200",
+        isIconOnly && size === "icon" ? "p-2" : "",
         className,
       )}
     >
@@ -34,7 +47,7 @@ export const WhatsAppButton = ({
         <MessageCircle className="h-4 w-4" />
       ) : (
         <>
-          <MessageCircle className="h-4 w-4 mr-2" />
+          <MessageCircle className="h-4 w-4 mr-2 flex-shrink-0" />
           {children}
         </>
       )}

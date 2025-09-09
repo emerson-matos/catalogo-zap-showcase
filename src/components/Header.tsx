@@ -32,18 +32,21 @@ const Header = () => {
           {/* Navigation Desktop */}
           <nav className="hidden md:flex items-center space-x-8">
             <Button
+              variant="ghost"
               onClick={() => scrollToSection("hero")}
               className="hover:text-primary transition-colors"
             >
               Início
             </Button>
             <Button
+              variant="ghost"
               onClick={() => scrollToSection("produtos")}
               className="hover:text-primary transition-colors"
             >
               Produtos
             </Button>
             <Button
+              variant="ghost"
               onClick={() => scrollToSection("contato")}
               className="hover:text-primary transition-colors"
             >
@@ -53,7 +56,13 @@ const Header = () => {
 
           {/* Actions Desktop */}
           <div className="hidden md:flex items-center gap-2">
-            <WhatsAppButton>WhatsApp</WhatsAppButton>
+            <WhatsAppButton 
+              variant="ghost" 
+              size="sm"
+              className="hover:text-primary transition-colors bg-transparent hover:bg-whatsapp/10"
+            >
+              WhatsApp
+            </WhatsAppButton>
             <ModeToggle />
           </div>
 
@@ -75,31 +84,32 @@ const Header = () => {
           <div className="md:hidden border-t border-border/40 py-4">
             <nav className="flex flex-col space-y-4">
               <Button
+                variant="ghost"
                 onClick={() => scrollToSection("hero")}
-                className="text-left hover:text-primary transition-colors"
+                className="text-left hover:text-primary transition-colors justify-start"
               >
                 Início
               </Button>
               <Button
+                variant="ghost"
                 onClick={() => scrollToSection("produtos")}
-                className="text-left hover:text-primary transition-colors"
+                className="text-left hover:text-primary transition-colors justify-start"
               >
                 Produtos
               </Button>
               <Button
+                variant="ghost"
                 onClick={() => scrollToSection("contato")}
-                className="text-left hover:text-primary transition-colors"
+                className="text-left hover:text-primary transition-colors justify-start"
               >
                 Contato
               </Button>
-              <Button
+              <WhatsAppButton
                 variant="ghost"
-                className="w-fit"
-                onClick={() => window.open(whatsappUrl, "_blank")}
+                className="w-fit justify-start hover:text-primary transition-colors bg-transparent hover:bg-whatsapp/10"
               >
-                <MessageCircle className="w-4 h-4" />
                 WhatsApp
-              </Button>
+              </WhatsAppButton>
               <ModeToggle />
             </nav>
           </div>
