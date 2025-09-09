@@ -15,6 +15,9 @@ export const WhatsAppButton = ({
   const whatsappUrl = product
     ? createProductWhatsAppUrl(product.name)
     : createWhatsAppUrl();
+  
+  const isIconOnly = !children || size === "icon";
+  
   return (
     <Button
       asChild={asChild}
@@ -22,12 +25,19 @@ export const WhatsAppButton = ({
       size={size ?? "icon"}
       variant={variant}
       className={cn(
-        "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover transition-colors",
+        "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover transition-all duration-200",
+        isIconOnly ? "p-2" : "px-4 py-2",
         className,
       )}
     >
-      <MessageCircle className="min-h-4 min-w-4" />
-      {children}
+      {isIconOnly ? (
+        <MessageCircle className="h-4 w-4" />
+      ) : (
+        <>
+          <MessageCircle className="h-4 w-4 mr-2" />
+          {children}
+        </>
+      )}
     </Button>
   );
 };
