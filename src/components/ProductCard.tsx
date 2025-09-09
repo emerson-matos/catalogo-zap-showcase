@@ -3,15 +3,12 @@ import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { Star } from "lucide-react";
 import type { Product } from "@/types/product";
-import { createWhatsAppUrl } from "@/constants/whatsapp";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const whatsappUrl = createWhatsAppUrl(product.name);
-
   return (
     <Card className="group h-full bg-gradient-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 border-0">
       <CardContent className="p-0">
@@ -54,9 +51,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="p-6 pt-0">
-        <WhatsAppButton >
-          Consultar Produto
-        </WhatsAppButton>
+        <WhatsAppButton product={product}>Consultar Produto</WhatsAppButton>
       </CardFooter>
     </Card>
   );

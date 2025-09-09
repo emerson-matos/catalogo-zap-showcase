@@ -1,6 +1,5 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 
-
 // Import the generated route tree
 import { Skeleton } from "@/components/ui/skeleton";
 import { Page404 } from "@/pages/404";
@@ -42,6 +41,4 @@ declare module "@tanstack/react-router" {
     router: typeof router;
   }
 }
-export const App = () => (
- <RouterProvider router={router} />
-);
+export const App = () => <RouterProvider router={router} />;

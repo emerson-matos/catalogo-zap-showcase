@@ -1,9 +1,10 @@
 import { Package, MessageCircle, Phone, Mail } from "lucide-react";
 import { Button } from "./ui/button";
+import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 const Footer = () => {
-  const whatsappNumber = "5511999999999"; // Substitua pelo número real
-  const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+  const whatsappNumber = getWhatsAppNumber();
+  const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me";
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -76,7 +77,7 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   className="hover:text-primary-foreground transition-colors"
                 >
-                  (11) 99999-9999
+                  {whatsappNumber ? `+${whatsappNumber}` : "WhatsApp"}
                 </a>
               </div>
               <div className="flex items-center space-x-2">
