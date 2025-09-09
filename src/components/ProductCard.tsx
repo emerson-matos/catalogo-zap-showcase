@@ -2,6 +2,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { Star } from "lucide-react";
+import { formatPriceBRL } from "@/lib/utils";
 import type { Product } from "@/types/product";
 
 interface ProductCardProps {
@@ -18,14 +19,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
             alt={product.name}
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
           />
-          {product.isNew && (
-            <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground">
-              Novo
-            </Badge>
-          )}
-          <Badge variant="secondary" className="absolute top-3 right-3">
-            {product.category}
-          </Badge>
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 to-transparent z-0" />
+          <div className="absolute top-3 left-3 right-3 z-10 flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2">
+              {product.isNew && (
+                <Badge className="bg-accent text-accent-foreground">Novo</Badge>
+              )}
+            </div>
+            <Badge variant="secondary">{product.category}</Badge>
+          </div>
         </div>
 
         <div className="p-6">
@@ -38,7 +40,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
           <div className="flex items-center justify-between mb-4">
             <span className="text-2xl font-bold text-primary">
-              {product.price}
+              {formatPriceBRL(product.price)}
             </span>
             {product.rating && (
               <div className="flex items-center gap-1">
@@ -51,7 +53,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="p-6 pt-0">
-        <WhatsAppButton product={product}>Consultar Produto</WhatsAppButton>
+        <WhatsAppButton product={product} size="default" className="w-full justify-center">Consultar Produto</WhatsAppButton>
       </CardFooter>
     </Card>
   );
