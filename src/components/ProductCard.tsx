@@ -41,7 +41,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </p>
 
           <div className="flex items-center justify-between mb-4">
-            <span className="text-2xl font-bold text-primary bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold text-primary bg-gradient-to-r from-primary to-primary/80 bg-clip-text">
               {formatPriceBRL(product.price)}
             </span>
             {product.rating && (
