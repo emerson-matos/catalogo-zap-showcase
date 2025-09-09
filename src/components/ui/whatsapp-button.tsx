@@ -16,7 +16,7 @@ export const WhatsAppButton = ({
     ? createProductWhatsAppUrl(product.name)
     : createWhatsAppUrl();
   
-  const isIconOnly = !children || size === "icon";
+  const isIconOnly = size === "icon" && !children;
   
   // Define base colors based on variant
   const getVariantClasses = () => {
@@ -34,12 +34,12 @@ export const WhatsAppButton = ({
     <Button
       asChild={asChild}
       onClick={() => window.open(whatsappUrl, "_blank")}
-      size={size ?? "icon"}
+      size={size ?? "default"}
       variant={variant}
       className={cn(
         getVariantClasses(),
         "transition-all duration-200",
-        isIconOnly && size === "icon" ? "p-2" : "",
+        isIconOnly ? "p-2" : "",
         className,
       )}
     >
