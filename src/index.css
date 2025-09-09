@@ -1,185 +1,38 @@
 @import "tailwindcss";
-/* ---break---
-*/
+
+
 @plugin "tailwindcss-animate";
-/* ---break---
-*/
+
+
 @custom-variant dark (&:is(.dark *));
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 214 84% 35%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 214 84% 45%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 45 93% 58%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --whatsapp: 142 76% 36%;
-    --whatsapp-foreground: 0 0% 100%;
-    --whatsapp-hover: 142 76% 31%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 214 84% 35%;
-
-    /* Charts */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 27%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-glow))
-    );
-    --gradient-hero: linear-gradient(
-      135deg,
-      hsl(214 84% 35%) 0%,
-      hsl(214 84% 45%) 100%
-    );
-    --gradient-card: linear-gradient(
-      145deg,
-      hsl(0 0% 100%) 0%,
-      hsl(210 40% 98%) 100%
-    );
-
-    --shadow-card:
-      0 4px 6px -1px hsl(214 84% 35% / 0.1),
-      0 2px 4px -1px hsl(214 84% 35% / 0.06);
-    --shadow-card-hover:
-      0 10px 15px -3px hsl(214 84% 35% / 0.1),
-      0 4px 6px -2px hsl(214 84% 35% / 0.05);
-    --shadow-button: 0 4px 14px 0 hsl(var(--primary) / 0.25);
-
-    --radius: 0.75rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  h1 {
+    @apply text-4xl font-bold md:text-5xl;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+  h2 {
+    @apply text-3xl font-bold md:text-4xl;
+  }
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+  h3 {
+    @apply text-2xl font-bold md:text-3xl;
+  }
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+  h4 {
+    @apply text-xl font-bold;
+  }
 
-    --primary: 214 84% 45%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 214 84% 55%;
+  h5 {
+    @apply text-lg font-bold;
+  }
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 45 93% 68%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --whatsapp: 142 76% 41%;
-    --whatsapp-foreground: 0 0% 100%;
-    --whatsapp-hover: 142 76% 36%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 214 84% 45%;
-
-    /* Charts */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-glow))
-    );
-    --gradient-hero: linear-gradient(
-      135deg,
-      hsl(214 84% 45%) 0%,
-      hsl(214 84% 55%) 100%
-    );
-    --gradient-card: linear-gradient(
-      145deg,
-      hsl(217.2 32.6% 17.5%) 0%,
-      hsl(217.2 32.6% 19.5%) 100%
-    );
-
-    --shadow-card:
-      0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -1px hsl(0 0% 0% / 0.2);
-    --shadow-card-hover:
-      0 10px 15px -3px hsl(0 0% 0% / 0.3), 0 4px 6px -2px hsl(0 0% 0% / 0.2);
-    --shadow-button: 0 4px 14px 0 hsl(var(--primary) / 0.35);
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  .wrapper {
+    @apply mx-auto p-6 sm:p-8;
+    max-width: 48rem;
   }
 }
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* ---break---
-*/
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -204,6 +57,10 @@ All colors MUST be HSL.
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  /* Custom Brand Colors for Tailwind utilities */
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--whatsapp-foreground);
+  --color-whatsapp-hover: var(--whatsapp-hover);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -217,19 +74,159 @@ All colors MUST be HSL.
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* Custom brand colors */
-  --color-whatsapp: var(--whatsapp);
-  --color-whatsapp-foreground: var(--whatsapp-foreground);
-  --color-whatsapp-hover: var(--whatsapp-hover);
+  /* Category color tokens for Tailwind utilities */
+  --color-category-aluguel: var(--category-aluguel);
+  --color-category-compras: var(--category-compras);
+  --color-category-contas: var(--category-contas);
+  --color-category-desconhecido: var(--category-desconhecido);
+  --color-category-despesas-medicas: var(--category-despesas-medicas);
+  --color-category-entretenimento: var(--category-entretenimento);
+  --color-category-inicial: var(--category-inicial);
+  --color-category-parcelamento-de-emprestimo: var(
+    --category-parcelamento-de-emprestimo
+  );
+  --color-category-presente: var(--category-presente);
+  --color-category-reembolso: var(--category-reembolso);
+  --color-category-rendimentos-de-investimentos: var(
+    --category-rendimentos-de-investimentos
+  );
+  --color-category-rendimentos-de-juros: var(--category-rendimentos-de-juros);
+  --color-category-restaurantes: var(--category-restaurantes);
+  --color-category-salario: var(--category-salario);
+  --color-category-seguro: var(--category-seguro);
+  --color-category-supermercado: var(--category-supermercado);
+  --color-category-transporte: var(--category-transporte);
 }
 
-/* ---break---
-*/
+/* Design System - Tailwind v4 Compatible */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 214 84% 35%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 45 93% 58%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 214 84% 35%;
+  
+  /* Custom Brand Colors */
+  --whatsapp: 142 76% 36%;
+  --whatsapp-foreground: 0 0% 100%;
+  --whatsapp-hover: 142 76% 45%;
+  
+  /* Chart Colors */
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  
+  /* Sidebar Colors */
+  --sidebar: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+  
+  /* Border Radius */
+  --radius: 0.5rem;
+}
 
-@layer utilities {
-  .bg-gradient-primary { background-image: var(--gradient-primary); }
-  .bg-gradient-hero { background-image: var(--gradient-hero); }
-  .bg-gradient-card { background-image: var(--gradient-card); }
-  .shadow-card { box-shadow: var(--shadow-card); }
-  .shadow-card-hover { box-shadow: var(--shadow-card-hover); }
+/* Dark Mode Colors */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 214 84% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 45 93% 68%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 214 84% 45%;
+  
+  /* Custom Brand Colors - Dark */
+  --whatsapp: 142 76% 41%;
+  --whatsapp-foreground: 0 0% 100%;
+  --whatsapp-hover: 142 76% 50%;
+  
+  /* Chart Colors - Dark */
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+  
+  /* Sidebar Colors - Dark */
+  --sidebar: 240 5.9% 10%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-primary: 224.3 76.3% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+}
+
+/* Base Styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom utility classes for gradients and shadows */
+.gradient-primary {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+}
+
+.gradient-hero {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.9));
+}
+
+.gradient-card {
+  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.95));
+}
+
+.shadow-card {
+  box-shadow: 
+    0 4px 6px -1px hsl(var(--primary) / 0.1),
+    0 2px 4px -1px hsl(var(--primary) / 0.06);
+}
+
+.shadow-card-hover {
+  box-shadow: 
+    0 10px 15px -3px hsl(var(--primary) / 0.1),
+    0 4px 6px -2px hsl(var(--primary) / 0.05);
+}
+
+.shadow-button {
+  box-shadow: 0 4px 14px 0 hsl(var(--primary) / 0.25);
 }

@@ -1,16 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageCircle, Phone, Mail, MapPin, Clock } from "lucide-react";
-import { createWhatsAppUrl } from "@/lib/whatsapp";
+import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { WhatsAppButton } from "./ui/whatsapp-button";
 
-const Contact = () => {
-  const whatsappUrl = createWhatsAppUrl({
-    message:
-      "Olá! Gostaria de entrar em contato para saber mais sobre seus produtos.",
-  });
+const Contact = ({ sectionId }: { sectionId: string }) => {
 
   return (
-    <section id="contato" className="py-20 bg-muted/30">
+    <section id={sectionId} className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Entre em Contato</h2>
@@ -34,10 +30,9 @@ const Contact = () => {
                     <p className="text-muted-foreground mb-4">
                       Atendimento rápido e personalizado via WhatsApp
                     </p>
-                    <Button onClick={() => window.open(whatsappUrl, "_blank")}>
-                      <MessageCircle className="w-4 h-4" />
+                    <WhatsAppButton>
                       Iniciar Conversa
-                    </Button>
+                    </WhatsAppButton>
                   </div>
                 </div>
               </CardContent>
@@ -120,14 +115,9 @@ const Contact = () => {
                 <p className="mb-6 opacity-90">
                   Clique no botão abaixo e fale conosco agora mesmo!
                 </p>
-                <Button
-                  size="lg"
-                  onClick={() => window.open(whatsappUrl, "_blank")}
-                  className="bg-whatsapp hover:bg-whatsapp-hover"
-                >
-                  <MessageCircle className="w-5 h-5" />
+                <WhatsAppButton>
                   Falar no WhatsApp
-                </Button>
+                </WhatsAppButton>
               </CardContent>
             </Card>
           </div>
@@ -138,4 +128,3 @@ const Contact = () => {
 };
 
 export default Contact;
-

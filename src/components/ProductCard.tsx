@@ -1,19 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Star } from "lucide-react";
-import { createProductWhatsAppUrl } from "@/lib/whatsapp";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  image: string;
-  category: string;
-  rating?: number;
-  isNew?: boolean;
-}
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
+import { Star } from "lucide-react";
+import type { Product } from "@/types/product";
+import { createWhatsAppUrl } from "@/constants/whatsapp";
 
 interface ProductCardProps {
   product: Product;
@@ -64,14 +54,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="p-6 pt-0">
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={() => window.open(whatsappUrl, "_blank")}
-        >
-          <MessageCircle className="size-4" />
+        <WhatsAppButton >
           Consultar Produto
-        </Button>
+        </WhatsAppButton>
       </CardFooter>
     </Card>
   );

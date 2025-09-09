@@ -1,15 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
 import heroImage from "@/assets/hero-catalog.jpg";
-import { createWhatsAppUrl } from "@/lib/whatsapp";
+import { Button } from "@/components/ui/button";
+import { WhatsAppButton } from "./ui/whatsapp-button";
 
-const Hero = () => {
-  const whatsappUrl = createWhatsAppUrl({
-    message: "Olá! Gostaria de conhecer seus produtos. Poderia me ajudar?",
-  });
-
+const Hero = ({ sectionId }: { sectionId: string }) => {
   return (
-    <section className="relative bg-gradient-hero overflow-hidden">
+    <section
+      id={sectionId}
+      className="relative bg-gradient-hero overflow-hidden"
+    >
       <div className="absolute inset-0 bg-secondary-foreground/20"></div>
       <div className="relative container mx-auto px-4 py-20 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -25,14 +23,7 @@ const Hero = () => {
               especialmente para você.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button
-                size="lg"
-                onClick={() => window.open(whatsappUrl, "_blank")}
-                className="text-lg px-8 py-4 h-auto"
-              >
-                <MessageCircle className="w-5 h-5" />
-                Fale Conosco
-              </Button>
+              <WhatsAppButton>Fale Conosco</WhatsAppButton>
               <Button
                 variant="outline"
                 size="lg"
@@ -61,4 +52,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
