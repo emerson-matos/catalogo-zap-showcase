@@ -2,8 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { WhatsAppButton } from "./ui/whatsapp-button";
+import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 const Contact = ({ sectionId }: { sectionId: string }) => {
+  const whatsappNumber = getWhatsAppNumber();
+  const displayPhone = whatsappNumber ? `+${whatsappNumber}` : "(11) 99999-9999";
 
   return (
     <section id={sectionId} className="py-20 bg-muted/30">
@@ -46,7 +49,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Telefone</h3>
-                    <p className="text-muted-foreground">(11) 99999-9999</p>
+                    <p className="text-muted-foreground">{displayPhone}</p>
                   </div>
                 </div>
               </CardContent>
@@ -60,9 +63,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">E-mail</h3>
-                    <p className="text-muted-foreground">
-                      contato@catalogoplus.com
-                    </p>
+                    <p className="text-muted-foreground">contato@dungastore.com</p>
                   </div>
                 </div>
               </CardContent>
