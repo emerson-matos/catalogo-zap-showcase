@@ -1,24 +1,32 @@
 import { MessageCircle } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Product } from "@/types/product";
+import { createProductWhatsAppUrl, createWhatsAppUrl } from "@/lib/whatsapp";
 
-const whatsappMessage =
-  "Olá! Gostaria de entrar em contato para saber mais sobre seus produtos.";
-const whatsappNumber = "5511999999999"; // Substitua pelo número real
-const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-  whatsappMessage
-)}`;
-export const WhatsAppButton = ({ children, className, size }: ButtonProps) => {
+export const WhatsAppButton = ({
+  children,
+  className,
+  asChild,
+  size,
+  variant,
+  product,
+}: ButtonProps & { product?: Product }) => {
+  const whatsappUrl = product
+    ? createProductWhatsAppUrl(product.name)
+    : createWhatsAppUrl();
   return (
     <Button
+      asChild={asChild}
       onClick={() => window.open(whatsappUrl, "_blank")}
-      size={size}
+      size={size ?? "icon"}
+      variant={variant}
       className={cn(
-        "h-full w-full min-h-6 min-w-6 bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover transition-colors",
-        className
+        "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover transition-colors",
+        className,
       )}
     >
-      <MessageCircle className="size-4" />
+      <MessageCircle className="min-h-4 min-w-4" />
       {children}
     </Button>
   );

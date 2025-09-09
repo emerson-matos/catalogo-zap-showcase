@@ -23,7 +23,9 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
               especialmente para você.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <WhatsAppButton>Fale Conosco</WhatsAppButton>
+              <WhatsAppButton variant="outline" size="lg">
+                Fale Conosco
+              </WhatsAppButton>
               <Button
                 variant="outline"
                 size="lg"

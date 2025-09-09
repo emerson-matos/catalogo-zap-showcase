@@ -3,11 +3,14 @@ import { MessageCircle, Menu, X, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createWhatsAppUrl } from "@/lib/whatsapp";
 import { ModeToggle } from "@/components/mode-toggle";
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const whatsappUrl = createWhatsAppUrl({ message: "Olá! Gostaria de conhecer mais sobre seus produtos." });
+  const whatsappUrl = createWhatsAppUrl({
+    message: "Olá! Gostaria de conhecer mais sobre seus produtos.",
+  });
 
   const scrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
@@ -50,13 +53,7 @@ const Header = () => {
 
           {/* Actions Desktop */}
           <div className="hidden md:flex items-center gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => window.open(whatsappUrl, "_blank")}
-            >
-              <MessageCircle className="size-4" />
-              WhatsApp
-            </Button>
+            <WhatsAppButton>WhatsApp</WhatsAppButton>
             <ModeToggle />
           </div>
 
