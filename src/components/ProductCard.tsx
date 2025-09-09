@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { Star } from "lucide-react";
 import type { Product } from "@/types/product";
+import { formatCurrencyBRL } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -18,12 +19,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
             alt={product.name}
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
           />
+          {/* Top gradient overlay to ensure badge readability */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 to-transparent" />
           {product.isNew && (
-            <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground">
+            <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground shadow-md">
               Novo
             </Badge>
           )}
-          <Badge variant="secondary" className="absolute top-3 right-3">
+          <Badge variant="secondary" className="absolute top-3 right-3 shadow-md">
             {product.category}
           </Badge>
         </div>
@@ -38,7 +41,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
           <div className="flex items-center justify-between mb-4">
             <span className="text-2xl font-bold text-primary">
-              {product.price}
+              {formatCurrencyBRL(product.price)}
             </span>
             {product.rating && (
               <div className="flex items-center gap-1">
@@ -51,7 +54,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="p-6 pt-0">
-        <WhatsAppButton product={product}>Consultar Produto</WhatsAppButton>
+        <WhatsAppButton size="lg" className="w-full flex" product={product}>
+          Consultar Produto
+        </WhatsAppButton>
       </CardFooter>
     </Card>
   );
