@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import { useProducts } from "@/hooks/useProducts";
 
 const ProductGrid = ({ sectionId }: { sectionId: string }) => {
-  const { products, categories, selectedCategory, setSelectedCategory, totalProducts } = useProducts();
+  const {
+    products,
+    categories,
+    selectedCategory,
+    setSelectedCategory,
+    totalProducts,
+  } = useProducts();
 
   return (
     <section id={sectionId} className="py-20 bg-background">
@@ -19,12 +25,12 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         <div className="flex flex-wrap justify-center gap-3 mb-12">
           {categories.map((category) => (
             <Button
-              key={category.id}
-              variant={selectedCategory === category.id ? "default" : "outline"}
-              onClick={() => setSelectedCategory(category.id)}
+              key={category}
+              variant={selectedCategory === category ? "default" : "outline"}
+              onClick={() => setSelectedCategory(category)}
               className="transition-all duration-300"
             >
-              {category.label}
+              {category}
             </Button>
           ))}
         </div>
@@ -39,7 +45,9 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         {/* Statistics */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="p-6">
-            <div className="text-4xl font-bold text-primary mb-2">{totalProducts}+</div>
+            <div className="text-4xl font-bold text-primary mb-2">
+              {totalProducts}+
+            </div>
             <div className="text-muted-foreground">Produtos Disponíveis</div>
           </div>
           <div className="p-6">

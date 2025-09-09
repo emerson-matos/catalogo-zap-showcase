@@ -1,18 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
-import { PRODUCTS } from '@/data/products';
-import { PRODUCT_CATEGORIES } from '@/types/product';
-import { fetchProductsFromGoogleSheet } from '@/lib/googleSheets';
+import { useEffect, useMemo, useState } from "react";
+import { fetchProductsFromGoogleSheet } from "@/lib/googleSheets";
+import { Product } from "@/types/product";
 
 export const useProducts = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [remoteProducts, setRemoteProducts] = useState<typeof PRODUCTS | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("todos");
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState(["todos"]);
 
   useEffect(() => {
     let isMounted = true;
     fetchProductsFromGoogleSheet().then((list) => {
       if (!isMounted) return;
       if (Array.isArray(list) && list.length > 0) {
-        setRemoteProducts(list as typeof PRODUCTS);
+        setAllProducts(list as Product[]);
+        setCategories(Array.from(new Set(list.map((i) => i.category))));
       }
     });
     return () => {
@@ -20,21 +21,15 @@ export const useProducts = () => {
     };
   }, []);
 
-  const allProducts = remoteProducts ?? PRODUCTS;
-
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === 'all') {
+    if (selectedCategory === "todos") {
       return allProducts;
     }
 
-    const categoryName = PRODUCT_CATEGORIES.find(
-      (cat) => cat.id === selectedCategory
-    )?.name;
+    const categoryName = categories.find((it) => it === selectedCategory);
 
     return allProducts.filter((product) => product.category === categoryName);
-  }, [selectedCategory, allProducts]);
-
-  const categories = PRODUCT_CATEGORIES;
+  }, [selectedCategory, allProducts, categories]);
 
   return {
     products: filteredProducts,
