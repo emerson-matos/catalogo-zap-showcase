@@ -6,27 +6,47 @@ export const useProducts = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("todos");
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState(["todos"]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
-    fetchProductsFromGoogleSheet().then((list) => {
-      if (!isMounted) return;
-      if (Array.isArray(list) && list.length > 0) {
-        setAllProducts(list as Product[]);
-        const uniqueCategories = Array.from(
-          new Set(
-            list
-              .map((item) => String(item.category || '').trim())
-              .filter((name) => name.length > 0)
-          )
-        );
-        const withoutTodos = uniqueCategories.filter(
-          (name) => name.toLowerCase() !== "todos"
-        );
-        withoutTodos.sort((a, b) => a.localeCompare(b));
-        setCategories(["todos", ...withoutTodos]);
+    
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const list = await fetchProductsFromGoogleSheet();
+        
+        if (!isMounted) return;
+        
+        if (Array.isArray(list) && list.length > 0) {
+          setAllProducts(list as Product[]);
+          const uniqueCategories = Array.from(
+            new Set(
+              list
+                .map((item) => String(item.category || '').trim())
+                .filter((name) => name.length > 0)
+            )
+          );
+          const withoutTodos = uniqueCategories.filter(
+            (name) => name.toLowerCase() !== "todos"
+          );
+          withoutTodos.sort((a, b) => a.localeCompare(b));
+          setCategories(["todos", ...withoutTodos]);
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        setError(err instanceof Error ? err.message : 'Failed to load products');
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    });
+    };
+
+    loadProducts();
+    
     return () => {
       isMounted = false;
     };
@@ -48,5 +68,7 @@ export const useProducts = () => {
     selectedCategory,
     setSelectedCategory,
     totalProducts: allProducts.length,
+    loading,
+    error,
   };
 };
