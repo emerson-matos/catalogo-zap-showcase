@@ -1,4 +1,5 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -6,16 +7,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { createQueryClient } from "@/lib/queryClient";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-    },
-  },
-});
+const queryClient = createQueryClient();
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -28,6 +22,9 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           </TooltipProvider>
           <Analytics />
           <SpeedInsights />
+          {process.env.NODE_ENV === 'development' && (
+            <ReactQueryDevtools initialIsOpen={false} />
+          )}
           <TanStackRouterDevtools />
         </QueryClientProvider>
       </ThemeProvider>
