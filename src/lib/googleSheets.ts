@@ -85,10 +85,18 @@ export async function fetchProductsFromGoogleSheet(
         continue;
       }
 
+      // Sanitize and validate inputs
+      const sanitizedName = name.replace(/<[^>]*>/g, '').trim();
+      const sanitizedDescription = description.replace(/<[^>]*>/g, '').trim();
+      
+      if (!sanitizedName) {
+        continue; // Skip if name becomes empty after sanitization
+      }
+
       const product: Product = {
         id: id || String(Date.now()) + Math.random().toString(36).slice(2),
-        name,
-        description,
+        name: sanitizedName,
+        description: sanitizedDescription,
         price,
         image,
         category,
