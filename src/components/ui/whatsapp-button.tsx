@@ -33,7 +33,7 @@ export const WhatsAppButton = ({
   return (
     <Button
       asChild={asChild}
-      onClick={() => window.open(whatsappUrl, "_blank")}
+      onClick={() => window.open(whatsappUrl, "_blank", "noopener,noreferrer")}
       size={size ?? "default"}
       variant={variant}
       className={cn(

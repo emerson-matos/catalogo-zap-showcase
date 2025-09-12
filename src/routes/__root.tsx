@@ -6,7 +6,7 @@ import { Providers } from "@/components/Providers";
 
 const title = "Dunga Store";
 const description = "Dunga Store";
-const url = window.location.origin;
+const url = typeof window !== "undefined" ? window.location.origin : "";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -88,14 +88,7 @@ export const Route = createRootRoute({
         rel: "icon",
         href: "/favicon.ico",
       },
-      {
-        rel: "apple-touch-icon",
-        href: "/apple-touch-icon-180x180.png",
-      },
-      {
-        rel: "manifest",
-        href: "/manifest.webmanifest",
-      },
+      // Removed links to missing PWA assets to avoid 404s. Re-add when assets are present.
     ],
   }),
   component: () => (

@@ -18,7 +18,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
         </TooltipProvider>
         <Analytics />
         <SpeedInsights />
-        <TanStackRouterDevtools />
+        {import.meta.env.DEV ? <TanStackRouterDevtools /> : null}
       </QueryClientProvider>
     </ThemeProvider>
   );

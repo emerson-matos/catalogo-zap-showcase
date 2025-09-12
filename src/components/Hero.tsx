@@ -48,6 +48,9 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
             <img
               src={heroImage}
               alt="Catálogo Digital Moderno"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
               className="w-full h-auto rounded-2xl shadow-2xl"
             />
           </div>
