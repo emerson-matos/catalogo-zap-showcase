@@ -22,9 +22,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           </TooltipProvider>
           <Analytics />
           <SpeedInsights />
-          {process.env.NODE_ENV === 'development' && (
-            <ReactQueryDevtools initialIsOpen={false} />
-          )}
+          <ReactQueryDevtools initialIsOpen={false} />
           <TanStackRouterDevtools />
         </QueryClientProvider>
       </ThemeProvider>
