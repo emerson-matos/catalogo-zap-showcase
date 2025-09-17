@@ -48,7 +48,11 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Telefone</h3>
-                    <p className="text-muted-foreground">{whatsappNumber ? `+${whatsappNumber.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+$1 ($2) $3-$4')}` : '(11) 99999-9999'}</p>
+                    <p className="text-muted-foreground">
+                      {whatsappNumber
+                        ? `+${whatsappNumber.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, "+$1 ($2) $3-$4")}`
+                        : "(11) 99999-9999"}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -63,7 +67,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">E-mail</h3>
                     <p className="text-muted-foreground">
-                      contato@dungastore.com
+                      sandrofar@hotmail.com
                     </p>
                   </div>
                 </div>
