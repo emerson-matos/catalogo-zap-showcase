@@ -1,4 +1,4 @@
-import type { Product } from '@/types/product';
+import type { Product } from "@/types/product";
 
 type GvizColumn = { label?: string };
 type GvizCell = { v?: unknown; f?: string };
@@ -21,43 +21,63 @@ interface GoogleSheetsOptions {
  * Accepts Portuguese alternatives: nome, descricao, preco, imagem, categoria, novo
  */
 export async function fetchProductsFromGoogleSheet(
-  options: GoogleSheetsOptions = {}
+  options: GoogleSheetsOptions = {},
 ): Promise<Product[]> {
-  const spreadsheetId = options.spreadsheetId ?? import.meta.env.VITE_GOOGLE_SHEETS_ID;
+  const spreadsheetId =
+    options.spreadsheetId ?? import.meta.env.VITE_GOOGLE_SHEETS_ID;
   const gid = options.gid ?? import.meta.env.VITE_GOOGLE_SHEETS_GID;
   const sheet = options.sheet ?? import.meta.env.VITE_GOOGLE_SHEETS_SHEET;
-  const csvOverrideUrl = import.meta.env.VITE_GOOGLE_SHEETS_CSV_URL as string | undefined;
+  const csvOverrideUrl = import.meta.env.VITE_GOOGLE_SHEETS_CSV_URL as
+    | string
+    | undefined;
 
   if (!spreadsheetId) {
     return [];
   }
 
-  const params = new URLSearchParams({ tqx: 'out:json' });
+  const params = new URLSearchParams({ tqx: "out:json" });
   if (gid) {
-    params.set('gid', String(gid));
+    params.set("gid", String(gid));
   } else if (sheet) {
-    params.set('sheet', String(sheet));
+    params.set("sheet", String(sheet));
   }
 
   const gvizUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?${params.toString()}`;
 
   try {
-    const response = await fetch(gvizUrl, { cache: 'no-store', redirect: 'follow' });
+    const response = await fetch(gvizUrl, {
+      cache: "no-store",
+      redirect: "follow",
+    });
     if (!response.ok) {
-      return await tryCsvFallback({ spreadsheetId, gid, sheet, csvOverrideUrl });
+      return await tryCsvFallback({
+        spreadsheetId,
+        gid,
+        sheet,
+        csvOverrideUrl,
+      });
     }
     const text = await response.text();
 
     // Strip the JS wrapper around the JSON
-    const jsonStart = text.indexOf('{');
-    const jsonEnd = text.lastIndexOf('}');
+    const jsonStart = text.indexOf("{");
+    const jsonEnd = text.lastIndexOf("}");
     if (jsonStart === -1 || jsonEnd === -1) {
-      return await tryCsvFallback({ spreadsheetId, gid, sheet, csvOverrideUrl });
+      return await tryCsvFallback({
+        spreadsheetId,
+        gid,
+        sheet,
+        csvOverrideUrl,
+      });
     }
-    const json = JSON.parse(text.slice(jsonStart, jsonEnd + 1)) as Partial<GvizResponse>;
+    const json = JSON.parse(
+      text.slice(jsonStart, jsonEnd + 1),
+    ) as Partial<GvizResponse>;
 
     const cols: string[] = (json.table?.cols ?? []).map((c) =>
-      String(c?.label ?? '').trim().toLowerCase()
+      String(c?.label ?? "")
+        .trim()
+        .toLowerCase(),
     );
     const rows: GvizRow[] = json.table?.rows ?? [];
 
@@ -68,17 +88,17 @@ export async function fetchProductsFromGoogleSheet(
         const labels = [label, ...alts].map((l) => l.toLowerCase());
         const idx = cols.findIndex((c) => labels.includes(c));
         const v = idx >= 0 ? cells[idx]?.v : undefined;
-        return v == null ? '' : String(v).trim();
+        return v == null ? "" : String(v).trim();
       };
 
-      const id = read('id');
-      const name = read('name', 'nome');
-      const description = read('description', 'descricao');
-      const price = read('price', 'preco');
-      const image = read('image', 'imagem');
-      const category = read('category', 'categoria');
-      const ratingRaw = read('rating');
-      const isNewRaw = read('isNew', 'is_new', 'novo');
+      const id = read("id");
+      const name = read("name", "nome");
+      const description = read("description", "descricao");
+      const price = read("price", "preco");
+      const image = read("image", "imagem");
+      const category = read("category", "categoria");
+      const ratingRaw = read("rating");
+      const isNewRaw = read("isNew", "is_new", "novo");
 
       if (!name || !price || !image) {
         // Skip incomplete rows
@@ -86,9 +106,9 @@ export async function fetchProductsFromGoogleSheet(
       }
 
       // Sanitize and validate inputs
-      const sanitizedName = name.replace(/<[^>]*>/g, '').trim();
-      const sanitizedDescription = description.replace(/<[^>]*>/g, '').trim();
-      
+      const sanitizedName = name.replace(/<[^>]*>/g, "").trim();
+      const sanitizedDescription = description.replace(/<[^>]*>/g, "").trim();
+
       if (!sanitizedName) {
         continue; // Skip if name becomes empty after sanitization
       }
@@ -108,7 +128,7 @@ export async function fetchProductsFromGoogleSheet(
       }
 
       const isNew = String(isNewRaw).toLowerCase();
-      if (['1', 'true', 'yes', 'sim'].includes(isNew)) {
+      if (["1", "true", "yes", "sim"].includes(isNew)) {
         product.isNew = true;
       }
 
@@ -116,7 +136,12 @@ export async function fetchProductsFromGoogleSheet(
     }
 
     if (products.length === 0) {
-      return await tryCsvFallback({ spreadsheetId, gid, sheet, csvOverrideUrl });
+      return await tryCsvFallback({
+        spreadsheetId,
+        gid,
+        sheet,
+        csvOverrideUrl,
+      });
     }
     return products;
   } catch (_err) {
@@ -138,18 +163,24 @@ async function tryCsvFallback(input: {
   }
   if (gid) {
     // Export endpoint
-    csvUrls.push(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`);
+    csvUrls.push(
+      `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`,
+    );
     // Published-to-web endpoint
-    csvUrls.push(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/pub?gid=${gid}&single=true&output=csv`);
+    csvUrls.push(
+      `https://docs.google.com/spreadsheets/d/${spreadsheetId}/pub?gid=${gid}&single=true&output=csv`,
+    );
   } else if (sheet) {
     // gviz CSV (may require share or publish)
-    const p = new URLSearchParams({ tqx: 'out:csv', sheet: String(sheet) });
-    csvUrls.push(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?${p.toString()}`);
+    const p = new URLSearchParams({ tqx: "out:csv", sheet: String(sheet) });
+    csvUrls.push(
+      `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?${p.toString()}`,
+    );
   }
 
   for (const url of csvUrls) {
     try {
-      const res = await fetch(url, { cache: 'no-store', redirect: 'follow' });
+      const res = await fetch(url, { cache: "no-store", redirect: "follow" });
       if (!res.ok) continue;
       const csv = await res.text();
       const list = parseCsvToProducts(csv);
@@ -164,18 +195,23 @@ async function tryCsvFallback(input: {
 function parseCsvToProducts(csv: string): Product[] {
   const rows = parseCsv(csv);
   if (rows.length === 0) return [];
-  const header = rows[0].map((h) => String(h || '').trim().toLowerCase());
-  const findIndex = (keys: string[]) => header.findIndex((h) => keys.includes(h));
+  const header = rows[0].map((h) =>
+    String(h || "")
+      .trim()
+      .toLowerCase(),
+  );
+  const findIndex = (keys: string[]) =>
+    header.findIndex((h) => keys.includes(h));
 
   const idx = {
-    id: findIndex(['id']),
-    name: findIndex(['name', 'nome']),
-    description: findIndex(['description', 'descricao']),
-    price: findIndex(['price', 'preco']),
-    image: findIndex(['image', 'imagem']),
-    category: findIndex(['category', 'categoria']),
-    rating: findIndex(['rating']),
-    isNew: findIndex(['isnew', 'is_new', 'novo']),
+    id: findIndex(["id"]),
+    name: findIndex(["name", "nome"]),
+    description: findIndex(["description", "descricao"]),
+    price: findIndex(["price", "preco"]),
+    image: findIndex(["image", "imagem"]),
+    category: findIndex(["category", "categoria"]),
+    rating: findIndex(["rating"]),
+    isNew: findIndex(["isnew", "is_new", "novo"]),
   };
 
   const products: Product[] = [];
@@ -187,7 +223,9 @@ function parseCsvToProducts(csv: string): Product[] {
     if (!name || !price || !image) continue;
 
     const p: Product = {
-      id: valueAt(r, idx.id) || String(Date.now()) + Math.random().toString(36).slice(2),
+      id:
+        valueAt(r, idx.id) ||
+        String(Date.now()) + Math.random().toString(36).slice(2),
       name,
       description: valueAt(r, idx.description),
       price,
@@ -197,28 +235,28 @@ function parseCsvToProducts(csv: string): Product[] {
     const rating = Number(valueAt(r, idx.rating));
     if (!Number.isNaN(rating) && rating > 0) p.rating = rating;
     const isNew = String(valueAt(r, idx.isNew)).toLowerCase();
-    if (['1', 'true', 'yes', 'sim'].includes(isNew)) p.isNew = true;
+    if (["1", "true", "yes", "sim"].includes(isNew)) p.isNew = true;
     products.push(p);
   }
   return products;
 }
 
 function valueAt(row: unknown[], index: number): string {
-  if (index < 0) return '';
+  if (index < 0) return "";
   const v = row[index];
-  return v == null ? '' : String(v).trim();
+  return v == null ? "" : String(v).trim();
 }
 
 // Minimal CSV parser supporting quoted fields and commas within quotes
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
-  let field = '';
+  let field = "";
   let inQuotes = false;
 
   const pushField = () => {
     row.push(field);
-    field = '';
+    field = "";
   };
   const pushRow = () => {
     rows.push(row);
@@ -241,12 +279,12 @@ function parseCsv(text: string): string[][] {
     } else {
       if (ch === '"') {
         inQuotes = true;
-      } else if (ch === ',') {
+      } else if (ch === ",") {
         pushField();
-      } else if (ch === '\n') {
+      } else if (ch === "\n") {
         pushField();
         pushRow();
-      } else if (ch === '\r') {
+      } else if (ch === "\r") {
         // ignore
       } else {
         field += ch;
@@ -256,7 +294,7 @@ function parseCsv(text: string): string[][] {
   // last field/row
   pushField();
   pushRow();
-  return rows.filter((r) => r.length > 1 || (r.length === 1 && r[0].trim() !== ''));
+  return rows.filter(
+    (r) => r.length > 1 || (r.length === 1 && r[0].trim() !== ""),
+  );
 }
-
-
