@@ -3,7 +3,9 @@ import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 const Footer = () => {
   const whatsappNumber = getWhatsAppNumber();
-  const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me";
+  const whatsappUrl = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}`
+    : "https://wa.me";
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -13,7 +15,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Package className="w-8 h-8" />
-              <span className="text-xl font-bold">DungaStore</span>
+              <span className="text-xl font-bold">SeRena Cosméticos</span>
             </div>
             <p className="text-primary-foreground/80 leading-relaxed">
               Sua loja digital completa com os melhores produtos e atendimento
@@ -81,7 +83,11 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="size-4" />
-                <span>{whatsappNumber ? `+${whatsappNumber.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+$1 ($2) $3-$4')}` : '(11) 99999-9999'}</span>
+                <span>
+                  {whatsappNumber
+                    ? `+${whatsappNumber.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, "+$1 ($2) $3-$4")}`
+                    : "(11) 99999-9999"}
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="size-4" />
@@ -92,7 +98,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center text-primary-foreground/60">
-          <p>&copy; 2024 DungaStore. Todos os direitos reservados.</p>
+          <p>&copy; 2024 SeRena Cosméticos. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>
@@ -100,4 +106,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
