@@ -1,9 +1,9 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createRootRoute, Outlet, HeadContent } from "@tanstack/react-router";
 import { Providers } from "@/components/Providers";
 
 const title = "SeRena Cosméticos";
 const description = "Distribuidora de comésticos do ABC paulista";
-const url = window.location.origin;
+const url = typeof window !== "undefined" ? window.location.origin : "";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -97,6 +97,7 @@ export const Route = createRootRoute({
   }),
   component: () => (
     <>
+      <HeadContent />
       <Providers>
         <Outlet />
       </Providers>
