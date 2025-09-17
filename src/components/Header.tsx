@@ -1,16 +1,11 @@
 import { useState } from "react";
-import { MessageCircle, Menu, X, Package } from "lucide-react";
+import { Menu, X, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createWhatsAppUrl } from "@/lib/whatsapp";
 import { ModeToggle } from "@/components/mode-toggle";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const whatsappUrl = createWhatsAppUrl({
-    message: "Olá! Gostaria de conhecer mais sobre seus produtos.",
-  });
 
   const scrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
@@ -25,7 +20,7 @@ const Header = () => {
           <div className="flex items-center space-x-2">
             <Package className="size-8 text-primary" />
             <span className="text-xl font-bold bg-gradient-primary bg-clip-text">
-              Dunga Store
+              SeRena Cosméticos
             </span>
           </div>
 
@@ -56,8 +51,8 @@ const Header = () => {
 
           {/* Actions Desktop */}
           <div className="hidden md:flex items-center gap-2">
-            <WhatsAppButton 
-              variant="ghost" 
+            <WhatsAppButton
+              variant="ghost"
               size="sm"
               className="hover:text-primary transition-colors bg-transparent hover:bg-whatsapp/10"
             >

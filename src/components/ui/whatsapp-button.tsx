@@ -15,9 +15,9 @@ export const WhatsAppButton = ({
   const whatsappUrl = product
     ? createProductWhatsAppUrl(product.name)
     : createWhatsAppUrl();
-  
+
   const isIconOnly = !children || size === "icon";
-  
+
   // Define base colors based on variant
   const getVariantClasses = () => {
     switch (variant) {
@@ -29,7 +29,7 @@ export const WhatsAppButton = ({
         return "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover";
     }
   };
-  
+
   return (
     <Button
       asChild={asChild}

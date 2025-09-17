@@ -13,9 +13,9 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-center lg:text-left">
             <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
-              Catálogo Digital
+              <p className="mask-origin-stroke italic">SeRena</p>
               <span className="block font-light text-secondary-foreground">
-                Moderno
+                Produtos de saúde e beleza
               </span>
             </h1>
             <p className="text-xl lg:text-2xl mb-8 leading-relaxed">
@@ -23,8 +23,8 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
               especialmente para você.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <WhatsAppButton 
-                variant="outline" 
+              <WhatsAppButton
+                variant="outline"
                 size="lg"
                 className="text-lg px-8 py-4 h-auto"
               >

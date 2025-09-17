@@ -1,11 +1,8 @@
-import {
-  createRootRoute,
-  Outlet,
-} from "@tanstack/react-router";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { Providers } from "@/components/Providers";
 
-const title = "Dunga Store";
-const description = "Dunga Store";
+const title = "SeRena Cosméticos";
+const description = "Distribuidora de comésticos do ABC paulista";
 const url = window.location.origin;
 
 export const Route = createRootRoute({
