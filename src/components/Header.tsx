@@ -3,6 +3,7 @@ import { Menu, X, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
+import { Link } from "@tanstack/react-router";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,6 +41,14 @@ const Header = () => {
             >
               Produtos
             </Button>
+            <Link to="/flipbook">
+              <Button
+                variant="ghost"
+                className="hover:text-primary transition-colors"
+              >
+                Catálogo
+              </Button>
+            </Link>
             <Button
               variant="ghost"
               onClick={() => scrollToSection("contato")}
@@ -92,6 +101,14 @@ const Header = () => {
               >
                 Produtos
               </Button>
+              <Link to="/flipbook" onClick={() => setIsMenuOpen(false)}>
+                <Button
+                  variant="ghost"
+                  className="text-left hover:text-primary transition-colors justify-start w-full"
+                >
+                  Catálogo
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 onClick={() => scrollToSection("contato")}
