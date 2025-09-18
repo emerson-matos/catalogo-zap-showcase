@@ -266,3 +266,16 @@
 .shadow-button {
   box-shadow: 0 4px 14px 0 hsl(var(--primary) / 0.25);
 }
+
+/* Flipbook Styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.transform-gpu {
+  transform: translateZ(0);
+}
