@@ -266,3 +266,79 @@
 .shadow-button {
   box-shadow: 0 4px 14px 0 hsl(var(--primary) / 0.25);
 }
+
+/* Flipbook Animations */
+@keyframes slide-right {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes flip-page {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(-90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+.animate-slide-right {
+  animation: slide-right 0.5s ease-in-out;
+}
+
+.animate-slide-left {
+  animation: slide-left 0.5s ease-in-out;
+}
+
+.animate-flip-page {
+  animation: flip-page 0.6s ease-in-out;
+}
+
+/* 3D Perspective Effects */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotate-y-5 {
+  transform: rotateY(5deg);
+}
+
+.rotate-y-10 {
+  transform: rotateY(10deg);
+}
+
+/* Page flip effect */
+.page-flip {
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease-in-out;
+}
+
+.page-flip:hover {
+  transform: rotateY(-10deg) scale(1.02);
+}
