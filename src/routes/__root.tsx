@@ -1,5 +1,8 @@
 import { createRootRoute, HeadContent, Outlet } from "@tanstack/react-router";
 import { Providers } from "@/components/Providers";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
 
 const title = "SeRena Cosméticos";
 const description = "Distribuidora de comésticos do ABC paulista";
@@ -99,7 +102,14 @@ export const Route = createRootRoute({
     <>
       <HeadContent />
       <Providers>
-        <Outlet />
+        <div className="min-h-screen">
+          <Header />
+          <main>
+            <Outlet />
+          </main>
+          <Footer />
+          <WhatsAppFloat />
+        </div>
       </Providers>
     </>
   ),
