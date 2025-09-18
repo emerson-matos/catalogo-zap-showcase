@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
-import { formatPriceBRL } from "@/lib/utils";
+import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/types/product";
 
 const Flipbook: React.FC = () => {
@@ -141,69 +139,11 @@ const Flipbook: React.FC = () => {
                 {currentProducts.map((product, index) => (
                   <div
                     key={product.id}
-                    className={`flex flex-col h-full flipbook-product-card ${
+                    className={`flipbook-product-card ${
                       index === 0 ? "md:border-r md:pr-8" : "md:pl-8"
                     }`}
                   >
-                    {/* Imagem do Produto */}
-                    <div className="relative mb-6 group">
-                      <div className="aspect-square overflow-hidden rounded-lg shadow-lg">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = "/placeholder.svg";
-                          }}
-                        />
-                      </div>
-                      
-                      {product.isNew && (
-                        <Badge className="absolute top-4 left-4 bg-gradient-to-r from-accent to-accent/90 text-black dark:text-white font-bold shadow-lg">
-                          Novo
-                        </Badge>
-                      )}
-                      
-                      <Badge
-                        variant="secondary"
-                        className="absolute top-4 right-4 bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 font-semibold shadow-md"
-                      >
-                        {product.category}
-                      </Badge>
-                    </div>
-
-                    {/* Informações do Produto */}
-                    <div className="flex-1 flex flex-col">
-                      <h3 className="text-2xl font-bold mb-3 text-primary">
-                        {product.name}
-                      </h3>
-                      
-                      <p className="text-muted-foreground mb-4 flex-1 leading-relaxed">
-                        {product.description}
-                      </p>
-
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-3xl font-bold text-primary">
-                            {formatPriceBRL(product.price)}
-                          </span>
-                          {product.rating && (
-                            <div className="flex items-center gap-1 bg-accent/10 px-3 py-1 rounded-full">
-                              <span className="text-sm font-medium">⭐ {product.rating}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        <WhatsAppButton
-                          product={product}
-                          className="w-full justify-center gap-2 h-12 text-base font-medium"
-                          size="lg"
-                        >
-                          Consultar Produto
-                        </WhatsAppButton>
-                      </div>
-                    </div>
+                    <ProductCard product={product} />
                   </div>
                 ))}
               </div>
