@@ -18,8 +18,7 @@ const Footer = () => {
               <span className="text-xl font-bold">SeRena Cosméticos</span>
             </div>
             <p className="text-primary-foreground/80 leading-relaxed">
-              Sua loja digital completa com os melhores produtos e atendimento
-              personalizado via WhatsApp.
+              Tudo posso naquele que me fortalesse. Deus é fiel!
             </p>
           </div>
 

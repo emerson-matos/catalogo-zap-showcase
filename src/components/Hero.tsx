@@ -44,12 +44,15 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
               </Button>
             </div>
           </div>
-          <div className="border-4 bg-white-500 w-full aspect-video overflow-clip">
+          <div className=" w-full aspect-video overflow-clip">
             <img
               src={heroImage}
               alt="SeRena Cosméticos Logo"
-              className="w-full h-70 sm:h-150 object-cover object-center"
+              className="border-4 bg-white-500 w-full h-70 sm:h-150 object-cover object-center"
             />
+            <div className="text-lg mt-4 italic flex justify-center text-center">
+              você é seu maior investimento, cuide-se.
+            </div>
           </div>
         </div>
       </div>
