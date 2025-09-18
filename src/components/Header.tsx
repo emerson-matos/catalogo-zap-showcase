@@ -36,6 +36,13 @@ const Header = () => {
             </Button>
             <Button
               variant="ghost"
+              onClick={() => scrollToSection("quem-somos")}
+              className="hover:text-primary transition-colors"
+            >
+              Quem Somos
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => scrollToSection("produtos")}
               className="hover:text-primary transition-colors"
             >
@@ -94,6 +101,13 @@ const Header = () => {
                 className="text-left hover:text-primary transition-colors justify-start"
               >
                 Início
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => scrollToSection("quem-somos")}
+                className="text-left hover:text-primary transition-colors justify-start"
+              >
+                Quem Somos
               </Button>
               <Button
                 variant="ghost"
