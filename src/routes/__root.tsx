@@ -1,4 +1,4 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet } from "@tanstack/react-router";
 import { Providers } from "@/components/Providers";
 
 const title = "SeRena Cosméticos";
@@ -97,6 +97,7 @@ export const Route = createRootRoute({
   }),
   component: () => (
     <>
+      <HeadContent />
       <Providers>
         <Outlet />
       </Providers>
