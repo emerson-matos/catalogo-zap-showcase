@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle, RefreshCw, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
-import FlipbookCard from "./FlipbookCard";
+import ProductCard from "./ProductCard";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import type { Product } from "@/types/product";
 
@@ -28,8 +28,8 @@ const Flipbook = ({ sectionId }: FlipbookProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
 
-  // Calculate pages - each page shows 2 products (left and right)
-  const productsPerPage = 2;
+  // Calculate pages - each page shows 4 products (2x2 grid)
+  const productsPerPage = 4;
   const totalPages = Math.ceil(products.length / productsPerPage);
   const currentProducts = products.slice(
     currentPage * productsPerPage,
@@ -132,11 +132,11 @@ const Flipbook = ({ sectionId }: FlipbookProps) => {
         </div>
 
         {/* Flipbook Container */}
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {isLoading ? (
             <div className="flex justify-center">
               <div className="space-y-4">
-                <Skeleton className="h-[600px] w-[800px] rounded-lg" />
+                <Skeleton className="h-[600px] w-[1000px] rounded-lg" />
               </div>
             </div>
           ) : (
@@ -150,28 +150,40 @@ const Flipbook = ({ sectionId }: FlipbookProps) => {
                 ${isFlipping ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}
               `}>
                 {/* Left page */}
-                {currentProducts[0] && (
-                  <div className="flex-1 max-w-md">
-                    <FlipbookCard
-                      product={currentProducts[0]}
-                      isLeftPage={true}
-                      pageNumber={currentPage * 2 + 1}
-                      totalPages={totalPages * 2}
-                    />
+                <div className="flex-1 max-w-lg">
+                  <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-2xl border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 h-[600px] overflow-hidden">
+                    <div className="text-center mb-4">
+                      <span className="text-sm text-muted-foreground font-medium">
+                        Página {currentPage * 2 + 1} / {totalPages * 2}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 h-full">
+                      {currentProducts.slice(0, 2).map((product) => (
+                        <div key={product.id} className="flex-1">
+                          <ProductCard product={product} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                )}
+                </div>
 
                 {/* Right page */}
-                {currentProducts[1] && (
-                  <div className="flex-1 max-w-md">
-                    <FlipbookCard
-                      product={currentProducts[1]}
-                      isRightPage={true}
-                      pageNumber={currentPage * 2 + 2}
-                      totalPages={totalPages * 2}
-                    />
+                <div className="flex-1 max-w-lg">
+                  <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-2xl border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 h-[600px] overflow-hidden">
+                    <div className="text-center mb-4">
+                      <span className="text-sm text-muted-foreground font-medium">
+                        Página {currentPage * 2 + 2} / {totalPages * 2}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 h-full">
+                      {currentProducts.slice(2, 4).map((product) => (
+                        <div key={product.id} className="flex-1">
+                          <ProductCard product={product} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Navigation Controls */}
