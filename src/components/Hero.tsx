@@ -48,7 +48,7 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
             <img
               src={heroImage}
               alt="SeRena Cosméticos Logo"
-              className="w-full h-150 sm:h-70 object-cover object-center"
+              className="w-full h-70 sm:h-150 object-cover object-center"
             />
           </div>
         </div>
