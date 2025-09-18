@@ -1,11 +1,35 @@
 @import "tailwindcss";
 
-
 @plugin "tailwindcss-animate";
-
 
 @custom-variant dark (&:is(.dark *));
 
+@layer utilities {
+  .clip-heart {
+    clip-path: polygon(
+      50% 12%,
+      60% 5%,
+      70% 3%,
+      80% 6%,
+      87% 14%,
+      92% 25%,
+      94% 38%,
+      90% 52%,
+      82% 65%,
+      70% 76%,
+      50% 92%,
+      30% 76%,
+      18% 65%,
+      10% 52%,
+      6% 38%,
+      8% 25%,
+      13% 14%,
+      20% 6%,
+      30% 3%,
+      40% 5%
+    );
+  }
+}
 
 @layer base {
   h1 {
@@ -119,19 +143,19 @@
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 214 84% 35%;
-  
+
   /* Custom Brand Colors */
   --whatsapp: 142 76% 36%;
   --whatsapp-foreground: 0 0% 100%;
   --whatsapp-hover: 142 76% 45%;
-  
+
   /* Chart Colors */
   --chart-1: 12 76% 61%;
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
-  
+
   /* Sidebar Colors */
   --sidebar: 0 0% 98%;
   --sidebar-foreground: 240 5.3% 26.1%;
@@ -141,7 +165,7 @@
   --sidebar-accent-foreground: 240 5.9% 10%;
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 217.2 91.2% 59.8%;
-  
+
   /* Border Radius */
   --radius: 0.5rem;
 }
@@ -167,19 +191,19 @@
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 214 84% 45%;
-  
+
   /* Custom Brand Colors - Dark */
   --whatsapp: 142 76% 41%;
   --whatsapp-foreground: 0 0% 100%;
   --whatsapp-hover: 142 76% 50%;
-  
+
   /* Chart Colors - Dark */
   --chart-1: 220 70% 50%;
   --chart-2: 160 60% 45%;
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
-  
+
   /* Sidebar Colors - Dark */
   --sidebar: 240 5.9% 10%;
   --sidebar-foreground: 240 4.8% 95.9%;
@@ -196,7 +220,7 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground;
   }
@@ -204,25 +228,37 @@
 
 /* Custom utility classes for gradients and shadows */
 .gradient-primary {
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)),
+    hsl(var(--primary) / 0.8)
+  );
 }
 
 .gradient-hero {
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.9));
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)),
+    hsl(var(--primary) / 0.9)
+  );
 }
 
 .gradient-card {
-  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.95));
+  background: linear-gradient(
+    145deg,
+    hsl(var(--card)),
+    hsl(var(--card) / 0.95)
+  );
 }
 
 .shadow-card {
-  box-shadow: 
+  box-shadow:
     0 4px 6px -1px hsl(var(--primary) / 0.1),
     0 2px 4px -1px hsl(var(--primary) / 0.06);
 }
 
 .shadow-card-hover {
-  box-shadow: 
+  box-shadow:
     0 10px 15px -3px hsl(var(--primary) / 0.1),
     0 4px 6px -2px hsl(var(--primary) / 0.05);
 }

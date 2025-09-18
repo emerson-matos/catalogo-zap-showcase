@@ -44,11 +44,11 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
               </Button>
             </div>
           </div>
-          <div className="relative">
+          <div className="w-full aspect-video overflow-clip">
             <img
               src={heroImage}
-              alt="Catálogo Digital Moderno"
-              className="w-full h-auto rounded-2xl shadow-2xl"
+              alt="SeRena Cosméticos Logo"
+              className="w-full h-150 object-cover object-center"
             />
           </div>
         </div>
