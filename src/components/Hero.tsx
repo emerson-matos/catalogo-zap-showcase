@@ -13,7 +13,7 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-center lg:text-left">
             <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
-              <p className="mask-origin-stroke italic">SeRena</p>
+              <p className="mask-origin-stroke italic">SeRena Cosméticos</p>
               <span className="block font-light text-secondary-foreground">
                 Produtos de saúde e beleza
               </span>
@@ -44,7 +44,7 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
               </Button>
             </div>
           </div>
-          <div className="w-full aspect-video overflow-clip">
+          <div className="border-4 bg-white-500 w-full aspect-video overflow-clip">
             <img
               src={heroImage}
               alt="SeRena Cosméticos Logo"
