@@ -105,9 +105,13 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Localização</h3>
                     <p className="text-muted-foreground">
-                      São Paulo, SP - Brasil
+                      Av. Sorocaba, 961, Pq João Ramalho
                       <br />
-                      Atendimento presencial sob agendamento
+                      Santo André - SP
+                      <br />
+                      <span className="text-sm opacity-75">
+                        Atendimento presencial sob agendamento
+                      </span>
                     </p>
                   </div>
                 </div>
