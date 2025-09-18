@@ -283,3 +283,18 @@
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+/* Flipbook specific styles for ProductCard integration */
+.flipbook-product-card {
+  height: 100%;
+  transform: scale(1);
+}
+
+.flipbook-product-card .group {
+  height: 100%;
+}
+
+.flipbook-product-card .group img {
+  height: 300px;
+  object-fit: cover;
+}
