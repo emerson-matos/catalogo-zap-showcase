@@ -1,4 +1,4 @@
-import heroImage from "@/assets/hero-catalog.jpg";
+import heroImage from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "./ui/whatsapp-button";
 
