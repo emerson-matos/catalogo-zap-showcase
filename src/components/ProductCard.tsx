@@ -20,10 +20,10 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             alt={product.name}
             loading="lazy"
             decoding="async"
-            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+            className="w-full h-64 transition-transform duration-300 group-hover:scale-110"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = '/placeholder.svg';
+              target.src = "/placeholder.svg";
             }}
           />
           {product.isNew && (
@@ -31,8 +31,8 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               Novo
             </Badge>
           )}
-          <Badge 
-            variant="secondary" 
+          <Badge
+            variant="secondary"
             className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 font-semibold shadow-md border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm hover:bg-white/95 dark:hover:bg-gray-800/95 transition-colors"
           >
             {product.category}
@@ -54,7 +54,9 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             {product.rating && (
               <div className="flex items-center gap-1 bg-accent/10 dark:bg-accent/20 px-2 py-1 rounded-full">
                 <Star className="w-4 h-4 fill-accent text-accent" />
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{product.rating}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {product.rating}
+                </span>
               </div>
             )}
           </div>
@@ -62,7 +64,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="p-6 pt-0">
-        <WhatsAppButton 
+        <WhatsAppButton
           product={product}
           className="w-full justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
           size="default"
@@ -74,6 +76,6 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
   );
 });
 
-ProductCard.displayName = 'ProductCard';
+ProductCard.displayName = "ProductCard";
 
 export default ProductCard;
