@@ -266,3 +266,67 @@
 .shadow-button {
   box-shadow: 0 4px 14px 0 hsl(var(--primary) / 0.25);
 }
+
+/* Flipbook Styles */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.flipbook-card {
+  height: 400px;
+  width: 100%;
+}
+
+.flipbook-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.7s;
+}
+
+.flipbook-front,
+.flipbook-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.flipbook-back {
+  transform: rotateY(180deg);
+}
+
+/* Animation for slide in effect */
+@keyframes slideInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effects for flipbook cards */
+.flipbook-card:hover .flipbook-inner {
+  transform: translateY(-5px);
+}
+
+/* Smooth transitions for all interactive elements */
+.flipbook-card * {
+  transition: all 0.3s ease;
+}
