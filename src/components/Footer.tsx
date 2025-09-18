@@ -78,14 +78,16 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   className="hover:text-primary-foreground transition-colors"
                 >
-                  {whatsappNumber ? `+${whatsappNumber}` : "WhatsApp"}
+                  {whatsappNumber
+                    ? `${whatsappNumber.replace(/(\d{2})?(\d{2})(\d{5})(\d{4})/, "($2) $3-$4")}`
+                    : "WhatsApp"}
                 </a>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="size-4" />
                 <span>
                   {whatsappNumber
-                    ? `+${whatsappNumber.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, "+$1 ($2) $3-$4")}`
+                    ? `${whatsappNumber.replace(/(\d{2})?(\d{2})(\d{5})(\d{4})/, "($2) $3-$4")}`
                     : "(11) 99999-9999"}
                 </span>
               </div>
