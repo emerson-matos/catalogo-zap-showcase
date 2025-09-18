@@ -41,6 +41,13 @@ const Header = () => {
             >
               Produtos
             </Button>
+            <Button
+              variant="ghost"
+              onClick={() => scrollToSection("quem-somos")}
+              className="hover:text-primary transition-colors"
+            >
+              Quem Somos
+            </Button>
             <Link to="/flipbook">
               <Button
                 variant="ghost"
@@ -101,6 +108,13 @@ const Header = () => {
                 className="text-left hover:text-primary transition-colors justify-start"
               >
                 Produtos
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => scrollToSection("quem-somos")}
+                className="text-left hover:text-primary transition-colors justify-start"
+              >
+                Quem Somos
               </Button>
               <Link to="/flipbook" onClick={() => setIsMenuOpen(false)}>
                 <Button
