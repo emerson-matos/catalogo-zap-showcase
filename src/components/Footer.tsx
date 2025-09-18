@@ -1,4 +1,4 @@
-import { Package, MessageCircle, Phone, Mail } from "lucide-react";
+import { Package, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 const Footer = () => {
@@ -54,6 +54,18 @@ const Footer = () => {
                 <button
                   onClick={() =>
                     document
+                      .getElementById("quem-somos")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                >
+                  Quem Somos
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() =>
+                    document
                       .getElementById("contato")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
@@ -93,6 +105,10 @@ const Footer = () => {
               <div className="flex items-center space-x-2">
                 <Mail className="size-4" />
                 <span>sandrofar@hotmail.com</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <MapPin className="size-4 mt-0.5" />
+                <span>Av. Sorocaba, 961, Pq João Ramalho, Santo André</span>
               </div>
             </div>
           </div>
