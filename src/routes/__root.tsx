@@ -7,7 +7,7 @@ import { Page404 } from "@/pages/404";
 
 const title = "SeRena Cosméticos";
 const description = "Distribuidora de comésticos do ABC paulista";
-const url = typeof window !== 'undefined' ? window.location.origin : 'https://serenacosmeticos.com';
+const url = window.location.origin;
 
 export const Route = createRootRoute({
   head: () => ({
