@@ -31,14 +31,15 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
               >
                 Fale Conosco
               </WhatsAppButton>
-              <Link to="/products">
-                <Button
-                variant="outline"
-                size="lg"
+              <Link
                 className="text-lg px-8 py-4 h-auto"
-              >
-                Ver Produtos
-              </Button>
+                to="/products">
+                <Button
+                  variant="outline"
+                  size="lg"
+                >
+                  Ver Produtos
+                </Button>
               </Link>
             </div>
           </div>
