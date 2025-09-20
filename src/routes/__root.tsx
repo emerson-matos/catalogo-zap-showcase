@@ -1,8 +1,9 @@
-import { createRootRoute, HeadContent, Outlet } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet, ErrorComponent } from "@tanstack/react-router";
 import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import { Page404 } from "@/pages/404";
 
 const title = "SeRena Cosméticos";
 const description = "Distribuidora de comésticos do ABC paulista";
@@ -113,4 +114,23 @@ export const Route = createRootRoute({
       </Providers>
     </>
   ),
+  errorComponent: ({ error }) => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-destructive mb-4">
+          Algo deu errado!
+        </h1>
+        <p className="text-muted-foreground mb-6">
+          {error instanceof Error ? error.message : 'Ocorreu um erro inesperado'}
+        </p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+        >
+          Recarregar página
+        </button>
+      </div>
+    </div>
+  ),
+  notFoundComponent: () => <Page404 />,
 });
