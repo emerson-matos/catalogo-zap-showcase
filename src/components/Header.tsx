@@ -92,6 +92,14 @@ const Header = () => {
                 Contato
               </Button>
             </Link>
+            <Link to="/examples">
+              <Button
+                variant="ghost"
+                className="hover:text-primary transition-colors"
+              >
+                Exemplos
+              </Button>
+            </Link>
           </nav>
 
           {/* Actions Desktop */}
@@ -181,6 +189,14 @@ const Header = () => {
                 >
                   <MessageCircle className="w-4 h-4" />
                   Contato
+                </Button>
+              </Link>
+              <Link to="/examples" onClick={() => setIsMenuOpen(false)}>
+                <Button
+                  variant="ghost"
+                  className="text-left hover:text-primary transition-colors justify-start"
+                >
+                  Exemplos
                 </Button>
               </Link>
               <WhatsAppButton
