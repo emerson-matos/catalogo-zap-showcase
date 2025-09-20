@@ -15,6 +15,21 @@ export interface ProductCategory {
   label: string;
 }
 
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export interface CartContextType {
+  items: CartItem[];
+  addItem: (product: Product) => void;
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+  getTotalItems: () => number;
+  getTotalPrice: () => number;
+}
+
 export const PRODUCT_CATEGORIES: ProductCategory[] = [
   { id: 'all', name: 'Todos', label: 'Todos' },
   { id: 'electronics', name: 'Eletrônicos', label: 'Eletrônicos' },

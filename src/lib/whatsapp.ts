@@ -20,3 +20,17 @@ export function createProductWhatsAppUrl(productName: string) {
   const message = `Olá! Tenho interesse no produto "${productName}". Poderia me enviar mais informações?`;
   return createWhatsAppUrl({ message });
 }
+
+export function createCartCheckoutWhatsAppUrl(cartItems: Array<{name: string, quantity: number, price: string}>, total: string) {
+  const message = `🛒 *Pedido via Carrinho Virtual*
+
+${cartItems.map(item => 
+  `• ${item.name} (${item.quantity}x) - ${item.price}`
+).join('\n')}
+
+💰 *Total: ${total}*
+
+Por favor, confirme este pedido e me informe sobre disponibilidade e formas de pagamento. Obrigado!`;
+  
+  return createWhatsAppUrl({ message });
+}
