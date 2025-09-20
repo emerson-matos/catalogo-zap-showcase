@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Package } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_layout/products/$productId")({
+export const Route = createFileRoute("/_layout/product/$productId")({
   component: ProductDetailPage,
   validateSearch: (search: Record<string, unknown>) => {
     return {

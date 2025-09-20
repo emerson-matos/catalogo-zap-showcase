@@ -20,7 +20,7 @@ export const ProductNavigationExamples = () => {
 
   const handleNavigateToProduct = (productId: string) => {
     navigate({ 
-      to: "/products/$productId", 
+      to: "/product/$productId", 
       params: { productId } 
     });
   };
@@ -48,7 +48,7 @@ export const ProductNavigationExamples = () => {
               {exampleProducts.map(product => (
                 <Link 
                   key={product.id}
-                  to="/products/$productId" 
+                  to="/product/$productId" 
                   params={{ productId: product.id }}
                   className="block"
                 >
@@ -101,13 +101,13 @@ export const ProductNavigationExamples = () => {
             </p>
             <div className="space-y-2 text-sm font-mono">
               <div className="p-2 bg-muted rounded">
-                /products/1
+                /product/1
               </div>
               <div className="p-2 bg-muted rounded">
-                /products/skincare-serum
+                /product/skincare-serum
               </div>
               <div className="p-2 bg-muted rounded">
-                /products/abc123
+                /product/abc123
               </div>
             </div>
           </CardContent>
@@ -129,7 +129,7 @@ export const ProductNavigationExamples = () => {
                   Navigate with additional query parameters
                 </p>
                 <Link 
-                  to="/products/$productId" 
+                  to="/product/$productId" 
                   params={{ productId: "1" }}
                   search={{ variant: "large", color: "blue" }}
                 >

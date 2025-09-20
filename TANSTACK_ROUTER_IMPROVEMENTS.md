@@ -21,7 +21,7 @@ The routing system has been significantly enhanced with modern patterns, better 
 /about                      # About page
 /contact                    # Contact page
 /products                   # Products listing
-/products/$productId        # Individual product details
+/product/$productId         # Individual product details
 /search                     # Product search with filters
 /login                      # Authentication
 /admin                      # Admin panel (protected)
@@ -35,7 +35,7 @@ The routing system has been significantly enhanced with modern patterns, better 
 - **Routes using layout**: `/about`, `/contact`, `/products`, `/search`, `/login`, `/admin`
 
 ### 2. Nested Routes
-- **Product detail route**: `/products/$productId` with dynamic parameters
+- **Product detail route**: `/product/$productId` with dynamic parameters
 - **Search functionality**: `/search` with query parameters
 - **Type-safe routing**: All routes are fully typed with TypeScript
 
@@ -117,7 +117,7 @@ export const router = createRouter({
 2. **About Page** (`/about`): Company information
 3. **Contact Page** (`/contact`): Contact form and information
 4. **Search Page** (`/search`): Advanced product search with filters
-5. **Product Detail** (`/products/$productId`): Individual product pages
+5. **Product Detail** (`/product/$productId`): Individual product pages
 6. **Login Page** (`/login`): Authentication form
 7. **Admin Panel** (`/admin`): Protected admin interface
 
@@ -194,7 +194,7 @@ import { Link } from "@tanstack/react-router";
 </Link>
 
 // With dynamic parameters
-<Link to="/products/$productId" params={{ productId: "123" }}>
+<Link to="/product/$productId" params={{ productId: "123" }}>
   View Product
 </Link>
 ```
@@ -204,8 +204,8 @@ import { Link } from "@tanstack/react-router";
 import { useParams, useSearch } from "@tanstack/react-router";
 
 function ProductPage() {
-  const { productId } = useParams({ from: "/products/$productId" });
-  const { variant } = useSearch({ from: "/products/$productId" });
+  const { productId } = useParams({ from: "/product/$productId" });
+  const { variant } = useSearch({ from: "/product/$productId" });
   
   // Type-safe access to route data
 }

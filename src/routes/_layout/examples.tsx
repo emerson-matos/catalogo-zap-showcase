@@ -24,7 +24,7 @@ function ExamplesPage() {
             <h4 className="font-medium mb-2">Link Component</h4>
             <pre className="text-sm bg-background p-3 rounded overflow-x-auto">
 {`<Link 
-  to="/products/$productId" 
+  to="/product/$productId" 
   params={{ productId: "123" }}
 >
   View Product
@@ -36,7 +36,7 @@ function ExamplesPage() {
             <pre className="text-sm bg-background p-3 rounded overflow-x-auto">
 {`const navigate = useNavigate();
 navigate({ 
-  to: "/products/$productId", 
+  to: "/product/$productId", 
   params: { productId: "123" } 
 });`}
             </pre>
