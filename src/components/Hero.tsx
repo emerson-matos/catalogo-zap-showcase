@@ -31,16 +31,16 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
               >
                 Fale Conosco
               </WhatsAppButton>
-              <Link
+              <Button
+                variant="outline"
+                size="lg"
                 className="text-lg px-8 py-4 h-auto"
-                to="/products">
-                <Button
-                  variant="outline"
-                  size="lg"
-                >
+                asChild
+              >
+                <Link to="/products">
                   Ver Produtos
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
           <div className=" w-full aspect-video overflow-clip">
