@@ -8,23 +8,6 @@ export const Home = () => {
     <>
         <Hero sectionId="hero" />
         
-        {/* Featured Products Preview */}
-        <section className="py-20 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Nossos Produtos</h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-                Descubra nossa linha completa de cosméticos de qualidade
-              </p>
-              <Link to="/products">
-                <Button size="lg" className="mb-8">
-                  Ver Todos os Produtos <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-        
         {/* Quick Navigation Section */}
         <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
