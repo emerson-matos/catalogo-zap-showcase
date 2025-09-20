@@ -3,6 +3,8 @@ import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import { Cart } from "@/components/Cart";
+import { CartButton } from "@/components/CartButton";
 import { Page404 } from "@/pages/404";
 
 const title = "SeRena Cosméticos";
@@ -110,6 +112,8 @@ export const Route = createRootRoute({
           </main>
           <Footer />
           <WhatsAppFloat />
+          <CartButton />
+          <Cart />
         </div>
       </Providers>
     </>

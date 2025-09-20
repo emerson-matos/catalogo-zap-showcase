@@ -20,3 +20,29 @@ export function createProductWhatsAppUrl(productName: string) {
   const message = `Olá! Tenho interesse no produto "${productName}". Poderia me enviar mais informações?`;
   return createWhatsAppUrl({ message });
 }
+
+export function createCartCheckoutWhatsAppUrl(cartItems: Array<{product: {name: string, price: number | string}, quantity: number}>, totalPrice: number) {
+  const formatPrice = (price: number | string) => {
+    if (typeof price === 'number') {
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(price);
+    }
+    return price;
+  };
+
+  const itemsList = cartItems
+    .map(item => `• ${item.product.name} - ${item.quantity}x ${formatPrice(item.product.price)}`)
+    .join('\n');
+
+  const message = `🛒 *Pedido via Carrinho Virtual*
+
+${itemsList}
+
+💰 *Total: ${formatPrice(totalPrice)}*
+
+Gostaria de finalizar este pedido. Poderia confirmar a disponibilidade e forma de pagamento?`;
+  
+  return createWhatsAppUrl({ message });
+}
