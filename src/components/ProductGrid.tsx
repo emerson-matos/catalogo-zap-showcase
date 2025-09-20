@@ -2,16 +2,30 @@ import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, RefreshCw, Wifi } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
+import { SortSelect, type SortOption } from "@/components/ui/sort-select";
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+import { AlertTriangle, RefreshCw, Wifi, SortAsc } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
+import { useState } from "react";
 
 const ProductGrid = ({ sectionId }: { sectionId: string }) => {
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  
   const {
     products,
     categories,
     selectedCategory,
     setSelectedCategory,
+    searchQuery,
+    setSearchQuery,
+    sortBy,
+    setSortBy,
+    filters,
+    setFilters,
+    priceRange,
     totalProducts,
+    filteredProductsCount,
     isLoading,
     isFetching,
     error,
@@ -19,7 +33,18 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
     refetch,
     isEmpty,
     isStale,
+    hasSearchResults,
+    hasActiveFilters,
   } = useProductsQuery();
+
+  const sortOptions: SortOption[] = [
+    { value: "name-asc", label: "Nome (A-Z)", icon: <SortAsc className="h-4 w-4" /> },
+    { value: "name-desc", label: "Nome (Z-A)", icon: <SortAsc className="h-4 w-4 rotate-180" /> },
+    { value: "price-asc", label: "Menor Preço", icon: <SortAsc className="h-4 w-4" /> },
+    { value: "price-desc", label: "Maior Preço", icon: <SortAsc className="h-4 w-4 rotate-180" /> },
+    { value: "rating-desc", label: "Melhor Avaliação", icon: <SortAsc className="h-4 w-4" /> },
+    { value: "category-asc", label: "Categoria", icon: <SortAsc className="h-4 w-4" /> },
+  ];
 
   return (
     <section id={sectionId} className="py-20 bg-background">
@@ -72,6 +97,49 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
           </Alert>
         )}
 
+        {/* Search and Controls */}
+        <div className="mb-8 space-y-6">
+          {/* Search Bar */}
+          <div className="max-w-md mx-auto">
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Pesquisar produtos..."
+            />
+          </div>
+
+          {/* Controls Row */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <SortSelect
+                value={sortBy}
+                onValueChange={setSortBy}
+                options={sortOptions}
+                placeholder="Ordenar por..."
+              />
+              
+              <AdvancedFilters
+                isOpen={showAdvancedFilters}
+                onToggle={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                filters={filters}
+                onFiltersChange={setFilters}
+                priceRange={priceRange}
+              />
+            </div>
+
+            {/* Results Counter */}
+            <div className="text-sm text-muted-foreground">
+              {hasSearchResults || hasActiveFilters ? (
+                <span>
+                  {filteredProductsCount} de {totalProducts} produtos
+                </span>
+              ) : (
+                <span>{totalProducts} produtos disponíveis</span>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Category Filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
           {isLoading ? (
@@ -93,31 +161,64 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
           )}
         </div>
 
+        {/* No Results Message */}
+        {!isLoading && products.length === 0 && (hasSearchResults || hasActiveFilters) && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-xl font-semibold mb-2">Nenhum produto encontrado</h3>
+            <p className="text-muted-foreground mb-4">
+              Tente ajustar seus filtros ou termos de pesquisa
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchQuery("");
+                setFilters({
+                  priceRange: priceRange,
+                  minRating: 0,
+                  showNewOnly: false,
+                  showInStock: false,
+                });
+                setSelectedCategory("Todos");
+              }}
+            >
+              Limpar Filtros
+            </Button>
+          </div>
+        )}
+
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {isLoading ? (
-            Array.from({ length: 8 }).map((_, i) => (
+        {!isLoading && products.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="space-y-3">
                 <Skeleton className="h-64 w-full rounded-lg" />
                 <Skeleton className="h-6 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
                 <Skeleton className="h-8 w-full" />
               </div>
-            ))
-          ) : (
-            products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Statistics */}
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="p-6">
             <div className="text-4xl font-bold text-primary mb-2">
-              {totalProducts}+
+              {hasSearchResults || hasActiveFilters ? filteredProductsCount : totalProducts}+
             </div>
-            <div className="text-muted-foreground">Produtos Disponíveis</div>
+            <div className="text-muted-foreground">
+              {hasSearchResults || hasActiveFilters ? "Produtos Encontrados" : "Produtos Disponíveis"}
+            </div>
           </div>
           <div className="p-6">
             <div className="text-4xl font-bold text-primary mb-2">1000+</div>

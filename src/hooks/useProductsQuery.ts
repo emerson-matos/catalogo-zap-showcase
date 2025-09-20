@@ -3,9 +3,18 @@ import { useMemo, useState } from "react";
 import { fetchProductsFromGoogleSheet } from "@/lib/googleSheets";
 import { queryKeys } from "@/lib/queryClient";
 import type { Product } from "@/types/product";
+import type { FilterOptions } from "@/components/ui/advanced-filters";
 
 export const useProductsQuery = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("Todos");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("name-asc");
+  const [filters, setFilters] = useState<FilterOptions>({
+    priceRange: [0, 1000],
+    minRating: 0,
+    showNewOnly: false,
+    showInStock: false,
+  });
 
   // Main products query with TanStack Query
   const {
@@ -42,19 +51,128 @@ export const useProductsQuery = () => {
     return ["Todos", ...withoutTodos];
   }, [allProducts]);
 
-  // Memoized filtered products based on selected category
+  // Memoized price range from all products
+  const priceRange = useMemo(() => {
+    if (!allProducts.length) return [0, 1000] as [number, number];
+    
+    const prices = allProducts
+      .map((product: Product) => {
+        const price = typeof product.price === 'string' 
+          ? parseFloat(product.price.replace(/[^\d.,]/g, '').replace(',', '.'))
+          : product.price;
+        return isNaN(price) ? 0 : price;
+      })
+      .filter(price => price > 0);
+    
+    if (!prices.length) return [0, 1000] as [number, number];
+    
+    const min = Math.floor(Math.min(...prices));
+    const max = Math.ceil(Math.max(...prices));
+    return [min, max] as [number, number];
+  }, [allProducts]);
+
+  // Update filters price range when products change
+  const currentFilters = useMemo(() => {
+    if (filters.priceRange[0] === 0 && filters.priceRange[1] === 1000) {
+      return { ...filters, priceRange };
+    }
+    return filters;
+  }, [filters, priceRange]);
+
+  // Memoized filtered products based on search, category, and filters
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === "Todos") {
-      return allProducts;
+    let filtered = allProducts;
+
+    // Filter by category
+    if (selectedCategory !== "Todos") {
+      const categoryName = categories.find(
+        (cat: string) => cat === selectedCategory,
+      );
+      filtered = filtered.filter(
+        (product: Product) => product.category === categoryName,
+      );
     }
 
-    const categoryName = categories.find(
-      (cat: string) => cat === selectedCategory,
-    );
-    return allProducts.filter(
-      (product: Product) => product.category === categoryName,
-    );
-  }, [selectedCategory, allProducts, categories]);
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter((product: Product) =>
+        product.name.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply advanced filters
+    filtered = filtered.filter((product: Product) => {
+      // Price range filter
+      const price = typeof product.price === 'string' 
+        ? parseFloat(product.price.replace(/[^\d.,]/g, '').replace(',', '.'))
+        : product.price;
+      
+      if (isNaN(price) || price < currentFilters.priceRange[0] || price > currentFilters.priceRange[1]) {
+        return false;
+      }
+
+      // Rating filter
+      if (currentFilters.minRating > 0 && (!product.rating || product.rating < currentFilters.minRating)) {
+        return false;
+      }
+
+      // New products filter
+      if (currentFilters.showNewOnly && !product.isNew) {
+        return false;
+      }
+
+      // In stock filter (assuming all products are in stock for now)
+      if (currentFilters.showInStock) {
+        // This could be enhanced with actual stock data
+        return true;
+      }
+
+      return true;
+    });
+
+    return filtered;
+  }, [selectedCategory, allProducts, categories, searchQuery, currentFilters]);
+
+  // Memoized sorted products
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts];
+
+    switch (sortBy) {
+      case 'name-asc':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'price-asc':
+        return sorted.sort((a, b) => {
+          const priceA = typeof a.price === 'string' 
+            ? parseFloat(a.price.replace(/[^\d.,]/g, '').replace(',', '.'))
+            : a.price;
+          const priceB = typeof b.price === 'string' 
+            ? parseFloat(b.price.replace(/[^\d.,]/g, '').replace(',', '.'))
+            : b.price;
+          return (priceA || 0) - (priceB || 0);
+        });
+      case 'price-desc':
+        return sorted.sort((a, b) => {
+          const priceA = typeof a.price === 'string' 
+            ? parseFloat(a.price.replace(/[^\d.,]/g, '').replace(',', '.'))
+            : a.price;
+          const priceB = typeof b.price === 'string' 
+            ? parseFloat(b.price.replace(/[^\d.,]/g, '').replace(',', '.'))
+            : b.price;
+          return (priceB || 0) - (priceA || 0);
+        });
+      case 'rating-desc':
+        return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      case 'category-asc':
+        return sorted.sort((a, b) => a.category.localeCompare(b.category));
+      default:
+        return sorted;
+    }
+  }, [filteredProducts, sortBy]);
 
   // Enhanced error message
   const errorMessage = useMemo(() => {
@@ -80,14 +198,28 @@ export const useProductsQuery = () => {
 
   return {
     // Data
-    products: filteredProducts,
+    products: sortedProducts,
     allProducts,
     categories,
     totalProducts: allProducts.length,
+    filteredProductsCount: filteredProducts.length,
 
     // Category management
     selectedCategory,
     setSelectedCategory,
+
+    // Search functionality
+    searchQuery,
+    setSearchQuery,
+
+    // Sort functionality
+    sortBy,
+    setSortBy,
+
+    // Filter functionality
+    filters: currentFilters,
+    setFilters,
+    priceRange,
 
     // Query states
     isLoading,
@@ -102,6 +234,13 @@ export const useProductsQuery = () => {
     // Computed states
     isEmpty: !isLoading && allProducts.length === 0,
     hasProducts: allProducts.length > 0,
+    hasSearchResults: searchQuery.trim().length > 0,
+    hasActiveFilters: 
+      currentFilters.minRating > 0 || 
+      currentFilters.showNewOnly || 
+      currentFilters.showInStock ||
+      currentFilters.priceRange[0] !== priceRange[0] ||
+      currentFilters.priceRange[1] !== priceRange[1],
   };
 };
 
