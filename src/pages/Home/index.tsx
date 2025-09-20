@@ -1,16 +1,31 @@
-import About from "@/components/About";
-import Contact from "@/components/Contact";
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Users, MessageCircle, Package } from "lucide-react";
+import { ArrowRight, Users, MessageCircle, Package, BookOpen } from "lucide-react";
 
 export const Home = () => {
   return (
     <>
         <Hero sectionId="hero" />
-        <ProductGrid sectionId="produtos" />
+        
+        {/* Featured Products Preview */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold mb-4">Nossos Produtos</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                Descubra nossa linha completa de cosméticos de qualidade
+              </p>
+              <Link to="/products">
+                <Button size="lg" className="mb-8">
+                  Ver Todos os Produtos <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+            <ProductGrid sectionId="produtos" />
+          </div>
+        </section>
         
         {/* Quick Navigation Section */}
         <section className="py-20 bg-muted/30">
@@ -22,7 +37,7 @@ export const Home = () => {
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-4 gap-8">
               <Link to="/about">
                 <div className="bg-gradient-card shadow-card rounded-lg p-8 text-center hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="bg-primary/10 p-4 rounded-lg w-fit mx-auto mb-4">
@@ -53,6 +68,21 @@ export const Home = () => {
                 </div>
               </Link>
               
+              <Link to="/flipbook">
+                <div className="bg-gradient-card shadow-card rounded-lg p-8 text-center hover:shadow-lg transition-shadow cursor-pointer">
+                  <div className="bg-primary/10 p-4 rounded-lg w-fit mx-auto mb-4">
+                    <BookOpen className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-xl mb-3">Catálogo</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Navegue pelos nossos produtos em um formato interativo de livro.
+                  </p>
+                  <Button variant="outline" className="w-full">
+                    Ver Catálogo <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </Link>
+              
               <Link to="/contact">
                 <div className="bg-gradient-card shadow-card rounded-lg p-8 text-center hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="bg-whatsapp/10 p-4 rounded-lg w-fit mx-auto mb-4">
@@ -70,9 +100,6 @@ export const Home = () => {
             </div>
           </div>
         </section>
-        
-        <About sectionId="quem-somos" />
-        <Contact sectionId="contato" />
     </>
   );
 };
