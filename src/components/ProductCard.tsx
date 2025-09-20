@@ -1,9 +1,11 @@
 import React from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
-import { Star } from "lucide-react";
+import { Star, ShoppingCart } from "lucide-react";
 import { formatPriceBRL } from "@/lib/utils";
+import { useCart } from "@/contexts/CartContext";
 import type { Product } from "@/types/product";
 
 interface ProductCardProps {
@@ -11,6 +13,12 @@ interface ProductCardProps {
 }
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
+  const { addItem } = useCart();
+
+  const handleAddToCart = () => {
+    addItem(product);
+  };
+
   return (
     <Card className="group h-full bg-gradient-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 border-0">
       <CardContent className="p-0">
@@ -63,10 +71,19 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
         </div>
       </CardContent>
 
-      <CardFooter className="p-6 pt-0">
+      <CardFooter className="p-6 pt-0 space-y-2">
+        <Button
+          onClick={handleAddToCart}
+          className="w-full justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
+          size="default"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          Adicionar ao Carrinho
+        </Button>
         <WhatsAppButton
           product={product}
-          className="w-full justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
+          variant="outline"
+          className="w-full justify-center gap-2 h-11 text-sm font-medium"
           size="default"
         >
           Consultar Produto

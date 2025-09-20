@@ -3,10 +3,13 @@ import { Menu, X, Package, BookOpen, Users, MessageCircle, ShoppingBag } from "l
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
+import { CartIcon } from "@/components/CartIcon";
+import { CartSidebar } from "@/components/CartSidebar";
 import { Link, useLocation } from "@tanstack/react-router";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const location = useLocation();
 
   const isActiveRoute = (path: string) => {
@@ -85,6 +88,7 @@ const Header = () => {
 
           {/* Actions Desktop */}
           <div className="hidden md:flex items-center gap-2">
+            <CartIcon onClick={() => setIsCartOpen(true)} />
             <WhatsAppButton
               variant="ghost"
               size="sm"
@@ -166,6 +170,10 @@ const Header = () => {
                   Contato
                 </Button>
               </Link>
+              <div className="flex items-center gap-2">
+                <CartIcon onClick={() => setIsCartOpen(true)} />
+                <span className="text-sm text-muted-foreground">Carrinho</span>
+              </div>
               <WhatsAppButton
                 variant="ghost"
                 className="w-fit justify-start hover:text-primary transition-colors bg-transparent hover:bg-whatsapp/10"
@@ -177,6 +185,9 @@ const Header = () => {
           </div>
         )}
       </div>
+      
+      {/* Cart Sidebar */}
+      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </header>
   );
 };

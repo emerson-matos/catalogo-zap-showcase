@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { createQueryClient } from "@/lib/queryClient";
+import { CartProvider } from "@/contexts/CartContext";
 
 const queryClient = createQueryClient();
 
@@ -16,10 +17,12 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     <ErrorBoundary>
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            {children}
-            <Toaster />
-          </TooltipProvider>
+          <CartProvider>
+            <TooltipProvider>
+              {children}
+              <Toaster />
+            </TooltipProvider>
+          </CartProvider>
           <Analytics />
           <SpeedInsights />
           <ReactQueryDevtools initialIsOpen={false} />
