@@ -9,14 +9,6 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
-  const scrollToSection = (sectionId: string) => {
-    // Only scroll if we're on the home page
-    if (location.pathname === '/') {
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-    }
-    setIsMenuOpen(false);
-  };
-
   const isActiveRoute = (path: string) => {
     return location.pathname === path;
   };
