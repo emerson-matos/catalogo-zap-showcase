@@ -10,11 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as FlipbookRouteImport } from './routes/flipbook'
+import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LayoutProductsRouteImport } from './routes/_layout/products'
+import { Route as LayoutContactRouteImport } from './routes/_layout/contact'
+import { Route as LayoutAboutRouteImport } from './routes/_layout/about'
 
 const FlipbookRoute = FlipbookRouteImport.update({
   id: '/flipbook',
   path: '/flipbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LayoutRoute = LayoutRouteImport.update({
+  id: '/_layout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,30 +30,63 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LayoutProductsRoute = LayoutProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutContactRoute = LayoutContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutAboutRoute = LayoutAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => LayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/flipbook': typeof FlipbookRoute
+  '/about': typeof LayoutAboutRoute
+  '/contact': typeof LayoutContactRoute
+  '/products': typeof LayoutProductsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/flipbook': typeof FlipbookRoute
+  '/about': typeof LayoutAboutRoute
+  '/contact': typeof LayoutContactRoute
+  '/products': typeof LayoutProductsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_layout': typeof LayoutRouteWithChildren
   '/flipbook': typeof FlipbookRoute
+  '/_layout/about': typeof LayoutAboutRoute
+  '/_layout/contact': typeof LayoutContactRoute
+  '/_layout/products': typeof LayoutProductsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/flipbook'
+  fullPaths: '/' | '/flipbook' | '/about' | '/contact' | '/products'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/flipbook'
-  id: '__root__' | '/' | '/flipbook'
+  to: '/' | '/flipbook' | '/about' | '/contact' | '/products'
+  id:
+    | '__root__'
+    | '/'
+    | '/_layout'
+    | '/flipbook'
+    | '/_layout/about'
+    | '/_layout/contact'
+    | '/_layout/products'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LayoutRoute: typeof LayoutRouteWithChildren
   FlipbookRoute: typeof FlipbookRoute
 }
 
@@ -58,6 +99,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FlipbookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_layout': {
+      id: '/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +113,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_layout/products': {
+      id: '/_layout/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof LayoutProductsRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/contact': {
+      id: '/_layout/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof LayoutContactRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/about': {
+      id: '/_layout/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof LayoutAboutRouteImport
+      parentRoute: typeof LayoutRoute
+    }
   }
 }
 
+interface LayoutRouteChildren {
+  LayoutAboutRoute: typeof LayoutAboutRoute
+  LayoutContactRoute: typeof LayoutContactRoute
+  LayoutProductsRoute: typeof LayoutProductsRoute
+}
+
+const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutAboutRoute: LayoutAboutRoute,
+  LayoutContactRoute: LayoutContactRoute,
+  LayoutProductsRoute: LayoutProductsRoute,
+}
+
+const LayoutRouteWithChildren =
+  LayoutRoute._addFileChildren(LayoutRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LayoutRoute: LayoutRouteWithChildren,
   FlipbookRoute: FlipbookRoute,
 }
 export const routeTree = rootRouteImport

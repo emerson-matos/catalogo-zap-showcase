@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 
 const title = "SeRena Cosméticos";
-const description = "Distribuidora de comésticos do ABC paulista";
-const url = window.location.origin;
+const description = "Distribuidora de cosméticos do ABC paulista";
+const url = typeof window !== 'undefined' ? window.location.origin : 'https://serenacosmeticos.com';
 
 export const Route = createRootRoute({
   head: () => ({
