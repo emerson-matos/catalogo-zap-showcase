@@ -4,6 +4,7 @@ import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Package } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { formatPriceBRL } from "@/lib/utils";
 
 export const Route = createFileRoute("/_layout/product/$productId")({
   component: ProductDetailPage,
@@ -80,7 +81,7 @@ function ProductDetailPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-primary">
-                R$ {product.price.toFixed(2)}
+                {formatPriceBRL(product.price)}
               </span>
             </div>
             
