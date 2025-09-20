@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
+import { AddToCartButton } from "@/components/ui/add-to-cart-button";
 import { Star } from "lucide-react";
 import { formatPriceBRL } from "@/lib/utils";
 import type { Product } from "@/types/product";
@@ -63,13 +64,20 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
         </div>
       </CardContent>
 
-      <CardFooter className="p-6 pt-0">
-        <WhatsAppButton
+      <CardFooter className="p-6 pt-0 space-x-2">
+        <AddToCartButton
           product={product}
-          className="w-full justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
+          className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
           size="default"
         >
-          Consultar Produto
+          Adicionar
+        </AddToCartButton>
+        <WhatsAppButton
+          product={product}
+          className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
+          size="default"
+        >
+          Consultar
         </WhatsAppButton>
       </CardFooter>
     </Card>
