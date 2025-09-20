@@ -1,5 +1,4 @@
 import Hero from "@/components/Hero";
-import ProductGrid from "@/components/ProductGrid";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, MessageCircle, Package, BookOpen } from "lucide-react";
@@ -23,7 +22,6 @@ export const Home = () => {
                 </Button>
               </Link>
             </div>
-            <ProductGrid sectionId="produtos" />
           </div>
         </section>
         
