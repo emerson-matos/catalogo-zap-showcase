@@ -1,6 +1,7 @@
 import heroImage from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "./ui/whatsapp-button";
+import { Link } from "@tanstack/react-router";
 
 const Hero = ({ sectionId }: { sectionId: string }) => {
   return (
@@ -30,13 +31,15 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
               >
                 Fale Conosco
               </WhatsAppButton>
-             <Link to"/products"> <Button
+              <Link to="/products">
+                <Button
                 variant="outline"
                 size="lg"
                 className="text-lg px-8 py-4 h-auto"
               >
                 Ver Produtos
-              </Button></Link>
+              </Button>
+              </Link>
             </div>
           </div>
           <div className=" w-full aspect-video overflow-clip">
