@@ -1,4 +1,5 @@
 import ProductCard from "@/components/ProductCard";
+import { ProductControls } from "@/components/ProductControls";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -9,9 +10,13 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
   const {
     products,
     categories,
-    selectedCategory,
-    setSelectedCategory,
     totalProducts,
+    filteredProductsCount,
+    filters,
+    updateFilters,
+    resetFilters,
+    setSearchTerm,
+    setSorting,
     isLoading,
     isFetching,
     error,
@@ -19,6 +24,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
     refetch,
     isEmpty,
     isStale,
+    hasActiveFilters,
   } = useProductsQuery();
 
   return (
@@ -72,26 +78,23 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
           </Alert>
         )}
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-24" />
-            ))
-          ) : (
-            categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-                className="transition-all duration-300"
-                disabled={isFetching && isLoading}
-              >
-                {category}
-              </Button>
-            ))
-          )}
-        </div>
+        {/* Product Controls */}
+        {!isLoading && (
+          <ProductControls
+            searchTerm={filters.searchTerm}
+            onSearchChange={setSearchTerm}
+            sortBy={filters.sortBy}
+            sortDirection={filters.sortDirection}
+            onSortChange={setSorting}
+            filters={filters}
+            onFiltersChange={updateFilters}
+            onResetFilters={resetFilters}
+            categories={categories}
+            hasActiveFilters={hasActiveFilters}
+            totalProducts={totalProducts}
+            filteredProductsCount={filteredProductsCount}
+          />
+        )}
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -105,7 +108,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
               </div>
             ))
           ) : (
-            products.map((product) => (
+            products.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))
           )}
@@ -120,8 +123,10 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
             <div className="text-muted-foreground">Produtos Disponíveis</div>
           </div>
           <div className="p-6">
-            <div className="text-4xl font-bold text-primary mb-2">1000+</div>
-            <div className="text-muted-foreground">Clientes Satisfeitos</div>
+            <div className="text-4xl font-bold text-primary mb-2">
+              {categories.length - 1}+
+            </div>
+            <div className="text-muted-foreground">Categorias</div>
           </div>
           <div className="p-6">
             <div className="text-4xl font-bold text-primary mb-2">24h</div>
