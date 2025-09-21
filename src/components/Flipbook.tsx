@@ -66,8 +66,11 @@ const Flipbook = ({ products }: FlipbookProps) => {
         >
           {/* Flipbook */}
           <PageCover>
-            <h2>Catálogo de Produtos</h2>
-            <p>Funciona igual um livro</p>
+            <div className="flex flex-col gap-2 mb-10">
+              <h2>Catálogo de Produtos</h2>
+              <br />
+              <p>Arraste para visualizar</p>
+            </div>
             <div className=" w-full aspect-video overflow-clip">
               <img
                 src={logoImage}
