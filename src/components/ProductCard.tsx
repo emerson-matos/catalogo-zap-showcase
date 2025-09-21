@@ -53,8 +53,8 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             </span>
             {product.rating && (
               <div className="flex items-center gap-1 bg-accent/10 dark:bg-accent/20 px-2 py-1 rounded-full">
-                <Star className="w-4 h-4 fill-accent text-accent" />
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                <Star className="size-4 fill-accent text-accent" />
+                <span className="text-sm font-medium text-accent">
                   {product.rating}
                 </span>
               </div>

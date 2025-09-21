@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import React from "react";
+
+import logoImage from "@/assets/logo.png";
+import { BookOpen } from "lucide-react";
 import type { Product } from "@/types/product";
-import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
 import HTMLFlipBook from "react-pageflip";
 
@@ -67,6 +68,16 @@ const Flipbook = ({ products }: FlipbookProps) => {
           <PageCover>
             <h2>Catálogo de Produtos</h2>
             <p>Funciona igual um livro</p>
+            <div className=" w-full aspect-video overflow-clip">
+              <img
+                src={logoImage}
+                alt="SeRena Cosméticos Logo"
+                className="border-4 bg-white-500 w-full h-70 sm:h-150 object-cover object-center"
+              />
+              <div className="text-lg mt-4 italic flex justify-center text-center">
+                você é seu maior investimento, cuide-se.
+              </div>
+            </div>
           </PageCover>
           {products.map((product) => (
             <FlipbookPage key={product.id} product={product} />
