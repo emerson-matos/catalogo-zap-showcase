@@ -1,4 +1,4 @@
-import { supabase, type Product, type ProductInsert, type ProductUpdate, type UserInvite, type UserInviteInsert, type UserInviteUpdate } from './supabase'
+import { supabase, type Product, type ProductInsert, type ProductUpdate } from './supabase'
 
 export { supabase }
 
@@ -164,123 +164,95 @@ export class SupabaseService {
     return userLevel >= requiredLevel
   }
 
-  // User Invites
-  static async createInvite(inviteData: UserInviteInsert): Promise<UserInvite> {
-    const { data, error } = await supabase
-      .from('user_invites')
-      .insert(inviteData)
-      .select()
-      .single()
+  // User Invites using Supabase Auth Admin API
+  static async createInvite(email: string, role: 'admin' | 'editor' | 'viewer'): Promise<any> {
+    // Use Supabase Auth Admin API to create invite
+    const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
+      redirectTo: `${window.location.origin}/admin`,
+    })
 
     if (error) {
       console.error('Error creating invite:', error)
       throw new Error(`Erro ao criar convite: ${error.message}`)
     }
 
+    // Store the role in user_roles table for when user accepts invite
+    if (data.user) {
+      await supabase
+        .from('user_roles')
+        .insert({
+          user_id: data.user.id,
+          role: role,
+        })
+    }
+
     return data
   }
 
-  static async getInvites(): Promise<UserInvite[]> {
-    const { data, error } = await supabase
-      .from('user_invites')
-      .select('*')
-      .order('created_at', { ascending: false })
-
+  static async getInvites(): Promise<any[]> {
+    // Get users with pending invites (users created but not confirmed)
+    const { data: users, error } = await supabase.auth.admin.listUsers()
+    
     if (error) {
       console.error('Error fetching invites:', error)
       throw new Error(`Erro ao buscar convites: ${error.message}`)
     }
 
-    return data || []
+    // Filter users who haven't confirmed their email yet
+    const pendingInvites = users.users.filter(user => !user.email_confirmed_at)
+    
+    // Get roles for these users
+    const userIds = pendingInvites.map(user => user.id)
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('user_id, role')
+      .in('user_id', userIds)
+
+    // Combine user data with roles
+    return pendingInvites.map(user => {
+      const userRole = roles?.find(role => role.user_id === user.id)
+      return {
+        id: user.id,
+        email: user.email,
+        role: userRole?.role || 'viewer',
+        created_at: user.created_at,
+        invited_at: user.created_at,
+        status: user.email_confirmed_at ? 'confirmed' : 'pending',
+      }
+    })
   }
 
-  static async getInviteByToken(token: string): Promise<UserInvite | null> {
-    const { data, error } = await supabase
-      .from('user_invites')
-      .select('*')
-      .eq('token', token)
-      .eq('used_at', null)
-      .gt('expires_at', new Date().toISOString())
-      .single()
-
-    if (error) {
-      console.error('Error fetching invite by token:', error)
-      return null
-    }
-
-    return data
-  }
-
-  static async getInviteByEmail(email: string): Promise<UserInvite | null> {
-    const { data, error } = await supabase
-      .from('user_invites')
-      .select('*')
-      .eq('email', email)
-      .eq('used_at', null)
-      .gt('expires_at', new Date().toISOString())
-      .single()
-
-    if (error) {
-      console.error('Error fetching invite by email:', error)
-      return null
-    }
-
-    return data
-  }
-
-  static async markInviteAsUsed(token: string): Promise<void> {
-    const { error } = await supabase
-      .from('user_invites')
-      .update({ used_at: new Date().toISOString() })
-      .eq('token', token)
-
-    if (error) {
-      console.error('Error marking invite as used:', error)
-      throw new Error(`Erro ao marcar convite como usado: ${error.message}`)
-    }
-  }
-
-  static async deleteInvite(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('user_invites')
-      .delete()
-      .eq('id', id)
-
+  static async deleteInvite(userId: string): Promise<void> {
+    // Delete the user from Supabase Auth
+    const { error } = await supabase.auth.admin.deleteUser(userId)
+    
     if (error) {
       console.error('Error deleting invite:', error)
       throw new Error(`Erro ao deletar convite: ${error.message}`)
     }
+
+    // Also delete from user_roles table
+    await supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId)
   }
 
-  static async updateInvite(id: string, updates: UserInviteUpdate): Promise<UserInvite> {
-    const { data, error } = await supabase
-      .from('user_invites')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single()
+  static async resendInvite(email: string): Promise<void> {
+    // Resend invitation email
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+    })
 
     if (error) {
-      console.error('Error updating invite:', error)
-      throw new Error(`Erro ao atualizar convite: ${error.message}`)
+      console.error('Error resending invite:', error)
+      throw new Error(`Erro ao reenviar convite: ${error.message}`)
     }
-
-    return data
   }
 
-  // Sign up with invite validation
-  static async signUpWithInvite(email: string, password: string, inviteToken: string): Promise<any> {
-    // First, validate the invite
-    const invite = await this.getInviteByToken(inviteToken)
-    if (!invite) {
-      throw new Error('Convite inválido ou expirado')
-    }
-
-    if (invite.email !== email) {
-      throw new Error('Email não corresponde ao convite')
-    }
-
-    // Create the user account
+  // Sign up with Supabase Auth (no custom validation needed)
+  static async signUp(email: string, password: string): Promise<any> {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -288,19 +260,6 @@ export class SupabaseService {
 
     if (error) {
       throw new Error(error.message)
-    }
-
-    // If user was created successfully, mark invite as used
-    if (data.user) {
-      await this.markInviteAsUsed(inviteToken)
-      
-      // Assign the role from the invite
-      await supabase
-        .from('user_roles')
-        .insert({
-          user_id: data.user.id,
-          role: invite.role,
-        })
     }
 
     return data

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+// import { useState } from 'react' // Removed unused import
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -9,12 +9,10 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Trash2, Copy, Check } from 'lucide-react'
+import { Loader2, Trash2, Mail } from 'lucide-react'
 import { SupabaseService } from '@/lib/supabaseService'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
-// import { queryKeys } from '@/lib/queryClient' // Removed unused import
-import type { UserInviteInsert } from '@/lib/supabase'
 
 const inviteSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -24,8 +22,6 @@ const inviteSchema = z.object({
 type InviteFormData = z.infer<typeof inviteSchema>
 
 export const InviteManagement = () => {
-  const [copiedToken, setCopiedToken] = useState<string | null>(null)
-  const { user } = useAuth()
   const toast = useToast()
   const queryClient = useQueryClient()
 
@@ -46,28 +42,12 @@ export const InviteManagement = () => {
   // Create invite mutation
   const createInviteMutation = useMutation({
     mutationFn: async (data: InviteFormData) => {
-      if (!user) throw new Error('Usuário não autenticado')
-
-      const token = crypto.randomUUID()
-      const expiresAt = new Date()
-      expiresAt.setDate(expiresAt.getDate() + 7) // 7 days from now
-
-      const inviteData: UserInviteInsert = {
-        email: data.email,
-        role: data.role,
-        invited_by: user.id,
-        token,
-        expires_at: expiresAt.toISOString(),
-      }
-
-      return SupabaseService.createInvite(inviteData)
+      return SupabaseService.createInvite(data.email, data.role)
     },
-    onSuccess: (invite) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invites'] })
-      toast.success('Convite criado com sucesso!')
+      toast.success('Convite enviado por email com sucesso!')
       form.reset()
-      setCopiedToken(invite.token)
-      setTimeout(() => setCopiedToken(null), 3000)
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Erro ao criar convite')
@@ -86,25 +66,29 @@ export const InviteManagement = () => {
     },
   })
 
+  // Resend invite mutation
+  const resendInviteMutation = useMutation({
+    mutationFn: SupabaseService.resendInvite,
+    onSuccess: () => {
+      toast.success('Convite reenviado por email!')
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Erro ao reenviar convite')
+    },
+  })
+
   const onSubmit = (data: InviteFormData) => {
     createInviteMutation.mutate(data)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (userId: string) => {
     if (confirm('Tem certeza que deseja deletar este convite?')) {
-      deleteInviteMutation.mutate(id)
+      deleteInviteMutation.mutate(userId)
     }
   }
 
-  const copyToClipboard = async (token: string) => {
-    try {
-      await navigator.clipboard.writeText(token)
-      setCopiedToken(token)
-      toast.success('Token copiado para a área de transferência!')
-      setTimeout(() => setCopiedToken(null), 3000)
-    } catch (error) {
-      toast.error('Erro ao copiar token')
-    }
+  const handleResend = (email: string) => {
+    resendInviteMutation.mutate(email)
   }
 
   const getRoleBadgeVariant = (role: string) => {
@@ -130,12 +114,15 @@ export const InviteManagement = () => {
     })
   }
 
-  const isExpired = (expiresAt: string) => {
-    return new Date(expiresAt) < new Date()
-  }
-
-  const isUsed = (usedAt: string | null) => {
-    return usedAt !== null
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'confirmed':
+        return <Badge variant="outline">Confirmado</Badge>
+      case 'pending':
+        return <Badge variant="secondary">Pendente</Badge>
+      default:
+        return <Badge variant="outline">Desconhecido</Badge>
+    }
   }
 
   if (isLoading) {
@@ -233,34 +220,25 @@ export const InviteManagement = () => {
                       <Badge variant={getRoleBadgeVariant(invite.role)}>
                         {invite.role}
                       </Badge>
-                      {isUsed(invite.used_at) && (
-                        <Badge variant="outline">Usado</Badge>
-                      )}
-                      {isExpired(invite.expires_at) && !isUsed(invite.used_at) && (
-                        <Badge variant="destructive">Expirado</Badge>
-                      )}
+                      {getStatusBadge(invite.status)}
                     </div>
                     <div className="text-sm text-gray-600">
-                      <p>Criado em: {formatDate(invite.created_at)}</p>
-                      <p>Expira em: {formatDate(invite.expires_at)}</p>
-                      {invite.used_at && (
-                        <p>Usado em: {formatDate(invite.used_at)}</p>
+                      <p>Convite enviado em: {formatDate(invite.invited_at)}</p>
+                      {invite.status === 'confirmed' && (
+                        <p>Confirmado em: {formatDate(invite.created_at)}</p>
                       )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {!isUsed(invite.used_at) && !isExpired(invite.expires_at) && (
+                    {invite.status === 'pending' && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => copyToClipboard(invite.token)}
+                        onClick={() => handleResend(invite.email)}
+                        disabled={resendInviteMutation.isPending}
                       >
-                        {copiedToken === invite.token ? (
-                          <Check className="h-4 w-4" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
+                        <Mail className="h-4 w-4" />
                       </Button>
                     )}
                     <Button

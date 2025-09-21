@@ -20,7 +20,6 @@ const signupSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
   confirmPassword: z.string(),
-  inviteToken: z.string().min(1, 'Token de convite é obrigatório'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Senhas não coincidem",
   path: ["confirmPassword"],
@@ -76,7 +75,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     setError(null)
 
     try {
-      await SupabaseService.signUpWithInvite(data.email, data.password, data.inviteToken)
+      await SupabaseService.signUp(data.email, data.password)
       setError('Conta criada! Verifique seu email para confirmar.')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar conta')
@@ -91,7 +90,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         <CardTitle>{isSignup ? 'Criar Conta' : 'Login'}</CardTitle>
         <CardDescription>
           {isSignup 
-            ? 'Crie uma conta usando seu convite para acessar o painel administrativo'
+            ? 'Crie uma conta para acessar o painel administrativo'
             : 'Entre com suas credenciais para acessar o painel administrativo'
           }
         </CardDescription>
@@ -161,21 +160,6 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="signup-invite-token">Token de Convite</Label>
-              <Input
-                id="signup-invite-token"
-                type="text"
-                placeholder="Cole aqui o token do seu convite"
-                {...signupForm.register('inviteToken')}
-                disabled={isLoading}
-              />
-              {signupForm.formState.errors.inviteToken && (
-                <p className="text-sm text-red-500">
-                  {signupForm.formState.errors.inviteToken.message}
-                </p>
-              )}
-            </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

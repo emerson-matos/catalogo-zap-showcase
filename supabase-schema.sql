@@ -26,32 +26,18 @@ CREATE TABLE IF NOT EXISTS user_roles (
   UNIQUE(user_id)
 );
 
--- Create user_invites table
-CREATE TABLE IF NOT EXISTS user_invites (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  email TEXT NOT NULL UNIQUE,
-  role TEXT NOT NULL CHECK (role IN ('admin', 'editor', 'viewer')),
-  invited_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  token TEXT NOT NULL UNIQUE,
-  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  used_at TIMESTAMP WITH TIME ZONE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Note: Using Supabase Auth native invite system instead of custom table
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_created_at ON products(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_products_is_new ON products(is_new);
 CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_invites_email ON user_invites(email);
-CREATE INDEX IF NOT EXISTS idx_user_invites_token ON user_invites(token);
-CREATE INDEX IF NOT EXISTS idx_user_invites_expires_at ON user_invites(expires_at);
+-- Removed custom invite indexes - using Supabase Auth native system
 
 -- Enable Row Level Security
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_invites ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for products table
 -- Anyone can read products (for public access)
@@ -107,45 +93,7 @@ CREATE POLICY "Only admins can manage user roles" ON user_roles
     )
   );
 
--- Create policies for user_invites table
--- Anyone can check if an invite exists (for signup validation)
-CREATE POLICY "Invites are viewable for validation" ON user_invites
-  FOR SELECT USING (
-    expires_at > NOW() AND used_at IS NULL
-  );
-
--- Only admins can create invites
-CREATE POLICY "Only admins can create invites" ON user_invites
-  FOR INSERT WITH CHECK (
-    auth.uid() IS NOT NULL AND
-    EXISTS (
-      SELECT 1 FROM user_roles 
-      WHERE user_id = auth.uid() 
-      AND role = 'admin'
-    )
-  );
-
--- Only admins can update invites
-CREATE POLICY "Only admins can update invites" ON user_invites
-  FOR UPDATE USING (
-    auth.uid() IS NOT NULL AND
-    EXISTS (
-      SELECT 1 FROM user_roles 
-      WHERE user_id = auth.uid() 
-      AND role = 'admin'
-    )
-  );
-
--- Only admins can delete invites
-CREATE POLICY "Only admins can delete invites" ON user_invites
-  FOR DELETE USING (
-    auth.uid() IS NOT NULL AND
-    EXISTS (
-      SELECT 1 FROM user_roles 
-      WHERE user_id = auth.uid() 
-      AND role = 'admin'
-    )
-  );
+-- Note: Using Supabase Auth native invite system - no custom policies needed
 
 -- Create function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -165,9 +113,7 @@ CREATE TRIGGER update_user_roles_updated_at
   BEFORE UPDATE ON user_roles 
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_user_invites_updated_at 
-  BEFORE UPDATE ON user_invites 
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Removed custom invite triggers - using Supabase Auth native system
 
 -- Create function to get user role
 CREATE OR REPLACE FUNCTION get_user_role(user_uuid UUID)
