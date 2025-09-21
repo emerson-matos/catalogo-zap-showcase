@@ -18,7 +18,7 @@ const Footer = () => {
               <span className="text-xl font-bold">SeRena Cosméticos</span>
             </div>
             <p className="text-primary-foreground/80 leading-relaxed">
-              Tudo posso naquele que me fortalesse.<br />Deus é fiel!
+              Tudo posso naquele que me fortalece.<br />Deus é fiel!
             </p>
           </div>
 
