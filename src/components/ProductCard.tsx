@@ -20,14 +20,14 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             alt={product.name}
             loading="lazy"
             decoding="async"
-            className="w-full h-64 transition-transform duration-300 group-hover:scale-110"
+            className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-scale-down"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = "/placeholder.svg";
             }}
           />
           {product.isNew && (
-            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-accent to-accent/90 text-black dark:text-white font-bold shadow-lg border border-accent/20 backdrop-blur-sm">
+            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-accent to-accent/90 text-accent font-bold shadow-lg border border-accent/20 backdrop-blur-sm">
               Novo
             </Badge>
           )}
