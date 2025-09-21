@@ -35,16 +35,29 @@ export const useAuth = () => {
       }
 
       if (session?.user) {
-        const role = await SupabaseService.getUserRole(session.user.id)
-        setAuthState({
-          user: session.user,
-          session,
-          role,
-          isLoading: false,
-          isAdmin: role === 'admin',
-          isEditor: role === 'editor' || role === 'admin',
-          isViewer: role === 'viewer' || role === 'editor' || role === 'admin',
-        })
+        try {
+          const role = await SupabaseService.getUserRole(session.user.id)
+          setAuthState({
+            user: session.user,
+            session,
+            role,
+            isLoading: false,
+            isAdmin: role === 'admin',
+            isEditor: role === 'editor' || role === 'admin',
+            isViewer: role === 'viewer' || role === 'editor' || role === 'admin',
+          })
+        } catch (error) {
+          console.error('Error getting user role:', error)
+          setAuthState({
+            user: session.user,
+            session,
+            role: null,
+            isLoading: false,
+            isAdmin: false,
+            isEditor: false,
+            isViewer: false,
+          })
+        }
       } else {
         setAuthState(prev => ({ ...prev, isLoading: false }))
       }
@@ -56,16 +69,29 @@ export const useAuth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session?.user) {
-          const role = await SupabaseService.getUserRole(session.user.id)
-          setAuthState({
-            user: session.user,
-            session,
-            role,
-            isLoading: false,
-            isAdmin: role === 'admin',
-            isEditor: role === 'editor' || role === 'admin',
-            isViewer: role === 'viewer' || role === 'editor' || role === 'admin',
-          })
+          try {
+            const role = await SupabaseService.getUserRole(session.user.id)
+            setAuthState({
+              user: session.user,
+              session,
+              role,
+              isLoading: false,
+              isAdmin: role === 'admin',
+              isEditor: role === 'editor' || role === 'admin',
+              isViewer: role === 'viewer' || role === 'editor' || role === 'admin',
+            })
+          } catch (error) {
+            console.error('Error getting user role:', error)
+            setAuthState({
+              user: session.user,
+              session,
+              role: null,
+              isLoading: false,
+              isAdmin: false,
+              isEditor: false,
+              isViewer: false,
+            })
+          }
         } else {
           setAuthState({
             user: null,

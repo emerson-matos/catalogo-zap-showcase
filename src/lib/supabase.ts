@@ -71,6 +71,38 @@ export interface Database {
           updated_at?: string
         }
       }
+      user_invites: {
+        Row: {
+          id: string
+          email: string
+          role: 'admin' | 'editor' | 'viewer'
+          invited_by: string | null
+          token: string
+          expires_at: string
+          used_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          role: 'admin' | 'editor' | 'viewer'
+          invited_by?: string | null
+          token: string
+          expires_at: string
+          used_at?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          role?: 'admin' | 'editor' | 'viewer'
+          invited_by?: string | null
+          token?: string
+          expires_at?: string
+          used_at?: string | null
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -90,3 +122,6 @@ export type ProductUpdate = Database['public']['Tables']['products']['Update']
 export type UserRole = Database['public']['Tables']['user_roles']['Row']
 export type UserRoleInsert = Database['public']['Tables']['user_roles']['Insert']
 export type UserRoleUpdate = Database['public']['Tables']['user_roles']['Update']
+export type UserInvite = Database['public']['Tables']['user_invites']['Row']
+export type UserInviteInsert = Database['public']['Tables']['user_invites']['Insert']
+export type UserInviteUpdate = Database['public']['Tables']['user_invites']['Update']

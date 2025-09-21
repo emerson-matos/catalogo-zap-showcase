@@ -14,6 +14,7 @@ import { useProductsQuery } from '@/hooks/useProductsQuery'
 import { useAdminProducts } from '@/hooks/useAdminProducts'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
+import { InviteManagement } from '@/components/InviteManagement'
 import type { Product, ProductInsert } from '@/lib/supabase'
 
 const productSchema = z.object({
@@ -35,7 +36,7 @@ interface AdminPanelProps {
 export const AdminPanel = ({ onLogout }: AdminPanelProps) => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   
-  const { user, signOut } = useAuth()
+  const { user, signOut, isAdmin } = useAuth()
   const { products, isLoading } = useProductsQuery()
   const { createProduct, updateProduct, deleteProduct, isMutating } = useAdminProducts()
   const toast = useToast()
@@ -142,6 +143,7 @@ export const AdminPanel = ({ onLogout }: AdminPanelProps) => {
           <TabsList>
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="add-product">Adicionar Produto</TabsTrigger>
+            {isAdmin && <TabsTrigger value="invites">Convites</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="products" className="space-y-6">
@@ -344,6 +346,12 @@ export const AdminPanel = ({ onLogout }: AdminPanelProps) => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="invites">
+              <InviteManagement />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
