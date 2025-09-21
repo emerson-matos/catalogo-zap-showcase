@@ -66,16 +66,11 @@ const Flipbook = ({ products }: FlipbookProps) => {
         >
           {/* Flipbook */}
           <PageCover>
-            <div className="flex flex-col gap-2 mb-10">
-              <h2>Catálogo de Produtos</h2>
-              <br />
-              <p>Arraste para visualizar</p>
-            </div>
             <div className=" w-full aspect-video overflow-clip">
               <img
                 src={logoImage}
                 alt="SeRena Cosméticos Logo"
-                className="border-4 bg-white-500 w-full h-70 sm:h-150 object-cover object-center"
+                className="border-4 bg-white-500 w-full h-70 sm:h-150 object-fill md:object-fill object-center"
               />
               <div className="text-lg mt-4 italic flex justify-center text-center">
                 você é seu maior investimento, cuide-se.

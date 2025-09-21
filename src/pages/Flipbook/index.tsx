@@ -29,12 +29,17 @@ export const FlipbookPage = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="container mx-auto px-4 mb-8">
-        <div className="text-center mb-8">
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto p-4 m-2">
+      <div className="container mx-auto px-4 m-8">
+        <div className="text-center">
+          <h1>Catálogo de Produtos</h1>
+        </div>
+        <div className="flex flex-col gap-2 mb-10 text-lg text-muted-foreground max-w-2xl mx-auto p-4 m-2">
+          <p>
             Navegue pelos nossos produtos em um formato interativo de livro. Use
             as setas do teclado ou os botões para virar as páginas.
           </p>
+          <br />
+          <p>Arraste para visualizar</p>
         </div>
       </div>
 
