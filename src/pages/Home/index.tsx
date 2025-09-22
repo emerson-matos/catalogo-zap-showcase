@@ -9,11 +9,13 @@ import {
   BookOpen,
 } from "lucide-react";
 
+import WhatsAppFloat from '@/components/WhatsAppFloat';
+
 export const Home = () => {
   return (
     <>
       <Hero sectionId="hero" />
-
+      <WhatsAppFloat />
       {/* Quick Navigation Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">

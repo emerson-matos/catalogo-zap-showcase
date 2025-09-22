@@ -4,33 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@layer utilities {
-  .clip-heart {
-    clip-path: polygon(
-      50% 12%,
-      60% 5%,
-      70% 3%,
-      80% 6%,
-      87% 14%,
-      92% 25%,
-      94% 38%,
-      90% 52%,
-      82% 65%,
-      70% 76%,
-      50% 92%,
-      30% 76%,
-      18% 65%,
-      10% 52%,
-      6% 38%,
-      8% 25%,
-      13% 14%,
-      20% 6%,
-      30% 3%,
-      40% 5%
-    );
-  }
-}
-
 @layer base {
   h1 {
     @apply text-4xl font-bold md:text-5xl;
@@ -98,28 +71,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* Category color tokens for Tailwind utilities */
-  --color-category-aluguel: var(--category-aluguel);
-  --color-category-compras: var(--category-compras);
-  --color-category-contas: var(--category-contas);
-  --color-category-desconhecido: var(--category-desconhecido);
-  --color-category-despesas-medicas: var(--category-despesas-medicas);
-  --color-category-entretenimento: var(--category-entretenimento);
-  --color-category-inicial: var(--category-inicial);
-  --color-category-parcelamento-de-emprestimo: var(
-    --category-parcelamento-de-emprestimo
-  );
-  --color-category-presente: var(--category-presente);
-  --color-category-reembolso: var(--category-reembolso);
-  --color-category-rendimentos-de-investimentos: var(
-    --category-rendimentos-de-investimentos
-  );
-  --color-category-rendimentos-de-juros: var(--category-rendimentos-de-juros);
-  --color-category-restaurantes: var(--category-restaurantes);
-  --color-category-salario: var(--category-salario);
-  --color-category-seguro: var(--category-seguro);
-  --color-category-supermercado: var(--category-supermercado);
-  --color-category-transporte: var(--category-transporte);
 }
 
 /* Design System - Tailwind v4 Compatible */
@@ -224,58 +175,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* Custom utility classes for gradients and shadows */
-.gradient-primary {
-  background: linear-gradient(
-    135deg,
-    hsl(var(--primary)),
-    hsl(var(--primary) / 0.8)
-  );
-}
-
-.gradient-hero {
-  background: linear-gradient(
-    135deg,
-    hsl(var(--primary)),
-    hsl(var(--primary) / 0.9)
-  );
-}
-
-.gradient-card {
-  background: linear-gradient(
-    145deg,
-    hsl(var(--card)),
-    hsl(var(--card) / 0.95)
-  );
-}
-
-.shadow-card {
-  box-shadow:
-    0 4px 6px -1px hsl(var(--primary) / 0.1),
-    0 2px 4px -1px hsl(var(--primary) / 0.06);
-}
-
-.shadow-card-hover {
-  box-shadow:
-    0 10px 15px -3px hsl(var(--primary) / 0.1),
-    0 4px 6px -2px hsl(var(--primary) / 0.05);
-}
-
-.shadow-button {
-  box-shadow: 0 4px 14px 0 hsl(var(--primary) / 0.25);
-}
-
-/* Flipbook Styles */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.transform-gpu {
-  transform: translateZ(0);
 }

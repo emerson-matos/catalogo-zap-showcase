@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
@@ -19,7 +18,6 @@ import { Loader2, Edit, Trash2 } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useAdminProducts } from "@/hooks/useAdminProducts";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/useToast";
 import type { Product, ProductInsert } from "@/lib/supabase";
 import {
   Form,
@@ -29,6 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
+import { toast } from "sonner";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -48,7 +47,6 @@ export const AdminPanel = () => {
   const { products, isLoading } = useProductsQuery();
   const { createProduct, updateProduct, deleteProduct, isMutating } =
     useAdminProducts();
-  const toast = useToast();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),

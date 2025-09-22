@@ -22,16 +22,19 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
   } = useProductsQuery();
 
   return (
-    <section id={sectionId} className="py-20 bg-background">
+    <section id={sectionId} className="py-20 bg-card text-foreground">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <h2 className="text-4xl font-bold">Nossos Produtos</h2>
+            <h2 className="text-4xl font-bold text-primary">Nossos Produtos</h2>
             {isFetching && !isLoading && (
               <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
             )}
             {isStale && (
-              <Wifi className="h-4 w-4 text-yellow-500" title="Dados podem estar desatualizados" />
+              <Wifi
+                className="h-4 w-4 text-yellow-500"
+                title="Dados podem estar desatualizados"
+              />
             )}
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -41,13 +44,13 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
 
         {/* Error State */}
         {isError && error && (
-          <Alert className="mb-8 border-destructive/50 bg-destructive/10">
+          <Alert className="mb-8 border-destructive bg-destructive/10">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
               <span>Erro ao carregar produtos: {error}</span>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => refetch()}
                 disabled={isFetching}
               >
@@ -74,45 +77,43 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
 
         {/* Category Filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-24" />
-            ))
-          ) : (
-            categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-                className="transition-all duration-300"
-                disabled={isFetching && isLoading}
-              >
-                {category}
-              </Button>
-            ))
-          )}
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-24" />
+              ))
+            : categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={
+                    selectedCategory === category ? "default" : "outline"
+                  }
+                  onClick={() => setSelectedCategory(category)}
+                  className="transition-all duration-300"
+                  disabled={isFetching && isLoading}
+                >
+                  {category}
+                </Button>
+              ))}
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {isLoading ? (
-            Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="h-64 w-full rounded-lg" />
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-8 w-full" />
-              </div>
-            ))
-          ) : (
-            products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 bg-card">
+          {isLoading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="h-64 w-full rounded-lg" />
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              ))
+            : products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
         </div>
 
         {/* Statistics */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center bg-background">
           <div className="p-6">
             <div className="text-4xl font-bold text-primary mb-2">
               {totalProducts}+

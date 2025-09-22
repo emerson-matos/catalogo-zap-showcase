@@ -40,13 +40,13 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-[400px] flex items-center justify-center p-8">
           <div className="max-w-md w-full">
-            <Alert className="border-destructive/50 bg-destructive/10">
+            <Alert className="border-destructive bg-destructive/10">
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Algo deu errado</AlertTitle>
               <AlertDescription className="mt-2">
                 Ocorreu um erro inesperado. Por favor, tente novamente.
                 {process.env.NODE_ENV === 'development' && this.state.error && (
-                  <details className="mt-4 p-4 bg-muted rounded text-sm">
+                  <details className="mt-4 p-4 bg-card rounded text-sm text-muted-foreground">
                     <summary className="cursor-pointer font-medium">
                       Detalhes do erro (desenvolvimento)
                     </summary>

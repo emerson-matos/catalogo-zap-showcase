@@ -8,7 +8,7 @@ const Footer = () => {
     : "https://wa.me";
 
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="bg-card text-foreground border-t border-border">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo e Descrição */}
@@ -120,7 +120,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center text-primary-foreground/60">
+        <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
           <p>&copy; 2024 SeRena Cosméticos. Todos os direitos reservados.</p>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { Heart, Users, Star, Award } from "lucide-react";
 
 const About = ({ sectionId }: { sectionId: string }) => {
   return (
-    <section id={sectionId} className="py-20 bg-background">
+    <section id={sectionId} className="py-20 bg-card text-foreground">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Quem Somos</h2>
@@ -15,7 +15,7 @@ const About = ({ sectionId }: { sectionId: string }) => {
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           {/* História */}
           <div className="space-y-6">
-            <Card className="bg-gradient-card shadow-card">
+            <Card className="bg-card shadow-lg border border-border">
               <CardContent className="p-8">
                 <div className="flex items-start space-x-4">
                   <div className="bg-primary/10 p-3 rounded-lg">
