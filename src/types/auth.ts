@@ -12,32 +12,10 @@ export interface AuthState {
   readonly isViewer: boolean;
 }
 
-export interface AuthContextType extends AuthState {
-  readonly signIn: (email: string, password: string) => Promise<void>;
-  readonly signUp: (email: string, password: string) => Promise<void>;
-  readonly signOut: () => Promise<void>;
-  readonly resetPassword: (email: string) => Promise<void>;
-}
-
 export interface JWTPayload {
   readonly user_role: UserRole;
   readonly sub: string;
   readonly email: string;
   readonly exp: number;
   readonly iat: number;
-}
-
-export interface LoginFormData {
-  readonly email: string;
-  readonly password: string;
-}
-
-export interface SignupFormData {
-  readonly email: string;
-  readonly password: string;
-  readonly confirmPassword: string;
-}
-
-export interface ResetPasswordFormData {
-  readonly email: string;
 }

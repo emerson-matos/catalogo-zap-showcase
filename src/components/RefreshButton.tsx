@@ -23,7 +23,7 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
     try {
       await refetchProducts();
       toast.success('Produtos atualizados com sucesso!');
-    } catch (error) {
+    } catch {
       toast.error('Erro ao atualizar produtos');
     }
   };

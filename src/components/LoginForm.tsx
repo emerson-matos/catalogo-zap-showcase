@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Auth } from "@supabase/auth-ui-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,7 +35,7 @@ interface LoginFormProps {
 }
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 

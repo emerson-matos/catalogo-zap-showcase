@@ -1,5 +1,3 @@
-// import type { BaseEntity } from './common';
-
 // Re-export Supabase types for backward compatibility
 export type { Product } from '@/lib/supabase';
 
@@ -46,28 +44,10 @@ export interface ProductSortOptions {
   readonly order: 'asc' | 'desc';
 }
 
-export interface ProductFormData {
-  readonly name: string;
-  readonly description: string;
-  readonly price: number;
-  readonly image: string;
-  readonly category: string;
-  readonly rating?: number;
-  readonly isNew?: boolean;
-}
-
 export interface ProductCardProps {
   readonly product: Product;
   readonly onAddToCart?: (product: Product) => void;
   readonly onWhatsApp?: (product: Product) => void;
-  readonly className?: string;
-}
-
-export interface ProductGridProps {
-  readonly products: readonly Product[];
-  readonly loading?: boolean;
-  readonly error?: string;
-  readonly onProductClick?: (product: Product) => void;
   readonly className?: string;
 }
 

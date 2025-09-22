@@ -1,4 +1,4 @@
-import { createRootRoute, HeadContent, Outlet, ErrorComponent } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet } from "@tanstack/react-router";
 import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
