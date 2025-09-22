@@ -14,9 +14,9 @@ interface ProductCardProps {
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
   return (
-    <Link to="/products/$productId" params={{ productId: product.id }}>
-      <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
-        <CardContent className="p-0">
+    <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
+      <CardContent className="p-0">
+        <Link to="/products/$id" params={{ id: product.id }}>
           <div className="relative overflow-hidden rounded-t-lg">
             <img
               src={product.image}
@@ -61,26 +61,26 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               )}
             </div>
           </div>
-        </CardContent>
+        </Link>
+      </CardContent>
 
-        <CardFooter className="p-6 pt-0 flex gap-2">
-          <WhatsAppButton
-            product={product}
-            className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
-            size="default"
-          >
-            Consultar
-          </WhatsAppButton>
-          <AddToCartButton
-            product={product}
-            className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow hover:shadow-lg transition-all duration-200 bg-primary text-primary-foreground"
-            size="default"
-          >
-            Adicionar
-          </AddToCartButton>
-        </CardFooter>
-      </Card>
-    </Link>
+      <CardFooter className="flex gap-2">
+        <WhatsAppButton
+          product={product}
+          className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
+          size="default"
+        >
+          Consultar
+        </WhatsAppButton>
+        <AddToCartButton
+          product={product}
+          className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow hover:shadow-lg transition-all duration-200 bg-primary text-primary-foreground"
+          size="default"
+        >
+          Adicionar
+        </AddToCartButton>
+      </CardFooter>
+    </Card>
   );
 });
 

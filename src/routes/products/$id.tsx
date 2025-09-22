@@ -5,21 +5,15 @@ import { ArrowLeft, Package } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { formatPriceBRL } from "@/lib/utils";
 
-export const Route = createFileRoute("/products/$productId")({
+export const Route = createFileRoute("/products/$id")({
   component: ProductDetailPage,
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      variant: (search.variant as string) || undefined,
-    };
-  },
 });
 
 function ProductDetailPage() {
-  const { productId } = Route.useParams();
-  const { variant } = Route.useSearch();
+  const { id } = Route.useParams();
   const { products, isLoading, error } = useProductsQuery();
 
-  const product = products?.find((p) => p.id === productId);
+  const product = products?.find((p) => p.id === id);
 
   if (isLoading) {
     return (
@@ -94,15 +88,6 @@ function ProductDetailPage() {
                 <span className="font-medium">{product.category}</span>
               </div>
             )}
-
-            {variant && (
-              <div>
-                <span className="text-sm text-muted-foreground">
-                  Variante:{" "}
-                </span>
-                <span className="font-medium">{variant}</span>
-              </div>
-            )}
           </div>
 
           <div className="pt-4">
@@ -115,4 +100,3 @@ function ProductDetailPage() {
     </div>
   );
 }
-
