@@ -1,12 +1,13 @@
-import { createRootRoute, HeadContent, Outlet, ErrorComponent } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet } from "@tanstack/react-router";
 import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
 import { Page404 } from "@/pages/404";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 const title = "SeRena Cosméticos";
-const description = "Distribuidora de comésticos do ABC paulista";
+const description = "Distribuidora de cosméticos do ABC paulista";
 const url = window.location.origin;
 
 export const Route = createRootRoute({
@@ -99,6 +100,40 @@ export const Route = createRootRoute({
       },
     ],
   }),
+  errorComponent: ({ error, reset }) => (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="text-center space-y-4 max-w-md">
+        <AlertTriangle className="w-16 h-16 mx-auto text-destructive" />
+        <h1 className="text-2xl font-bold">Algo deu errado</h1>
+        <p className="text-muted-foreground">
+          Ocorreu um erro inesperado. Tente recarregar a página.
+        </p>
+        <div className="space-y-2">
+          <Button onClick={reset} className="w-full">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Tentar Novamente
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = "/")}
+            className="w-full"
+          >
+            Voltar ao Início
+          </Button>
+        </div>
+        {process.env.NODE_ENV === "development" && (
+          <details className="text-left">
+            <summary className="cursor-pointer text-sm text-muted-foreground">
+              Detalhes do erro
+            </summary>
+            <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
+              {error instanceof Error ? error.message : String(error)}
+            </pre>
+          </details>
+        )}
+      </div>
+    </div>
+  ),
   component: () => (
     <>
       <HeadContent />
@@ -109,28 +144,9 @@ export const Route = createRootRoute({
             <Outlet />
           </main>
           <Footer />
-          <WhatsAppFloat />
         </div>
       </Providers>
     </>
-  ),
-  errorComponent: ({ error }) => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-destructive mb-4">
-          Algo deu errado!
-        </h1>
-        <p className="text-muted-foreground mb-6">
-          {error instanceof Error ? error.message : 'Ocorreu um erro inesperado'}
-        </p>
-        <button 
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-        >
-          Recarregar página
-        </button>
-      </div>
-    </div>
   ),
   notFoundComponent: () => <Page404 />,
 });

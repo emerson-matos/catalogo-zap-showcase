@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import type { Product } from "@/types/product";
+import type { Product } from "@/lib/supabase";
 
 export interface ProductFilters {
   priceRange: [number, number];
@@ -52,7 +52,7 @@ export const useProductFilters = (products: Product[]) => {
       }
 
       // New products filter
-      if (currentFilters.showNewOnly && !product.isNew) {
+      if (currentFilters.showNewOnly && !product.is_new) {
         return false;
       }
 

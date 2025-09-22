@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import type { Product } from "@/types/product";
+import type { Product } from "@/lib/supabase";
 
 export const useProductSearch = (products: Product[]) => {
   const [searchQuery, setSearchQuery] = useState("");

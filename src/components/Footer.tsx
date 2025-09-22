@@ -1,5 +1,7 @@
-import { Package, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
+import { MessageCircle, Phone, Mail, MapPin, Rose } from "lucide-react";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
+import { Button } from "./ui/button";
+import { Link } from "@tanstack/react-router";
 
 const Footer = () => {
   const whatsappNumber = getWhatsAppNumber();
@@ -8,24 +10,26 @@ const Footer = () => {
     : "https://wa.me";
 
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="border-t border-border">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo e Descrição */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Package className="w-8 h-8" />
+              <Rose className="size-8" />
               <span className="text-xl font-bold">SeRena Cosméticos</span>
             </div>
-            <p className="text-primary-foreground/80 leading-relaxed">
-              Tudo posso naquele que me fortalesse. Deus é fiel!
+            <p className="text-muted-foreground leading-relaxed">
+              Tudo posso naquele que me fortalece.
+              <br />
+              Deus é fiel!
             </p>
           </div>
 
           {/* Links Rápidos */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Links Rápidos</h3>
-            <ul className="space-y-2 text-primary-foreground/80">
+            <ul className="space-y-2 text-muted-foreground">
               <li>
                 <button
                   onClick={() =>
@@ -39,40 +43,28 @@ const Footer = () => {
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() =>
-                    document
-                      .getElementById("produtos")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
+                <a
                   className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                  href="/products"
                 >
                   Produtos
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() =>
-                    document
-                      .getElementById("quem-somos")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
+                <a
                   className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                  href="/about"
                 >
                   Quem Somos
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() =>
-                    document
-                      .getElementById("contato")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
+                <a
                   className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                  href="/contact"
                 >
                   Contato
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -80,7 +72,7 @@ const Footer = () => {
           {/* Contato */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Contato</h3>
-            <div className="space-y-3 text-primary-foreground/80">
+            <div className="space-y-3 text-muted-foreground">
               <div className="flex items-center space-x-2">
                 <MessageCircle className="size-4" />
                 <a
@@ -104,12 +96,13 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="size-4" />
-                <span>sandrofar@hotmail.com</span>
+                <span>serenacosmeticos@hotmail.com</span>
               </div>
               <div className="flex items-start space-x-2">
                 <MapPin className="size-4 mt-0.5" />
                 <span className="text-sm">
-                  Av. Sorocaba, 961, Pq João Ramalho<br />
+                  Av. Sorocaba, 961, Pq João Ramalho
+                  <br />
                   Santo André - SP
                 </span>
               </div>
@@ -117,7 +110,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center text-primary-foreground/60">
+        <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
           <p>&copy; 2024 SeRena Cosméticos. Todos os direitos reservados.</p>
         </div>
       </div>

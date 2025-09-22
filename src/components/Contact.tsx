@@ -7,7 +7,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
   const whatsappNumber = getWhatsAppNumber();
 
   return (
-    <section id={sectionId} className="py-20 bg-muted/30">
+    <section id={sectionId} className="py-20 bg-card text-foreground">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Entre em Contato</h2>
@@ -20,7 +20,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Informações de Contato */}
           <div className="space-y-6">
-            <Card className="bg-gradient-card shadow-card">
+            <Card className="bg-card shadow-card border border-border">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
                   <div className="bg-whatsapp/10 p-3 rounded-lg">
@@ -39,11 +39,11 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-card shadow-card">
+            <Card className="shadow-card">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-primary/10 p-3 rounded-lg">
-                    <Phone className="w-6 h-6 text-primary" />
+                  <div className="p-3 rounded-lg">
+                    <Phone className="size-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">Telefone</h3>
@@ -57,16 +57,16 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-card shadow-card">
+            <Card className="shadow-card">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-primary/10 p-3 rounded-lg">
+                  <div className="p-3 rounded-lg">
                     <Mail className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">E-mail</h3>
                     <p className="text-muted-foreground">
-                      sandrofar@hotmail.com
+                      serenacosmeticos@hotmail.com
                     </p>
                   </div>
                 </div>
@@ -76,11 +76,11 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
 
           {/* Informações Adicionais */}
           <div className="space-y-6">
-            <Card className="bg-gradient-card shadow-card">
+            <Card className="shadow-card">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-accent/10 p-3 rounded-lg">
-                    <Clock className="w-6 h-6 text-accent" />
+                  <div className="p-3 rounded-lg">
+                    <Clock className="size-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">
@@ -96,10 +96,10 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-card shadow-card">
+            <Card className="shadow-card">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-primary/10 p-3 rounded-lg">
+                  <div className=" p-3 rounded-lg">
                     <MapPin className="w-6 h-6 text-primary" />
                   </div>
                   <div>
@@ -116,7 +116,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-primary text-primary-foreground shadow-card">
+            <Card className="bg-primary text-primary-foreground shadow-lg border border-border">
               <CardContent className="p-6 text-center">
                 <h3 className="font-bold text-xl mb-3">Pronto para Comprar?</h3>
                 <p className="mb-6 opacity-90">

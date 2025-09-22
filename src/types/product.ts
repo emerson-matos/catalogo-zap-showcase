@@ -1,4 +1,8 @@
-export interface Product {
+// Re-export Supabase types for backward compatibility
+export type { Product } from '@/lib/supabase'
+
+// Legacy interface for backward compatibility
+export interface LegacyProduct {
   id: string;
   name: string;
   description: string;
@@ -7,6 +11,21 @@ export interface Product {
   category: string;
   rating?: number;
   isNew?: boolean;
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export interface CartContextType {
+  items: CartItem[];
+  addItem: (product: Product, quantity?: number) => void;
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+  getTotalItems: () => number;
+  getTotalPrice: () => number;
 }
 
 export interface ProductCategory {

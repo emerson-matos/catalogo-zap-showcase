@@ -1,6 +1,7 @@
 import heroImage from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "./ui/whatsapp-button";
+import { Link } from "@tanstack/react-router";
 
 const Hero = ({ sectionId }: { sectionId: string }) => {
   return (
@@ -34,13 +35,9 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
                 variant="outline"
                 size="lg"
                 className="text-lg px-8 py-4 h-auto"
-                onClick={() =>
-                  document
-                    .getElementById("produtos")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
+                asChild
               >
-                Ver Produtos
+                <Link to="/products">Ver Produtos</Link>
               </Button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import type { Product } from "@/types/product";
+import type { Product } from "@/lib/supabase";
 
 export type SortOption = "name-asc" | "name-desc" | "price-asc" | "price-desc" | "rating-desc" | "category-asc";
 
