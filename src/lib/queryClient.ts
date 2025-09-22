@@ -41,7 +41,6 @@ export const createQueryClient = () =>
 export const queryKeys = {
   products: {
     all: ["products"] as const,
-    sheets: () => [...queryKeys.products.all, "sheets"] as const,
     supabase: () => [...queryKeys.products.all, "supabase"] as const,
     categories: () => [...queryKeys.products.all, "categories"] as const,
     byCategory: (category: string) =>
@@ -55,15 +54,9 @@ export const queryKeys = {
     list: () => [...queryKeys.categories.all, "list"] as const,
     byId: (id: string) => [...queryKeys.categories.all, "id", id] as const,
   },
-  categories: {
-    all: ['categories'] as const,
-    list: () => [...queryKeys.categories.all, 'list'] as const,
-    byId: (id: string) => [...queryKeys.categories.all, 'id', id] as const,
-  },
   auth: {
     all: ["auth"] as const,
     user: () => [...queryKeys.auth.all, "user"] as const,
     role: (userId: string) => [...queryKeys.auth.all, "role", userId] as const,
   },
 } as const;
-

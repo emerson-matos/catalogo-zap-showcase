@@ -7,14 +7,6 @@ export const APP_CONFIG = {
     anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
   },
 
-  // Google Sheets configuration (for migration)
-  googleSheets: {
-    id: import.meta.env.VITE_GOOGLE_SHEETS_ID,
-    gid: import.meta.env.VITE_GOOGLE_SHEETS_GID,
-    sheet: import.meta.env.VITE_GOOGLE_SHEETS_SHEET,
-    csvUrl: import.meta.env.VITE_GOOGLE_SHEETS_CSV_URL,
-  },
-
   // App settings
   app: {
     name: "Serena Cosméticos",
@@ -24,7 +16,6 @@ export const APP_CONFIG = {
 
   // Feature flags
   features: {
-    enableMigration: !!import.meta.env.VITE_GOOGLE_SHEETS_ID,
     enableAdminPanel: true,
     enablePublicAccess: true,
   },
@@ -38,4 +29,3 @@ if (!APP_CONFIG.supabase.url || !APP_CONFIG.supabase.anonKey) {
 }
 
 export default APP_CONFIG;
-
