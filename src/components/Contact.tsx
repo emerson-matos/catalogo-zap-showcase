@@ -66,7 +66,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
                   <div>
                     <h3 className="font-semibold text-lg mb-2">E-mail</h3>
                     <p className="text-muted-foreground">
-                      sandrofar@hotmail.com
+                      serenacosmeticos@hotmail.com
                     </p>
                   </div>
                 </div>
