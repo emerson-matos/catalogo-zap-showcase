@@ -74,7 +74,6 @@ export const useAuth = () => {
     });
     return () => subscription.unsubscribe();
   }, []);
-  console.log(authState, "auth");
   return {
     ...authState,
   };

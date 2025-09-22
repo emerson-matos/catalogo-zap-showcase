@@ -37,7 +37,6 @@ const productSchema = z.object({
   image: z.string().url("URL da imagem inválida"),
   category: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().min(0).max(5).optional(),
-  is_new: z.boolean().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -60,7 +59,6 @@ export const AdminPanel = () => {
       image: "",
       category: "",
       rating: undefined,
-      is_new: false,
     },
   });
 
@@ -99,7 +97,6 @@ export const AdminPanel = () => {
       image: product.image,
       category: product.category,
       rating: product.rating,
-      is_new: product.is_new || false,
     });
   };
 
@@ -142,8 +139,6 @@ export const AdminPanel = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <toast.ToastComponent />
-
         <Tabs defaultValue="products" className="space-y-6">
           <TabsList>
             <TabsTrigger value="products">Produtos</TabsTrigger>
