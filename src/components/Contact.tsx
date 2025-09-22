@@ -7,7 +7,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
   const whatsappNumber = getWhatsAppNumber();
 
   return (
-    <section id={sectionId} className="py-20 bg-muted/30">
+    <section id={sectionId} className="py-20 bg-card text-foreground">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Entre em Contato</h2>
@@ -20,7 +20,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Informações de Contato */}
           <div className="space-y-6">
-            <Card className="bg-gradient-card shadow-card">
+            <Card className="bg-card shadow-lg border border-border">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
                   <div className="bg-whatsapp/10 p-3 rounded-lg">
@@ -116,7 +116,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-primary text-primary-foreground shadow-card">
+            <Card className="bg-primary text-primary-foreground shadow-lg border border-border">
               <CardContent className="p-6 text-center">
                 <h3 className="font-bold text-xl mb-3">Pronto para Comprar?</h3>
                 <p className="mb-6 opacity-90">

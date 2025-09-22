@@ -31,7 +31,7 @@ export function CartFloat() {
           </div>
         </Button>
       ) : (
-        <Card className="w-80 max-h-96 shadow-xl border-0 bg-background/95 backdrop-blur-sm">
+        <Card className="w-80 max-h-96 shadow-lg border border-border bg-card">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold">
@@ -126,7 +126,7 @@ export function CartFloat() {
 
               <Button
                 onClick={handleWhatsAppCheckout}
-                className="w-full justify-center gap-2 bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover"
+                className="w-full justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
                 size="default"
               >
                 <MessageCircle className="h-4 w-4 mr-2" />

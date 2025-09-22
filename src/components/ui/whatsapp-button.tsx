@@ -22,11 +22,11 @@ export const WhatsAppButton = ({
   const getVariantClasses = () => {
     switch (variant) {
       case "ghost":
-        return "bg-transparent text-whatsapp hover:bg-whatsapp/10 hover:text-whatsapp";
+        return "bg-transparent text-accent hover:bg-accent/10 hover:text-accent";
       case "outline":
-        return "border-whatsapp text-whatsapp hover:bg-whatsapp hover:text-whatsapp-foreground";
+        return "border-accent text-accent hover:bg-accent hover:text-accent-foreground";
       default:
-        return "bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover";
+        return "bg-accent text-accent-foreground hover:bg-accent/90";
     }
   };
 
