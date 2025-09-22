@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
-import type { Product } from '@/types/product';
+import { useState, useMemo } from "react";
+import type { Product } from "@/types/product";
+import { useCategoriesQuery, useCategoryQuery } from "./useCategoryQuery";
 
 export interface ProductFilters {
   category: string;
@@ -9,14 +10,18 @@ export interface ProductFilters {
 }
 
 const parsePrice = (price: number | string): number => {
-  if (typeof price === 'number') return price;
-  const parsed = parseFloat(String(price).replace(/[^\d.,]/g, '').replace(',', '.'));
+  if (typeof price === "number") return price;
+  const parsed = parseFloat(
+    String(price)
+      .replace(/[^\d.,]/g, "")
+      .replace(",", "."),
+  );
   return isNaN(parsed) ? 0 : parsed;
 };
 
 export const useProductFilters = (products: Product[]) => {
   const [filters, setFilters] = useState<ProductFilters>({
-    category: 'Todos',
+    category: "Todos",
     priceRange: [0, 1000],
     minRating: 0,
     showNewOnly: false,
@@ -25,27 +30,22 @@ export const useProductFilters = (products: Product[]) => {
   // Get price range from products
   const priceRange = useMemo(() => {
     if (!products.length) return { min: 0, max: 1000 };
-    
-    const prices = products.map(product => parsePrice(product.price));
+
+    const prices = products.map((product) => parsePrice(product.price));
     return {
       min: Math.min(...prices),
       max: Math.max(...prices),
     };
   }, [products]);
 
-  // Get unique categories
-  const categories = useMemo(() => {
-    const uniqueCategories = Array.from(
-      new Set(products.map(product => product.category).filter(Boolean))
-    );
-    return ['Todos', ...uniqueCategories.sort()];
-  }, [products]);
-
   // Apply filters
   const filteredProducts = useMemo(() => {
-    return products.filter(product => {
+    return products.filter((product) => {
       // Category filter
-      if (filters.category !== 'Todos' && product.category !== filters.category) {
+      if (
+        filters.category !== "Todos" &&
+        product.category_id !== filters.category
+      ) {
         return false;
       }
 
@@ -56,7 +56,10 @@ export const useProductFilters = (products: Product[]) => {
       }
 
       // Rating filter
-      if (filters.minRating > 0 && (!product.rating || product.rating < filters.minRating)) {
+      if (
+        filters.minRating > 0 &&
+        (!product.rating || product.rating < filters.minRating)
+      ) {
         return false;
       }
 
@@ -72,8 +75,8 @@ export const useProductFilters = (products: Product[]) => {
   return {
     filters,
     setFilters,
-    categories,
     priceRange,
     filteredProducts,
   };
 };
+

@@ -2,7 +2,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { SupabaseService } from "@/lib/supabaseService";
 import { queryKeys } from "@/lib/queryClient";
-import type { Product } from "@/lib/supabase";
 
 export const useProductsQuery = () => {
   const {
@@ -81,4 +80,3 @@ export const useInvalidateProducts = () => {
 
   return { invalidateProducts, refetchProducts };
 };
-

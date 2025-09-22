@@ -12,21 +12,41 @@ import { useProductSearch } from "@/hooks/useProductSearch";
 import { useProductSort } from "@/hooks/useProductSort";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { useState } from "react";
+import { useCategoriesQuery } from "@/hooks/useCategoryQuery";
 
 const ProductGrid = ({ sectionId }: { sectionId: string }) => {
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Main data query
-  const { products, isLoading, isFetching, error, isError, refetch, isEmpty, isStale } = useProductsQuery();
-  
+  const {
+    products,
+    isLoading,
+    isFetching,
+    error,
+    isError,
+    refetch,
+    isEmpty,
+    isStale,
+  } = useProductsQuery();
+
   // Search functionality
-  const { searchQuery, setSearchQuery, filteredProducts: searchResults } = useProductSearch(products);
-  
+  const {
+    searchQuery,
+    setSearchQuery,
+    filteredProducts: searchResults,
+  } = useProductSearch(products);
+
   // Filter functionality
-  const { filters, setFilters, categories, priceRange, filteredProducts: filterResults } = useProductFilters(searchResults);
-  
+  const {
+    filters,
+    setFilters,
+    priceRange,
+    filteredProducts: filterResults,
+  } = useProductFilters(searchResults);
+
   // Sort functionality
-  const { sortOption, setSortOption, sortedProducts } = useProductSort(filterResults);
+  const { sortOption, setSortOption, sortedProducts } =
+    useProductSort(filterResults);
 
   return (
     <section id={sectionId} className="py-20 text-foreground">
@@ -55,9 +75,9 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
               <span>Erro ao carregar produtos: {error}</span>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => refetch()}
                 disabled={isFetching}
               >
@@ -87,11 +107,12 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
           <div className="max-w-md mx-auto mb-6">
             <SearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>
-          
+
           <CategoryFilters
-            categories={categories}
             selectedCategory={filters.category}
-            onCategoryChange={(category) => setFilters({ ...filters, category })}
+            onCategoryChange={(category) =>
+              setFilters({ ...filters, category })
+            }
             isLoading={isLoading}
           />
         </div>
@@ -99,7 +120,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         {/* Controls */}
         <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-8">
           <SortSelect value={sortOption} onValueChange={setSortOption} />
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -121,7 +142,9 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         {/* Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters */}
-          <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+          <div
+            className={`lg:col-span-1 ${showFilters ? "block" : "hidden lg:block"}`}
+          >
             <FilterPanel
               filters={filters}
               onFiltersChange={setFilters}
@@ -131,31 +154,33 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
           </div>
 
           {/* Products */}
-          <div className={`lg:col-span-3 ${showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
+          <div
+            className={`lg:col-span-3 ${showFilters ? "lg:col-span-3" : "lg:col-span-4"}`}
+          >
             {!isLoading && sortedProducts.length === 0 ? (
               <div className="text-center py-12">
                 <Filter className="h-12 w-12 mx-auto mb-4 opacity-50 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-2">Nenhum produto encontrado</h3>
+                <h3 className="text-lg font-medium mb-2">
+                  Nenhum produto encontrado
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Tente ajustar os filtros ou termos de pesquisa
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {isLoading ? (
-                  Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="space-y-3">
-                      <Skeleton className="h-64 w-full rounded-lg" />
-                      <Skeleton className="h-6 w-3/4" />
-                      <Skeleton className="h-4 w-1/2" />
-                      <Skeleton className="h-8 w-full" />
-                    </div>
-                  ))
-                ) : (
-                  sortedProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))
-                )}
+                {isLoading
+                  ? Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="space-y-3">
+                        <Skeleton className="h-64 w-full rounded-lg" />
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                    ))
+                  : sortedProducts.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
               </div>
             )}
           </div>
@@ -184,3 +209,4 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
 };
 
 export default ProductGrid;
+

@@ -7,12 +7,14 @@ import { Star } from "lucide-react";
 import { formatPriceBRL } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/types/product";
+import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
+  const { data: category } = useCategoryQuery(product.category_id!);
   return (
     <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
       <CardContent className="p-0">
@@ -35,7 +37,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               </Badge>
             )}
             <Badge className="absolute top-3 right-3 bg-accent text-green-foreground font-semibold shadow border border-border">
-              {product.category}
+              {category?.name}
             </Badge>
           </div>
 

@@ -1,20 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCategoriesQuery } from "@/hooks/useCategoryQuery";
+import { useId } from "react";
 
 interface CategoryFiltersProps {
-  categories: string[];
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   isLoading: boolean;
 }
 
-export const CategoryFilters = ({ 
-  categories, 
-  selectedCategory, 
-  onCategoryChange, 
-  isLoading 
+export const CategoryFilters = ({
+  selectedCategory,
+  onCategoryChange,
+  isLoading,
 }: CategoryFiltersProps) => {
-  if (isLoading) {
+  const { data } = useCategoriesQuery();
+  const todosId = useId();
+  if (isLoading || !data) {
     return (
       <div className="flex flex-wrap justify-center gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -26,16 +28,25 @@ export const CategoryFilters = ({
 
   return (
     <div className="flex flex-wrap justify-center gap-3">
-      {categories.map((category) => (
+      <Button
+        key={todosId}
+        variant={selectedCategory === "Todos" ? "default" : "outline"}
+        onClick={() => onCategoryChange("Todos")}
+        className="transition-all duration-300"
+      >
+        Todos
+      </Button>
+      {data.map((category) => (
         <Button
-          key={category}
-          variant={selectedCategory === category ? "default" : "outline"}
-          onClick={() => onCategoryChange(category)}
+          key={category.id}
+          variant={selectedCategory === category.id ? "default" : "outline"}
+          onClick={() => onCategoryChange(category.id)}
           className="transition-all duration-300"
         >
-          {category}
+          {category.name}
         </Button>
       ))}
     </div>
   );
 };
+
