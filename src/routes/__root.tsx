@@ -110,8 +110,6 @@ export const Route = createRootRoute({
             <Outlet />
           </main>
           <Footer />
-          <WhatsAppFloat />
-          <CartFloat />
         </div>
       </Providers>
     </>

@@ -36,12 +36,15 @@ export const Route = createFileRoute('/products')({
   ),
 })
 
+import { CartFloat } from '@/components/CartFloat';
+
 function ProductsPage() {
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <ProductGrid sectionId="products" />
       </div>
+      <CartFloat />
     </div>
   )
 }

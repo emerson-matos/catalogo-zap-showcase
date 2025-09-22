@@ -25,7 +25,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           </TooltipProvider>
           <Analytics />
           <SpeedInsights />
-          <ReactQueryDevtools initialIsOpen={false} />
+          <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
           <TanStackRouterDevtools />
         </QueryClientProvider>
       </ThemeProvider>

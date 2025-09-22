@@ -8,17 +8,14 @@ import { formatPriceBRL } from "@/lib/utils";
 import { createCartWhatsAppUrl } from "@/lib/whatsapp";
 
 export function CartFloat() {
-  const { items, removeItem, updateQuantity, getTotalItems, getTotalPrice } = useCart();
+  const { items, removeItem, updateQuantity, getTotalItems, getTotalPrice } =
+    useCart();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleWhatsAppCheckout = () => {
     const whatsappUrl = createCartWhatsAppUrl(items);
     window.open(whatsappUrl, "_blank");
   };
-
-  if (getTotalItems() === 0) {
-    return null;
-  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -50,11 +47,14 @@ export function CartFloat() {
               </Button>
             </div>
           </CardHeader>
-          
+
           <CardContent className="space-y-4">
             <div className="max-h-48 overflow-y-auto space-y-3">
               {items.map((item: any) => (
-                <div key={item.product.id} className="flex items-center space-x-3">
+                <div
+                  key={item.product.id}
+                  className="flex items-center space-x-3"
+                >
                   <img
                     src={item.product.image}
                     alt={item.product.name}
@@ -64,7 +64,7 @@ export function CartFloat() {
                       target.src = "/placeholder.svg";
                     }}
                   />
-                  
+
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
                       {item.product.name}
@@ -73,31 +73,35 @@ export function CartFloat() {
                       {formatPriceBRL(item.product.price)}
                     </p>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
                       size="icon"
                       className="h-6 w-6"
-                      onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                      onClick={() =>
+                        updateQuantity(item.product.id, item.quantity - 1)
+                      }
                     >
                       <Minus className="h-3 w-3" />
                     </Button>
-                    
+
                     <span className="text-sm font-medium min-w-[20px] text-center">
                       {item.quantity}
                     </span>
-                    
+
                     <Button
                       variant="outline"
                       size="icon"
                       className="h-6 w-6"
-                      onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                      onClick={() =>
+                        updateQuantity(item.product.id, item.quantity + 1)
+                      }
                     >
                       <Plus className="h-3 w-3" />
                     </Button>
                   </div>
-                  
+
                   <Button
                     variant="ghost"
                     size="icon"
@@ -109,9 +113,9 @@ export function CartFloat() {
                 </div>
               ))}
             </div>
-            
+
             <Separator />
-            
+
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Total:</span>
@@ -119,7 +123,7 @@ export function CartFloat() {
                   {formatPriceBRL(getTotalPrice())}
                 </span>
               </div>
-              
+
               <Button
                 onClick={handleWhatsAppCheckout}
                 className="w-full justify-center gap-2 bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp-hover"
