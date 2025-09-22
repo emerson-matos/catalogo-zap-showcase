@@ -1,11 +1,11 @@
 import {
-  Category,
-  CategoryInsert,
-  CategoryUpdate,
   supabase,
   type Product,
   type ProductInsert,
   type ProductUpdate,
+  type Category,
+  type CategoryInsert,
+  type CategoryUpdate,
 } from "./supabase";
 
 export { supabase };
