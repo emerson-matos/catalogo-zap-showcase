@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProductsRouteImport } from './routes/products'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as FlipbookRouteImport } from './routes/flipbook'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -23,11 +22,6 @@ import { Route as ProductsIdRouteImport } from './routes/products/$id'
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FlipbookRoute = FlipbookRouteImport.update({
@@ -77,7 +71,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
-  '/login': typeof LoginRoute
   '/products': typeof ProductsRouteWithChildren
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
@@ -89,7 +82,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
-  '/login': typeof LoginRoute
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
   '/products': typeof ProductsIndexRoute
@@ -101,7 +93,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
-  '/login': typeof LoginRoute
   '/products': typeof ProductsRouteWithChildren
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
@@ -115,7 +106,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/flipbook'
-    | '/login'
     | '/products'
     | '/products/$id'
     | '/products/search'
@@ -127,7 +117,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/flipbook'
-    | '/login'
     | '/products/$id'
     | '/products/search'
     | '/products'
@@ -138,7 +127,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/flipbook'
-    | '/login'
     | '/products'
     | '/products/$id'
     | '/products/search'
@@ -151,7 +139,6 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
   FlipbookRoute: typeof FlipbookRoute
-  LoginRoute: typeof LoginRoute
   ProductsRoute: typeof ProductsRouteWithChildren
 }
 
@@ -162,13 +149,6 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/flipbook': {
@@ -252,7 +232,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
   FlipbookRoute: FlipbookRoute,
-  LoginRoute: LoginRoute,
   ProductsRoute: ProductsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
