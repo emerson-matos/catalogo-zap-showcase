@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ProductGrid from "@/components/ProductGrid";
 
-export const Route = createFileRoute("/products")({
+export const Route = createFileRoute("/products/")({
   component: ProductsPage,
   head: () => ({
     meta: [

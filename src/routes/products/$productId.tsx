@@ -1,17 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
-import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Package } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { formatPriceBRL } from "@/lib/utils";
 
-export const Route = createFileRoute("/_layout/product/$productId")({
+export const Route = createFileRoute("/products/$productId")({
   component: ProductDetailPage,
   validateSearch: (search: Record<string, unknown>) => {
     return {
       variant: (search.variant as string) || undefined,
-    }
+    };
   },
 });
 
@@ -19,8 +18,8 @@ function ProductDetailPage() {
   const { productId } = Route.useParams();
   const { variant } = Route.useSearch();
   const { products, isLoading, error } = useProductsQuery();
-  
-  const product = products?.find(p => p.id === productId);
+
+  const product = products?.find((p) => p.id === productId);
 
   if (isLoading) {
     return (
@@ -62,7 +61,7 @@ function ProductDetailPage() {
           </Button>
         </Link>
       </div>
-      
+
       <div className="grid gap-8 md:grid-cols-2">
         <div>
           <img
@@ -71,35 +70,41 @@ function ProductDetailPage() {
             className="w-full h-96 object-cover rounded-lg"
           />
         </div>
-        
+
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-            <p className="text-lg text-muted-foreground">{product.description}</p>
+            <p className="text-lg text-muted-foreground">
+              {product.description}
+            </p>
           </div>
-          
+
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-primary">
                 {formatPriceBRL(product.price)}
               </span>
             </div>
-            
+
             {product.category && (
               <div>
-                <span className="text-sm text-muted-foreground">Categoria: </span>
+                <span className="text-sm text-muted-foreground">
+                  Categoria:{" "}
+                </span>
                 <span className="font-medium">{product.category}</span>
               </div>
             )}
-            
+
             {variant && (
               <div>
-                <span className="text-sm text-muted-foreground">Variante: </span>
+                <span className="text-sm text-muted-foreground">
+                  Variante:{" "}
+                </span>
                 <span className="font-medium">{variant}</span>
               </div>
             )}
           </div>
-          
+
           <div className="pt-4">
             <Button size="lg" className="w-full">
               Entrar em Contato via WhatsApp
@@ -110,3 +115,4 @@ function ProductDetailPage() {
     </div>
   );
 }
+
