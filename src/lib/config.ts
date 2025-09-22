@@ -7,13 +7,6 @@ export const APP_CONFIG = {
     anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
   },
 
-  // App settings
-  app: {
-    name: "Serena Cosméticos",
-    version: "2.0.0",
-    adminPath: "/admin",
-  },
-
   // Feature flags
   features: {
     enableAdminPanel: true,
