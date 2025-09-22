@@ -10,21 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as FlipbookRouteImport } from './routes/flipbook'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
-import { Route as LayoutRouteImport } from './routes/_layout'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
+import { Route as ProductsSearchRouteImport } from './routes/products/search'
 import { Route as ProductsIdRouteImport } from './routes/products/$id'
-import { Route as LayoutSearchRouteImport } from './routes/_layout/search'
-import { Route as LayoutLoginRouteImport } from './routes/_layout/login'
-import { Route as LayoutExamplesRouteImport } from './routes/_layout/examples'
-import { Route as LayoutContactRouteImport } from './routes/_layout/contact'
-import { Route as LayoutAboutRouteImport } from './routes/_layout/about'
 
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FlipbookRoute = FlipbookRouteImport.update({
@@ -32,13 +35,19 @@ const FlipbookRoute = FlipbookRouteImport.update({
   path: '/flipbook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LayoutRoute = LayoutRouteImport.update({
-  id: '/_layout',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -51,124 +60,98 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProductsRoute,
 } as any)
+const ProductsSearchRoute = ProductsSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => ProductsRoute,
+} as any)
 const ProductsIdRoute = ProductsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ProductsRoute,
 } as any)
-const LayoutSearchRoute = LayoutSearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => LayoutRoute,
-} as any)
-const LayoutLoginRoute = LayoutLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => LayoutRoute,
-} as any)
-const LayoutExamplesRoute = LayoutExamplesRouteImport.update({
-  id: '/examples',
-  path: '/examples',
-  getParentRoute: () => LayoutRoute,
-} as any)
-const LayoutContactRoute = LayoutContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => LayoutRoute,
-} as any)
-const LayoutAboutRoute = LayoutAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => LayoutRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
+  '/login': typeof LoginRoute
   '/products': typeof ProductsRouteWithChildren
-  '/about': typeof LayoutAboutRoute
-  '/contact': typeof LayoutContactRoute
-  '/examples': typeof LayoutExamplesRoute
-  '/login': typeof LayoutLoginRoute
-  '/search': typeof LayoutSearchRoute
   '/products/$id': typeof ProductsIdRoute
+  '/products/search': typeof ProductsSearchRoute
   '/products/': typeof ProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
-  '/about': typeof LayoutAboutRoute
-  '/contact': typeof LayoutContactRoute
-  '/examples': typeof LayoutExamplesRoute
-  '/login': typeof LayoutLoginRoute
-  '/search': typeof LayoutSearchRoute
+  '/login': typeof LoginRoute
   '/products/$id': typeof ProductsIdRoute
+  '/products/search': typeof ProductsSearchRoute
   '/products': typeof ProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_layout': typeof LayoutRouteWithChildren
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
+  '/login': typeof LoginRoute
   '/products': typeof ProductsRouteWithChildren
-  '/_layout/about': typeof LayoutAboutRoute
-  '/_layout/contact': typeof LayoutContactRoute
-  '/_layout/examples': typeof LayoutExamplesRoute
-  '/_layout/login': typeof LayoutLoginRoute
-  '/_layout/search': typeof LayoutSearchRoute
   '/products/$id': typeof ProductsIdRoute
+  '/products/search': typeof ProductsSearchRoute
   '/products/': typeof ProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
-    | '/flipbook'
-    | '/products'
     | '/about'
+    | '/admin'
     | '/contact'
-    | '/examples'
+    | '/flipbook'
     | '/login'
-    | '/search'
+    | '/products'
     | '/products/$id'
+    | '/products/search'
     | '/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
-    | '/flipbook'
     | '/about'
+    | '/admin'
     | '/contact'
-    | '/examples'
+    | '/flipbook'
     | '/login'
-    | '/search'
     | '/products/$id'
+    | '/products/search'
     | '/products'
   id:
     | '__root__'
     | '/'
-    | '/_layout'
+    | '/about'
     | '/admin'
+    | '/contact'
     | '/flipbook'
+    | '/login'
     | '/products'
-    | '/_layout/about'
-    | '/_layout/contact'
-    | '/_layout/examples'
-    | '/_layout/login'
-    | '/_layout/search'
     | '/products/$id'
+    | '/products/search'
     | '/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LayoutRoute: typeof LayoutRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  ContactRoute: typeof ContactRoute
   FlipbookRoute: typeof FlipbookRoute
+  LoginRoute: typeof LoginRoute
   ProductsRoute: typeof ProductsRouteWithChildren
 }
 
@@ -181,11 +164,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/flipbook': {
       id: '/flipbook'
       path: '/flipbook'
       fullPath: '/flipbook'
       preLoaderRoute: typeof FlipbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -195,11 +192,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_layout': {
-      id: '/_layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof LayoutRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -216,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIndexRouteImport
       parentRoute: typeof ProductsRoute
     }
+    '/products/search': {
+      id: '/products/search'
+      path: '/search'
+      fullPath: '/products/search'
+      preLoaderRoute: typeof ProductsSearchRouteImport
+      parentRoute: typeof ProductsRoute
+    }
     '/products/$id': {
       id: '/products/$id'
       path: '/$id'
@@ -223,70 +227,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIdRouteImport
       parentRoute: typeof ProductsRoute
     }
-    '/_layout/search': {
-      id: '/_layout/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof LayoutSearchRouteImport
-      parentRoute: typeof LayoutRoute
-    }
-    '/_layout/login': {
-      id: '/_layout/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LayoutLoginRouteImport
-      parentRoute: typeof LayoutRoute
-    }
-    '/_layout/examples': {
-      id: '/_layout/examples'
-      path: '/examples'
-      fullPath: '/examples'
-      preLoaderRoute: typeof LayoutExamplesRouteImport
-      parentRoute: typeof LayoutRoute
-    }
-    '/_layout/contact': {
-      id: '/_layout/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof LayoutContactRouteImport
-      parentRoute: typeof LayoutRoute
-    }
-    '/_layout/about': {
-      id: '/_layout/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof LayoutAboutRouteImport
-      parentRoute: typeof LayoutRoute
-    }
   }
 }
 
-interface LayoutRouteChildren {
-  LayoutAboutRoute: typeof LayoutAboutRoute
-  LayoutContactRoute: typeof LayoutContactRoute
-  LayoutExamplesRoute: typeof LayoutExamplesRoute
-  LayoutLoginRoute: typeof LayoutLoginRoute
-  LayoutSearchRoute: typeof LayoutSearchRoute
-}
-
-const LayoutRouteChildren: LayoutRouteChildren = {
-  LayoutAboutRoute: LayoutAboutRoute,
-  LayoutContactRoute: LayoutContactRoute,
-  LayoutExamplesRoute: LayoutExamplesRoute,
-  LayoutLoginRoute: LayoutLoginRoute,
-  LayoutSearchRoute: LayoutSearchRoute,
-}
-
-const LayoutRouteWithChildren =
-  LayoutRoute._addFileChildren(LayoutRouteChildren)
-
 interface ProductsRouteChildren {
   ProductsIdRoute: typeof ProductsIdRoute
+  ProductsSearchRoute: typeof ProductsSearchRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
 }
 
 const ProductsRouteChildren: ProductsRouteChildren = {
   ProductsIdRoute: ProductsIdRoute,
+  ProductsSearchRoute: ProductsSearchRoute,
   ProductsIndexRoute: ProductsIndexRoute,
 }
 
@@ -296,9 +248,11 @@ const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LayoutRoute: LayoutRouteWithChildren,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  ContactRoute: ContactRoute,
   FlipbookRoute: FlipbookRoute,
+  LoginRoute: LoginRoute,
   ProductsRoute: ProductsRouteWithChildren,
 }
 export const routeTree = rootRouteImport

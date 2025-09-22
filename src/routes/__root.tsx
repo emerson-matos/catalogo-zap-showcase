@@ -8,7 +8,7 @@ import { AlertTriangle, RefreshCw } from "lucide-react";
 
 const title = "SeRena Cosméticos";
 const description = "Distribuidora de cosméticos do ABC paulista";
-const url = typeof window !== 'undefined' ? window.location.origin : '';
+const url = window.location.origin;
 
 export const Route = createRootRoute({
   head: () => ({

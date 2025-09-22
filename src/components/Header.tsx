@@ -80,7 +80,7 @@ const Header = () => {
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
-                Catálogo
+                Revista Digital
               </Button>
             </Link>
             <Link to="/contact">
@@ -92,14 +92,6 @@ const Header = () => {
               >
                 <MessageCircle className="w-4 h-4" />
                 Contato
-              </Button>
-            </Link>
-            <Link to="/examples">
-              <Button
-                variant="ghost"
-                className="hover:text-primary transition-colors"
-              >
-                Exemplos
               </Button>
             </Link>
           </nav>
@@ -177,7 +169,7 @@ const Header = () => {
                   }`}
                 >
                   <BookOpen className="w-4 h-4" />
-                  Catálogo
+                  Revista Digital
                 </Button>
               </Link>
               <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
@@ -191,14 +183,6 @@ const Header = () => {
                 >
                   <MessageCircle className="w-4 h-4" />
                   Contato
-                </Button>
-              </Link>
-              <Link to="/examples" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className="text-left hover:text-primary transition-colors justify-start"
-                >
-                  Exemplos
                 </Button>
               </Link>
               <WhatsAppButton

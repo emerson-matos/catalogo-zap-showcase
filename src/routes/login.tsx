@@ -13,7 +13,7 @@ import {
 import { mockAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_layout/login")({
+export const Route = createFileRoute("/login")({
   component: LoginPage,
   validateSearch: (search: Record<string, unknown>) => {
     return {
