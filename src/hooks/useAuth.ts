@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
-import { supabase, SupabaseService } from "@/lib/supabaseService";
+import { supabase } from "@/lib/supabaseService";
 import { jwtDecode } from "jwt-decode";
 
 export interface AuthState {

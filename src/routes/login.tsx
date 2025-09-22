@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { mockAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/login")({
@@ -36,7 +35,6 @@ function LoginPage() {
     setError("");
 
     try {
-      await mockAuth.login(email, password);
       navigate({ to: redirect });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login");
@@ -91,4 +89,3 @@ function LoginPage() {
     </div>
   );
 }
-
