@@ -5,38 +5,28 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SearchInput } from "@/components/ui/search-input";
 import { SortSelect } from "@/components/ui/sort-select";
 import { FilterPanel } from "@/components/ui/filter-panel";
-import { AlertTriangle, RefreshCw, Wifi, Filter, Grid, List, Star } from "lucide-react";
+import { CategoryFilters } from "@/components/CategoryFilters";
+import { AlertTriangle, RefreshCw, Wifi, Filter } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
+import { useProductSearch } from "@/hooks/useProductSearch";
+import { useProductSort } from "@/hooks/useProductSort";
+import { useProductFilters } from "@/hooks/useProductFilters";
 import { useState } from "react";
-import { formatPriceBRL } from "@/lib/utils";
 
 const ProductGrid = ({ sectionId }: { sectionId: string }) => {
   const [showFilters, setShowFilters] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
-  const {
-    products,
-    categories,
-    selectedCategory,
-    setSelectedCategory,
-    searchQuery,
-    setSearchQuery,
-    sortOption,
-    setSortOption,
-    filters,
-    setFilters,
-    priceRange,
-    totalProducts,
-    filteredCount,
-    isLoading,
-    isFetching,
-    error,
-    isError,
-    refetch,
-    isEmpty,
-    isStale,
-    hasFilteredResults,
-  } = useProductsQuery();
+  // Main data query
+  const { products, isLoading, isFetching, error, isError, refetch, isEmpty, isStale } = useProductsQuery();
+  
+  // Search functionality
+  const { searchQuery, setSearchQuery, filteredProducts: searchResults } = useProductSearch(products);
+  
+  // Filter functionality
+  const { filters, setFilters, categories, priceRange, filteredProducts: filterResults } = useProductFilters(searchResults);
+  
+  // Sort functionality
+  const { sortOption, setSortOption, sortedProducts } = useProductSort(filterResults);
 
   return (
     <section id={sectionId} className="py-20 bg-background">
@@ -89,203 +79,82 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
           </Alert>
         )}
 
-        {/* Search and Controls */}
-        <div className="mb-8 space-y-6">
-          {/* Search Bar */}
-          <div className="max-w-md mx-auto">
-            <SearchInput
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Pesquisar produtos..."
+        {/* Search */}
+        <div className="mb-8">
+          <div className="max-w-md mx-auto mb-6">
+            <SearchInput value={searchQuery} onChange={setSearchQuery} />
+          </div>
+          
+          <CategoryFilters
+            categories={categories}
+            selectedCategory={filters.category}
+            onCategoryChange={(category) => setFilters({ ...filters, category })}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Controls */}
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-8">
+          <SortSelect value={sortOption} onValueChange={setSortOption} />
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className="lg:hidden"
+          >
+            <Filter className="h-4 w-4 mr-2" />
+            Filtros
+          </Button>
+        </div>
+
+        {/* Results Count */}
+        {!isLoading && (
+          <div className="text-center text-sm text-muted-foreground mb-8">
+            {sortedProducts.length} de {products.length} produtos encontrados
+          </div>
+        )}
+
+        {/* Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Filters */}
+          <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+            <FilterPanel
+              filters={filters}
+              onFiltersChange={setFilters}
+              maxPrice={priceRange.max}
+              minPrice={priceRange.min}
             />
           </div>
 
-          {/* Controls Row */}
-          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-            {/* Category Filters */}
-            <div className="flex flex-wrap justify-center lg:justify-start gap-3">
-              {isLoading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-24" />
-                ))
-              ) : (
-                categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? "default" : "outline"}
-                    onClick={() => setSelectedCategory(category)}
-                    className="transition-all duration-300"
-                    disabled={isFetching && isLoading}
-                  >
-                    {category}
-                  </Button>
-                ))
-              )}
-            </div>
-
-            {/* Sort and View Controls */}
-            <div className="flex items-center gap-3">
-              <SortSelect
-                value={sortOption}
-                onValueChange={setSortOption}
-              />
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filtros
-              </Button>
-
-              <div className="flex items-center border rounded-md">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="rounded-r-none"
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="rounded-l-none"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
+          {/* Products */}
+          <div className={`lg:col-span-3 ${showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
+            {!isLoading && sortedProducts.length === 0 ? (
+              <div className="text-center py-12">
+                <Filter className="h-12 w-12 mx-auto mb-4 opacity-50 text-muted-foreground" />
+                <h3 className="text-lg font-medium mb-2">Nenhum produto encontrado</h3>
+                <p className="text-sm text-muted-foreground">
+                  Tente ajustar os filtros ou termos de pesquisa
+                </p>
               </div>
-            </div>
-          </div>
-
-          {/* Results Count */}
-          {!isLoading && (
-            <div className="text-center text-sm text-muted-foreground">
-              {filteredCount === totalProducts ? (
-                `${totalProducts} produtos encontrados`
-              ) : (
-                `${filteredCount} de ${totalProducts} produtos encontrados`
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Filters Panel */}
-        <div className="mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Desktop Filters */}
-            <div className="hidden lg:block">
-              <FilterPanel
-                filters={filters}
-                onFiltersChange={setFilters}
-                maxPrice={priceRange.max}
-                minPrice={priceRange.min}
-              />
-            </div>
-
-            {/* Mobile Filters */}
-            {showFilters && (
-              <div className="lg:hidden">
-                <FilterPanel
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  maxPrice={priceRange.max}
-                  minPrice={priceRange.min}
-                />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {isLoading ? (
+                  Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className="space-y-3">
+                      <Skeleton className="h-64 w-full rounded-lg" />
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-8 w-full" />
+                    </div>
+                  ))
+                ) : (
+                  sortedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))
+                )}
               </div>
             )}
-
-            {/* Products Grid */}
-            <div className={`lg:col-span-3 ${showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
-
-              {/* No Results */}
-              {!isLoading && !hasFilteredResults && (
-                <div className="text-center py-12">
-                  <div className="text-muted-foreground mb-4">
-                    <Filter className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-lg font-medium mb-2">Nenhum produto encontrado</h3>
-                    <p className="text-sm">
-                      Tente ajustar os filtros ou termos de pesquisa
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Products Grid/List */}
-              {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                  {isLoading ? (
-                    Array.from({ length: 8 }).map((_, i) => (
-                      <div key={i} className="space-y-3">
-                        <Skeleton className="h-64 w-full rounded-lg" />
-                        <Skeleton className="h-6 w-3/4" />
-                        <Skeleton className="h-4 w-1/2" />
-                        <Skeleton className="h-8 w-full" />
-                      </div>
-                    ))
-                  ) : (
-                    products.map((product) => (
-                      <ProductCard key={product.id} product={product} />
-                    ))
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {isLoading ? (
-                    Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="flex gap-4 p-4 border rounded-lg">
-                        <Skeleton className="h-24 w-24 rounded-lg" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-6 w-3/4" />
-                          <Skeleton className="h-4 w-full" />
-                          <Skeleton className="h-4 w-1/2" />
-                          <Skeleton className="h-8 w-32" />
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    products.map((product) => (
-                      <div key={product.id} className="flex gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="h-24 w-24 object-cover rounded-lg"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = "/placeholder.svg";
-                          }}
-                        />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-lg font-semibold">{product.name}</h3>
-                            <span className="text-xl font-bold text-primary">
-                              {formatPriceBRL(product.price)}
-                            </span>
-                          </div>
-                          <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
-                            {product.description}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                              {product.category}
-                            </span>
-                            {product.rating && (
-                              <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 fill-accent text-accent" />
-                                <span className="text-sm font-medium">{product.rating}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
