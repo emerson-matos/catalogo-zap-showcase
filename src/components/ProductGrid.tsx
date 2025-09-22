@@ -12,7 +12,6 @@ import { useProductSearch } from "@/hooks/useProductSearch";
 import { useProductSort } from "@/hooks/useProductSort";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { useState } from "react";
-import { useCategoriesQuery } from "@/hooks/useCategoryQuery";
 
 const ProductGrid = ({ sectionId }: { sectionId: string }) => {
   const [showFilters, setShowFilters] = useState(false);
@@ -209,4 +208,3 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
 };
 
 export default ProductGrid;
-
