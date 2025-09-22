@@ -14,7 +14,15 @@ interface ProductCardProps {
 }
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
-  const { data: category } = useCategoryQuery(product.category_id!);
+  const { data: category } = useCategoryQuery(product.category_id || "");
+  const isNewProduct = () => {
+    if (!product.created_at) return false;
+    const createdDate = new Date(product.created_at);
+    const today = new Date();
+    const diffTime = today.getTime() - createdDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 7;
+  };
   return (
     <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
       <CardContent className="p-0">
@@ -31,11 +39,11 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
                 target.src = "/placeholder.svg";
               }}
             />
-            {product.is_new && (
-              <Badge className="absolute top-3 left-3 bg-muted text-green-600 font-bold shadow border border-border">
-                Novo
-              </Badge>
-            )}
+            {isNewProduct() && (
+                <Badge className="absolute top-3 left-3 bg-muted text-green-600 font-bold shadow border border-border">
+                  Novo
+                </Badge>
+              )}
             <Badge className="absolute top-3 right-3 bg-accent text-green-foreground font-semibold shadow border border-border">
               {category?.name}
             </Badge>

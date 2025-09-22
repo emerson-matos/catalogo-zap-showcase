@@ -36,14 +36,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { StarRating } from "./ui/star-rating";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
   price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
-  image: z.string().url("URL da imagem inválida"),
+  image: z.url("URL da imagem inválida"),
   category_id: z.string().min(1, "Categoria é obrigatória"),
-  rating: z.number().min(0).max(5).optional(),
+  rating: z.number().int().min(0).max(5).default(3),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -60,7 +61,14 @@ export const AdminPanel = () => {
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
-    defaultValues: {},
+    defaultValues: {
+      name: "",
+      description: "",
+      price: 0,
+      image: "",
+      category_id: "",
+      rating: 3,
+    },
   });
 
   const onSubmit = async (data: ProductFormData) => {
@@ -215,7 +223,7 @@ export const AdminPanel = () => {
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4"
+                    className="space-y-4 grid grid-cols-2 gap-4"
                   >
                     <FormField
                       control={form.control}
@@ -233,12 +241,82 @@ export const AdminPanel = () => {
 
                     <FormField
                       control={form.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Avaliação (0-5 estrelas)</FormLabel>
+                          <FormControl>
+                            <StarRating
+                              value={field.value}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
                       name="price"
                       render={({ field }) => (
-                        <FormItem className="space-y-2">
+                        <FormItem>
                           <FormLabel>Preço</FormLabel>
                           <FormControl>
-                            <Input step="0.01" {...field} />
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.01"
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value) || 0)
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {isCategoriesLoading ? (
+                      <LoaderIcon />
+                    ) : (
+                      <FormField
+                        control={form.control}
+                        name="category_id"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Categoria</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione a categoria" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {(categories || []).map((c) => (
+                                    <SelectItem key={c.id} value={c.id}>
+                                      {c.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    <FormField
+                      control={form.control}
+                      name="image"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>URL da Imagem</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -248,76 +326,22 @@ export const AdminPanel = () => {
                     <FormField
                       control={form.control}
                       name="description"
-                      render={({ field }) => {
-                        <FormItem>
+                      render={({ field }) => (
+                        <FormItem className="col-span-full">
                           <FormLabel>Descrição</FormLabel>
                           <FormControl>
                             <Textarea {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>;
-                      }}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="image"
-                      render={({ field }) => {
-                        <FormItem>
-                          <FormLabel>URL da Imagem</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>;
-                      }}
-                    />
-
-                    {isCategoriesLoading ? (
-                      <LoaderIcon />
-                    ) : (
-                      <FormField
-                        control={form.control}
-                        name="category_id"
-                        render={({ field }) => {
-                          <FormItem>
-                            <FormLabel>Categoria</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione a categoria" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {(categories || []).map((c) => (
-                                  <SelectItem value={c.id}>{c.name}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>;
-                        }}
-                      />
-                    )}
-
-                    <FormField
-                      control={form.control}
-                      name="rating"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Avaliação (0-5)</FormLabel>
-                          <FormControl>
-                            <Input step="0.1" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
-                    <Button type="submit" disabled={isMutating}>
+                    <Button
+                      className="col-span-full"
+                      type="submit"
+                      disabled={isMutating}
+                    >
                       {isMutating && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
@@ -326,6 +350,7 @@ export const AdminPanel = () => {
 
                     {editingProduct && (
                       <Button
+                        className="col-span-full"
                         type="button"
                         variant="outline"
                         onClick={() => {
