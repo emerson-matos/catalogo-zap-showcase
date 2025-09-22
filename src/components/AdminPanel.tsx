@@ -1,115 +1,112 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Edit, Trash2 } from "lucide-react";
-import { useProductsQuery } from "@/hooks/useProductsQuery";
-import { useAdminProducts } from "@/hooks/useAdminProducts";
-import { useAuth } from "@/hooks/useAuth";
-import type { Product, ProductInsert } from "@/lib/supabase";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
-import { toast } from "sonner";
+import React, { useState, useCallback } from 'react';
+import { Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
 
-const productSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  description: z.string().min(1, "Descrição é obrigatória"),
-  price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
-  image: z.string().url("URL da imagem inválida"),
-  category: z.string().min(1, "Categoria é obrigatória"),
-  rating: z.number().min(0).max(5).optional(),
-});
+// Hooks
+import { useProductsQuery } from '@/hooks/useProductsQuery';
+import { useAdminProducts } from '@/hooks/useAdminProducts';
+import { useAuth } from '@/hooks/useAuth';
+import { useProductFilters } from '@/hooks/useProductFilters';
+import { useBulkOperations } from '@/hooks/useBulkOperations';
+import { useProductForm } from '@/hooks/useProductForm';
 
-type ProductFormData = z.infer<typeof productSchema>;
+// Components
+import { SearchAndFilters } from '@/components/admin/SearchAndFilters';
+import { BulkActions } from '@/components/admin/BulkActions';
+import { ProductCard } from '@/components/admin/ProductCard';
+import { EmptyState } from '@/components/admin/EmptyState';
+import { ProductForm } from '@/components/admin/ProductForm';
+import { AdminErrorBoundary } from '@/components/admin/AdminErrorBoundary';
 
-export const AdminPanel = () => {
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+// Constants
+import { VIEW_MODES } from '@/constants/admin';
+import type { ViewMode } from '@/constants/admin';
+
+export const AdminPanel: React.FC = () => {
+  const [viewMode, setViewMode] = useState<ViewMode>(VIEW_MODES.GRID);
 
   const { user } = useAuth();
   const { products, isLoading } = useProductsQuery();
-  const { createProduct, updateProduct, deleteProduct, isMutating } =
-    useAdminProducts();
+  const { deleteProduct } = useAdminProducts();
 
-  const form = useForm<ProductFormData>({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
-      image: "",
-      category: "",
-      rating: undefined,
-    },
-  });
+  // Custom hooks for business logic
+  const {
+    filters,
+    filteredProducts,
+    categories,
+    updateSearchQuery,
+    updateCategory,
+    toggleNewOnly,
+  } = useProductFilters(products);
 
-  const onSubmit = async (data: ProductFormData) => {
-    try {
-      if (editingProduct) {
-        await updateProduct(editingProduct.id, data);
-        toast.success("Produto atualizado com sucesso!");
-        setEditingProduct(null);
-        form.reset();
-      } else {
-        if (!user) throw new Error("Usuário não autenticado");
+  const {
+    selectedProducts,
+    showBulkActions,
+    isBulkDeleting,
+    selectProduct,
+    selectAll,
+    clearSelection,
+    bulkDelete,
+    exportProducts,
+  } = useBulkOperations();
 
-        const productData: ProductInsert = {
-          ...data,
-          created_by: user.id,
-        };
+  const {
+    form,
+    editingProduct,
+    imagePreview,
+    setEditingProduct,
+    handleImageChange,
+    onSubmit,
+    resetForm,
+  } = useProductForm();
 
-        await createProduct(productData);
-        toast.success("Produto criado com sucesso!");
-        form.reset();
-      }
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Erro ao salvar produto",
-      );
-    }
-  };
+  // Memoized handlers
+  const handleViewModeChange = useCallback((mode: ViewMode) => {
+    setViewMode(mode);
+  }, []);
 
-  const handleEdit = (product: Product) => {
+  const handleProductEdit = useCallback((product: any) => {
     setEditingProduct(product);
-    form.reset({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      image: product.image,
-      category: product.category,
-      rating: product.rating,
-    });
-  };
+  }, [setEditingProduct]);
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Tem certeza que deseja deletar este produto?")) {
+  const handleProductDelete = useCallback(async (id: string) => {
+    if (confirm('Tem certeza que deseja deletar este produto?')) {
       try {
         await deleteProduct(id);
-        toast.success("Produto deletado com sucesso!");
+        toast.success('Produto deletado com sucesso!');
+        // Remove from selected products if it was selected
+        const newSelected = new Set(selectedProducts);
+        newSelected.delete(id);
+        if (newSelected.size === 0) {
+          clearSelection();
+        }
       } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Erro ao deletar produto",
-        );
+        console.error('Error deleting product:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar produto';
+        toast.error(errorMessage, {
+          description: 'Tente novamente ou contate o suporte',
+          duration: 5000,
+        });
       }
     }
-  };
+  }, [deleteProduct, selectedProducts, clearSelection]);
+
+  const handleSelectAll = useCallback(() => {
+    selectAll(filteredProducts);
+  }, [selectAll, filteredProducts]);
+
+  const handleExport = useCallback(() => {
+    exportProducts(filteredProducts);
+  }, [exportProducts, filteredProducts]);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingProduct(null);
+    resetForm();
+  }, [setEditingProduct, resetForm]);
+
+  const hasFilters = filters.searchQuery || filters.selectedCategory !== 'all' || filters.showNewOnly;
 
   if (isLoading) {
     return (
@@ -120,252 +117,104 @@ export const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-accent">
-                Painel Administrativo
-              </h1>
-              <p className="text-sm text-accent-foreground">
-                Bem-vindo, {user?.email}
-              </p>
+    <AdminErrorBoundary>
+      <div className="min-h-screen bg-gray-50/50">
+        {/* Header */}
+        <div className="shadow-sm border-b bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-6">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Painel Administrativo
+                </h1>
+                <p className="text-sm text-gray-600 mt-1">
+                  Bem-vindo, {user?.email}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-sm">
+                  {filteredProducts.length} produtos
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="products" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="products">Produtos</TabsTrigger>
-            <TabsTrigger value="add-product">Adicionar Produto</TabsTrigger>
-          </TabsList>
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Tabs defaultValue="products" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="products">Produtos</TabsTrigger>
+              <TabsTrigger value="add-product">Adicionar Produto</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="products" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
-                <Card key={product.id} className="overflow-hidden">
-                  <div className="aspect-square">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
+            <TabsContent value="products" className="space-y-6">
+              {/* Search and Filters */}
+              <SearchAndFilters
+                searchQuery={filters.searchQuery}
+                selectedCategory={filters.selectedCategory}
+                showNewOnly={filters.showNewOnly}
+                viewMode={viewMode}
+                categories={categories}
+                onSearchChange={updateSearchQuery}
+                onCategoryChange={updateCategory}
+                onToggleNewOnly={toggleNewOnly}
+                onViewModeChange={handleViewModeChange}
+              />
+
+              {/* Bulk Actions */}
+              {showBulkActions && (
+                <BulkActions
+                  selectedCount={selectedProducts.size}
+                  totalCount={filteredProducts.length}
+                  isBulkDeleting={isBulkDeleting}
+                  onSelectAll={handleSelectAll}
+                  onExport={handleExport}
+                  onBulkDelete={bulkDelete}
+                />
+              )}
+
+              {/* Products List */}
+              {filteredProducts.length === 0 ? (
+                <EmptyState
+                  hasFilters={hasFilters}
+                  onAddProduct={() => setEditingProduct(null)}
+                />
+              ) : (
+                <div className={
+                  viewMode === VIEW_MODES.GRID
+                    ? 'grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                    : 'space-y-4'
+                }>
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      viewMode={viewMode}
+                      isSelected={selectedProducts.has(product.id)}
+                      onSelect={selectProduct}
+                      onEdit={handleProductEdit}
+                      onDelete={handleProductDelete}
                     />
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-lg">{product.name}</h3>
-                      <div className="flex gap-1">
-                        {product.is_new && (
-                          <Badge variant="secondary">Novo</Badge>
-                        )}
-                        {product.rating && (
-                          <Badge variant="outline">⭐ {product.rating}</Badge>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-lg">
-                        R$ {product.price}
-                      </span>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(product)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(product.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
 
-          <TabsContent value="add-product">
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {editingProduct ? "Editar Produto" : "Adicionar Novo Produto"}
-                </CardTitle>
-                <CardDescription>
-                  {editingProduct
-                    ? "Atualize as informações do produto"
-                    : "Preencha as informações do novo produto"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.name}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel>Nome</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="space-y-2">
-                        <FormLabel>Preço *</FormLabel>
-                        <Input
-                          id="price"
-                          type="number"
-                          step="0.01"
-                          {...form.register("price", { valueAsNumber: true })}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.price && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.price.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FormLabel>Descrição *</FormLabel>
-                      <Textarea
-                        id="description"
-                        {...form.register("description")}
-                        disabled={isMutating}
-                      />
-                      {form.formState.errors.description && (
-                        <p className="text-sm text-red-500">
-                          {form.formState.errors.description.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <FormLabel>URL da Imagem *</FormLabel>
-                        <Input
-                          id="image"
-                          {...form.register("image")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.image && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.image.message}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <FormLabel>Categoria *</FormLabel>
-                        <Input
-                          id="category"
-                          {...form.register("category")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.category && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.category.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        className="space-y-2"
-                        control={form.rate}
-                        name="rate"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Avaliação (0-5)</FormLabel>
-                            <Input
-                              id="rating"
-                              type="number"
-                              min="0"
-                              max="5"
-                              step="0.1"
-                              {...form.register("rating", {
-                                valueAsNumber: true,
-                              })}
-                              disabled={isMutating}
-                            />
-                            {form.formState.errors.rating && (
-                              <p className="text-sm text-red-500">
-                                {form.formState.errors.rating.message}
-                              </p>
-                            )}
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        className="space-y-2"
-                        control={form.is_new}
-                        name="new"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Produto Novo</FormLabel>
-                            <FormControl>
-                              <div className="flex items-center space-x-2">
-                                <Input {...field} />
-                                <span className="text-sm">
-                                  Marcar como novo produto
-                                </span>
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="flex gap-4">
-                      <Button type="submit" disabled={isMutating}>
-                        {isMutating && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        {editingProduct ? "Atualizar Produto" : "Criar Produto"}
-                      </Button>
-
-                      {editingProduct && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingProduct(null);
-                            form.reset();
-                          }}
-                        >
-                          Cancelar
-                        </Button>
-                      )}
-                    </div>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="add-product">
+              <ProductForm
+                form={form}
+                editingProduct={editingProduct}
+                imagePreview={imagePreview}
+                isMutating={false} // This should come from the hook
+                onImageChange={handleImageChange}
+                onSubmit={onSubmit}
+                onCancel={handleCancelEdit}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-    </div>
+    </AdminErrorBoundary>
   );
 };
