@@ -1,12 +1,15 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { CartItem, CartContextType, Product } from '@/types/product';
+import React, { createContext, useContext, useReducer, useEffect } from "react";
+import { CartItem, CartContextType, Product } from "@/types/product";
 
 type CartAction =
-  | { type: 'ADD_ITEM'; payload: { product: Product; quantity?: number } }
-  | { type: 'REMOVE_ITEM'; payload: { productId: string } }
-  | { type: 'UPDATE_QUANTITY'; payload: { productId: string; quantity: number } }
-  | { type: 'CLEAR_CART' }
-  | { type: 'LOAD_CART'; payload: { items: CartItem[] } };
+  | { type: "ADD_ITEM"; payload: { product: Product; quantity?: number } }
+  | { type: "REMOVE_ITEM"; payload: { productId: string } }
+  | {
+      type: "UPDATE_QUANTITY";
+      payload: { productId: string; quantity: number };
+    }
+  | { type: "CLEAR_CART" }
+  | { type: "LOAD_CART"; payload: { items: CartItem[] } };
 
 interface CartState {
   items: CartItem[];
@@ -18,59 +21,61 @@ const initialState: CartState = {
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
-    case 'ADD_ITEM': {
+    case "ADD_ITEM": {
       const { product, quantity = 1 } = action.payload;
-      const existingItem = state.items.find(item => item.product.id === product.id);
-      
+      const existingItem = state.items.find(
+        (item) => item.product.id === product.id,
+      );
+
       if (existingItem) {
         return {
           ...state,
-          items: state.items.map(item =>
+          items: state.items.map((item) =>
             item.product.id === product.id
               ? { ...item, quantity: item.quantity + quantity }
-              : item
+              : item,
           ),
         };
       }
-      
+
       return {
         ...state,
         items: [...state.items, { product, quantity }],
       };
     }
-    
-    case 'REMOVE_ITEM': {
+
+    case "REMOVE_ITEM": {
       return {
         ...state,
-        items: state.items.filter(item => item.product.id !== action.payload.productId),
+        items: state.items.filter(
+          (item) => item.product.id !== action.payload.productId,
+        ),
       };
     }
-    
-    case 'UPDATE_QUANTITY': {
+
+    case "UPDATE_QUANTITY": {
       const { productId, quantity } = action.payload;
       if (quantity <= 0) {
         return {
           ...state,
-          items: state.items.filter(item => item.product.id !== productId),
+          items: state.items.filter((item) => item.product.id !== productId),
         };
       }
-      
+
       return {
         ...state,
-        items: state.items.map(item =>
-          item.product.id === productId
-            ? { ...item, quantity }
-            : item
+        items: state.items.map((item) =>
+          item.product.id === productId ? { ...item, quantity } : item,
         ),
       };
     }
-    
-    case 'CLEAR_CART':
+
+    case "CLEAR_CART":
       return { ...state, items: [] };
-    
-    case 'LOAD_CART':
+
+    case "LOAD_CART":
       return { ...state, items: action.payload.items };
-    
+
     default:
       return state;
   }
@@ -83,36 +88,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
+    const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       try {
         const items = JSON.parse(savedCart);
-        dispatch({ type: 'LOAD_CART', payload: { items } });
+        dispatch({ type: "LOAD_CART", payload: { items } });
       } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
+        console.error("Error loading cart from localStorage:", error);
       }
     }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state.items));
+    localStorage.setItem("cart", JSON.stringify(state.items));
   }, [state.items]);
 
   const addItem = (product: Product, quantity: number = 1) => {
-    dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
+    dispatch({ type: "ADD_ITEM", payload: { product, quantity } });
   };
 
   const removeItem = (productId: string) => {
-    dispatch({ type: 'REMOVE_ITEM', payload: { productId } });
+    dispatch({ type: "REMOVE_ITEM", payload: { productId } });
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
+    dispatch({ type: "UPDATE_QUANTITY", payload: { productId, quantity } });
   };
 
   const clearCart = () => {
-    dispatch({ type: 'CLEAR_CART' });
+    dispatch({ type: "CLEAR_CART" });
   };
 
   const getTotalItems = () => {
@@ -121,10 +126,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const getTotalPrice = () => {
     return state.items.reduce((total, item) => {
-      const price = typeof item.product.price === 'string' 
-        ? parseFloat(item.product.price.replace(/[^\d.,]/g, '').replace(',', '.'))
-        : item.product.price;
-      return total + (price * item.quantity);
+      const price =
+        typeof item.product.price === "string"
+          ? parseFloat(
+              item.product.price.replace(/[^\d.,]/g, "").replace(",", "."),
+            )
+          : item.product.price;
+      return total + price * item.quantity;
     }, 0);
   };
 
@@ -138,17 +146,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     getTotalPrice,
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 }
+
