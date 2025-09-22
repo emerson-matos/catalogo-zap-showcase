@@ -1,15 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { SupabaseService } from "@/lib/supabaseService";
 import { queryKeys } from "@/lib/queryClient";
 import type { Product } from "@/lib/supabase";
 
 export const useProductsQuery = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("Todos");
-
-  // Main products query with TanStack Query
   const {
-    data: allProducts = [],
+    data: products = [],
     isLoading,
     error,
     isError,
@@ -19,53 +16,15 @@ export const useProductsQuery = () => {
   } = useQuery({
     queryKey: queryKeys.products.supabase(),
     queryFn: SupabaseService.getProducts,
-    // Use global defaults from queryClient, but can override specific options here if needed
   });
 
-  // Memoized categories derived from products
-  const categories = useMemo(() => {
-    if (!allProducts.length) return ["Todos"];
-
-    const uniqueCategories = Array.from(
-      new Set(
-        allProducts
-          .map((item: Product) => String(item.category || "").trim())
-          .filter((name) => name.length > 0),
-      ),
-    );
-
-    const withoutTodos = uniqueCategories.filter(
-      (name) => name.toLowerCase() !== "todos",
-    );
-
-    withoutTodos.sort((a, b) => a.localeCompare(b));
-    return ["Todos", ...withoutTodos];
-  }, [allProducts]);
-
-  // Memoized filtered products based on selected category
-  const filteredProducts = useMemo(() => {
-    if (selectedCategory === "Todos") {
-      return allProducts;
-    }
-
-    const categoryName = categories.find(
-      (cat: string) => cat === selectedCategory,
-    );
-    return allProducts.filter(
-      (product: Product) => product.category === categoryName,
-    );
-  }, [selectedCategory, allProducts, categories]);
-
-  // Enhanced error message
   const errorMessage = useMemo(() => {
     if (!error) return null;
 
     if (error instanceof Error) {
-      // Network errors
       if (error.message.includes("fetch")) {
         return "Erro de conexão. Verifique sua internet e tente novamente.";
       }
-      // Google Sheets specific errors
       if (error.message.includes("403")) {
         return "Acesso negado. Verifique as permissões da planilha.";
       }
@@ -79,29 +38,14 @@ export const useProductsQuery = () => {
   }, [error]);
 
   return {
-    // Data
-    products: filteredProducts,
-    allProducts,
-    categories,
-    totalProducts: allProducts.length,
-
-    // Category management
-    selectedCategory,
-    setSelectedCategory,
-
-    // Query states
+    products,
     isLoading,
     isFetching,
     isError,
     error: errorMessage,
     isStale,
-
-    // Actions
     refetch,
-
-    // Computed states
-    isEmpty: !isLoading && allProducts.length === 0,
-    hasProducts: allProducts.length > 0,
+    isEmpty: !isLoading && products.length === 0,
   };
 };
 
