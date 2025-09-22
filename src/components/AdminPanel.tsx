@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Edit, Trash2 } from "lucide-react";
+import { Loader2, Edit, Trash2, LoaderIcon } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useAdminProducts } from "@/hooks/useAdminProducts";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,13 +28,21 @@ import {
   FormMessage,
 } from "./ui/form";
 import { toast } from "sonner";
+import { useCategoriesQuery } from "@/hooks/useCategoryQuery";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
   price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
   image: z.string().url("URL da imagem inválida"),
-  category: z.string().min(1, "Categoria é obrigatória"),
+  category_id: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().min(0).max(5).optional(),
 });
 
@@ -44,20 +52,15 @@ export const AdminPanel = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const { user } = useAuth();
+  const { data: categories, isLoading: isCategoriesLoading } =
+    useCategoriesQuery();
   const { products, isLoading } = useProductsQuery();
   const { createProduct, updateProduct, deleteProduct, isMutating } =
     useAdminProducts();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
-      image: "",
-      category: "",
-      rating: undefined,
-    },
+    defaultValues: {},
   });
 
   const onSubmit = async (data: ProductFormData) => {
@@ -93,7 +96,7 @@ export const AdminPanel = () => {
       description: product.description,
       price: product.price,
       image: product.image,
-      category: product.category,
+      category_id: product.category_id,
       rating: product.rating,
     });
   };
@@ -214,151 +217,125 @@ export const AdminPanel = () => {
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-4"
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.name}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel>Nome</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="space-y-2">
-                        <FormLabel>Preço *</FormLabel>
-                        <Input
-                          id="price"
-                          type="number"
-                          step="0.01"
-                          {...form.register("price", { valueAsNumber: true })}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.price && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.price.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FormLabel>Descrição *</FormLabel>
-                      <Textarea
-                        id="description"
-                        {...form.register("description")}
-                        disabled={isMutating}
-                      />
-                      {form.formState.errors.description && (
-                        <p className="text-sm text-red-500">
-                          {form.formState.errors.description.message}
-                        </p>
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel>Nome</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </div>
+                    />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <FormLabel>URL da Imagem *</FormLabel>
-                        <Input
-                          id="image"
-                          {...form.register("image")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.image && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.image.message}
-                          </p>
-                        )}
-                      </div>
+                    <FormField
+                      control={form.control}
+                      name="price"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel>Preço</FormLabel>
+                          <FormControl>
+                            <Input step="0.01" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      <div className="space-y-2">
-                        <FormLabel>Categoria *</FormLabel>
-                        <Input
-                          id="category"
-                          {...form.register("category")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.category && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.category.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => {
+                        <FormItem>
+                          <FormLabel>Descrição</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>;
+                      }}
+                    />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="image"
+                      render={({ field }) => {
+                        <FormItem>
+                          <FormLabel>URL da Imagem</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>;
+                      }}
+                    />
+
+                    {isCategoriesLoading ? (
+                      <LoaderIcon />
+                    ) : (
                       <FormField
-                        className="space-y-2"
-                        control={form.rate}
-                        name="rate"
-                        render={({ field }) => (
+                        control={form.control}
+                        name="category_id"
+                        render={({ field }) => {
                           <FormItem>
-                            <FormLabel>Avaliação (0-5)</FormLabel>
-                            <Input
-                              id="rating"
-                              type="number"
-                              min="0"
-                              max="5"
-                              step="0.1"
-                              {...form.register("rating", {
-                                valueAsNumber: true,
-                              })}
-                              disabled={isMutating}
-                            />
-                            {form.formState.errors.rating && (
-                              <p className="text-sm text-red-500">
-                                {form.formState.errors.rating.message}
-                              </p>
-                            )}
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        className="space-y-2"
-                        control={form.is_new}
-                        name="new"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Produto Novo</FormLabel>
-                            <FormControl>
-                              <div className="flex items-center space-x-2">
-                                <Input {...field} />
-                                <span className="text-sm">
-                                  Marcar como novo produto
-                                </span>
-                              </div>
-                            </FormControl>
+                            <FormLabel>Categoria</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione a categoria" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {(categories || []).map((c) => (
+                                  <SelectItem value={c.id}>{c.name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
-                          </FormItem>
-                        )}
+                          </FormItem>;
+                        }}
                       />
-                    </div>
+                    )}
 
-                    <div className="flex gap-4">
-                      <Button type="submit" disabled={isMutating}>
-                        {isMutating && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        {editingProduct ? "Atualizar Produto" : "Criar Produto"}
+                    <FormField
+                      control={form.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Avaliação (0-5)</FormLabel>
+                          <FormControl>
+                            <Input step="0.1" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button type="submit" disabled={isMutating}>
+                      {isMutating && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      {editingProduct ? "Atualizar Produto" : "Criar Produto"}
+                    </Button>
+
+                    {editingProduct && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setEditingProduct(null);
+                          form.reset();
+                        }}
+                      >
+                        Cancelar
                       </Button>
-
-                      {editingProduct && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingProduct(null);
-                            form.reset();
-                          }}
-                        >
-                          Cancelar
-                        </Button>
-                      )}
-                    </div>
+                    )}
                   </form>
                 </Form>
               </CardContent>

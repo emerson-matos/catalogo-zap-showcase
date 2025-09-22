@@ -20,6 +20,7 @@ export interface Database {
           name: string;
           description: string;
           price: number;
+          image: string;
           category_id?: string;
           rating?: number;
           is_new?: boolean;
