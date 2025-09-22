@@ -81,6 +81,52 @@ export class SupabaseService {
     }
   }
 
+  static async getProductsPaginated(options: {
+    offset?: number;
+    limit?: number;
+    category?: string;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}): Promise<Product[]> {
+    const {
+      offset = 0,
+      limit = 20,
+      category,
+      search,
+      sortBy = 'created_at',
+      sortOrder = 'desc'
+    } = options;
+
+    let query = supabase
+      .from("products")
+      .select("*");
+
+    // Apply filters
+    if (category && category !== 'Todos') {
+      query = query.eq("category", category);
+    }
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    // Apply sorting
+    query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Error fetching paginated products:", error);
+      throw new Error(`Erro ao buscar produtos: ${error.message}`);
+    }
+
+    return data || [];
+  }
+
   static async getProductsByCategory(category: string): Promise<Product[]> {
     const { data, error } = await supabase
       .from("products")

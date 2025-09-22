@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { QueryStatusIndicator } from "@/components/QueryStatusIndicator";
 import { createQueryClient } from "@/lib/queryClient";
 import { CartProvider } from "@/contexts/CartContext";
 
@@ -20,13 +21,25 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           <TooltipProvider>
             <CartProvider>
               {children}
-              <Toaster />
+              <Toaster 
+                richColors 
+                position="top-right"
+                duration={4000}
+                toastOptions={{
+                  style: {
+                    background: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    color: 'hsl(var(--foreground))',
+                  },
+                }}
+              />
+              <QueryStatusIndicator showInProduction={process.env.NODE_ENV === 'development'} />
             </CartProvider>
           </TooltipProvider>
           <Analytics />
           <SpeedInsights />
           <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-          <TanStackRouterDevtools />
+          {process.env.NODE_ENV === 'development' && <TanStackRouterDevtools />}
         </QueryClientProvider>
       </ThemeProvider>
     </ErrorBoundary>
