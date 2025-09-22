@@ -13,7 +13,7 @@ export class SupabaseService {
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: true });
 
     if (error) {
       console.error("Error fetching products:", error);
