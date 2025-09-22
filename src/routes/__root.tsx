@@ -1,8 +1,10 @@
-import { createRootRoute, HeadContent, Outlet, ErrorComponent } from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Outlet } from "@tanstack/react-router";
 import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Page404 } from "@/pages/404";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 const title = "SeRena Cosméticos";
 const description = "Distribuidora de cosméticos do ABC paulista";
@@ -111,15 +113,15 @@ export const Route = createRootRoute({
             <RefreshCw className="w-4 h-4 mr-2" />
             Tentar Novamente
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.href = '/'}
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = "/")}
             className="w-full"
           >
             Voltar ao Início
           </Button>
         </div>
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === "development" && (
           <details className="text-left">
             <summary className="cursor-pointer text-sm text-muted-foreground">
               Detalhes do erro

@@ -3,7 +3,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { mockAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -12,7 +18,7 @@ export const Route = createFileRoute("/_layout/login")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
       redirect: (search.redirect as string) || "/",
-    }
+    };
   },
 });
 
@@ -61,7 +67,7 @@ function LoginPage() {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
               <Input
@@ -73,25 +79,16 @@ function LoginPage() {
                 required
               />
             </div>
-            
-            {error && (
-              <div className="text-sm text-destructive">
-                {error}
-              </div>
-            )}
-            
+
+            {error && <div className="text-sm text-destructive">{error}</div>}
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
-          
-          <div className="mt-6 text-sm text-muted-foreground">
-            <p className="font-medium mb-2">Credenciais de teste:</p>
-            <p>Admin: admin@serena.com / admin123</p>
-            <p>User: user@serena.com / user123</p>
-          </div>
         </CardContent>
       </Card>
     </div>
   );
 }
+

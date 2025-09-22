@@ -1,28 +1,30 @@
-import { createFileRoute } from '@tanstack/react-router'
-import ProductGrid from '@/components/ProductGrid'
+import { createFileRoute } from "@tanstack/react-router";
+import ProductGrid from "@/components/ProductGrid";
 
-export const Route = createFileRoute('/products')({
+export const Route = createFileRoute("/products")({
   component: ProductsPage,
   head: () => ({
     meta: [
       {
-        title: 'Produtos - SeRena Cosméticos',
+        title: "Produtos - SeRena Cosméticos",
       },
       {
-        name: 'description',
-        content: 'Conheça nossa linha completa de produtos cosméticos. Qualidade garantida com atendimento personalizado.',
+        name: "description",
+        content:
+          "Conheça nossa linha completa de produtos cosméticos. Qualidade garantida com atendimento personalizado.",
       },
       {
-        name: 'keywords',
-        content: 'produtos, cosméticos, linha completa, qualidade, SeRena',
+        name: "keywords",
+        content: "produtos, cosméticos, linha completa, qualidade, SeRena",
       },
       {
-        name: 'og:title',
-        content: 'Produtos - SeRena Cosméticos',
+        name: "og:title",
+        content: "Produtos - SeRena Cosméticos",
       },
       {
-        name: 'og:description',
-        content: 'Conheça nossa linha completa de produtos cosméticos. Qualidade garantida com atendimento personalizado.',
+        name: "og:description",
+        content:
+          "Conheça nossa linha completa de produtos cosméticos. Qualidade garantida com atendimento personalizado.",
       },
     ],
   }),
@@ -34,9 +36,9 @@ export const Route = createFileRoute('/products')({
       </div>
     </div>
   ),
-})
+});
 
-import { CartFloat } from '@/components/CartFloat';
+import { CartFloat } from "@/components/CartFloat";
 
 function ProductsPage() {
   return (
@@ -46,5 +48,5 @@ function ProductsPage() {
       </div>
       <CartFloat />
     </div>
-  )
+  );
 }
