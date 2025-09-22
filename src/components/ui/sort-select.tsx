@@ -8,17 +8,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
-export type SortOption = {
-  value: string;
-  label: string;
-  icon?: React.ReactNode;
-};
+import type { SortOption } from "@/hooks/useProductSort";
 
 interface SortSelectProps {
   value: string;
   onValueChange: (value: string) => void;
-  options: SortOption[];
+  options: Array<{ value: string; label: string; icon?: React.ReactNode }>;
   placeholder?: string;
   className?: string;
 }

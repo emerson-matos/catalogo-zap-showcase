@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SearchInput } from "@/components/ui/search-input";
-import { SortSelect, type SortOption } from "@/components/ui/sort-select";
+import { SortSelect } from "@/components/ui/sort-select";
 import { AdvancedFilters } from "@/components/ui/advanced-filters";
 import { AlertTriangle, RefreshCw, Wifi, SortAsc } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
@@ -33,11 +33,12 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
     refetch,
     isEmpty,
     isStale,
-    hasSearchResults,
+    hasSearch,
     hasActiveFilters,
+    clearFilters,
   } = useProductsQuery();
 
-  const sortOptions: SortOption[] = [
+  const sortOptions = [
     { value: "name-asc", label: "Nome (A-Z)", icon: <SortAsc className="h-4 w-4" /> },
     { value: "name-desc", label: "Nome (Z-A)", icon: <SortAsc className="h-4 w-4 rotate-180" /> },
     { value: "price-asc", label: "Menor Preço", icon: <SortAsc className="h-4 w-4" /> },
@@ -129,7 +130,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
 
             {/* Results Counter */}
             <div className="text-sm text-muted-foreground">
-              {hasSearchResults || hasActiveFilters ? (
+              {hasSearch || hasActiveFilters ? (
                 <span>
                   {filteredProductsCount} de {totalProducts} produtos
                 </span>
@@ -162,7 +163,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         </div>
 
         {/* No Results Message */}
-        {!isLoading && products.length === 0 && (hasSearchResults || hasActiveFilters) && (
+        {!isLoading && products.length === 0 && (hasSearch || hasActiveFilters) && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold mb-2">Nenhum produto encontrado</h3>
@@ -173,12 +174,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
               variant="outline"
               onClick={() => {
                 setSearchQuery("");
-                setFilters({
-                  priceRange: priceRange,
-                  minRating: 0,
-                  showNewOnly: false,
-                  showInStock: false,
-                });
+                clearFilters();
                 setSelectedCategory("Todos");
               }}
             >
@@ -214,10 +210,10 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="p-6">
             <div className="text-4xl font-bold text-primary mb-2">
-              {hasSearchResults || hasActiveFilters ? filteredProductsCount : totalProducts}+
+              {hasSearch || hasActiveFilters ? filteredProductsCount : totalProducts}+
             </div>
             <div className="text-muted-foreground">
-              {hasSearchResults || hasActiveFilters ? "Produtos Encontrados" : "Produtos Disponíveis"}
+              {hasSearch || hasActiveFilters ? "Produtos Encontrados" : "Produtos Disponíveis"}
             </div>
           </div>
           <div className="p-6">

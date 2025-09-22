@@ -5,26 +5,20 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { PriceRangeFilter } from "@/components/ui/price-range-filter";
 import { cn } from "@/lib/utils";
-
-export interface FilterOptions {
-  priceRange: [number, number];
-  minRating: number;
-  showNewOnly: boolean;
-  showInStock: boolean;
-}
+import type { ProductFilters } from "@/hooks/useProductFilters";
 
 interface AdvancedFiltersProps {
   isOpen: boolean;
   onToggle: () => void;
-  filters: FilterOptions;
-  onFiltersChange: (filters: FilterOptions) => void;
+  filters: ProductFilters;
+  onFiltersChange: (filters: ProductFilters) => void;
   priceRange: [number, number];
   className?: string;
 }
 
 export const AdvancedFilters = React.forwardRef<HTMLDivElement, AdvancedFiltersProps>(
   ({ isOpen, onToggle, filters, onFiltersChange, priceRange, className }, ref) => {
-    const handleFilterChange = (key: keyof FilterOptions, value: any) => {
+    const handleFilterChange = (key: keyof ProductFilters, value: any) => {
       onFiltersChange({
         ...filters,
         [key]: value,
