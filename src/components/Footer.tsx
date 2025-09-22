@@ -1,5 +1,7 @@
 import { MessageCircle, Phone, Mail, MapPin, Rose } from "lucide-react";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
+import { Button } from "./ui/button";
+import { Link } from "@tanstack/react-router";
 
 const Footer = () => {
   const whatsappNumber = getWhatsAppNumber();
@@ -8,7 +10,7 @@ const Footer = () => {
     : "https://wa.me";
 
   return (
-    <footer className="bg-card text-foreground border-t border-border">
+    <footer className="border-t border-border">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo e Descrição */}
@@ -17,7 +19,7 @@ const Footer = () => {
               <Rose className="size-8" />
               <span className="text-xl font-bold">SeRena Cosméticos</span>
             </div>
-            <p className="text-primary-foreground/80 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Tudo posso naquele que me fortalece.
               <br />
               Deus é fiel!
@@ -27,7 +29,7 @@ const Footer = () => {
           {/* Links Rápidos */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Links Rápidos</h3>
-            <ul className="space-y-2 text-primary-foreground/80">
+            <ul className="space-y-2 text-muted-foreground">
               <li>
                 <button
                   onClick={() =>
@@ -41,40 +43,28 @@ const Footer = () => {
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() =>
-                    document
-                      .getElementById("produtos")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
+                <a
                   className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                  href="/products"
                 >
                   Produtos
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() =>
-                    document
-                      .getElementById("quem-somos")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
+                <a
                   className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                  href="/about"
                 >
                   Quem Somos
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() =>
-                    document
-                      .getElementById("contato")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
+                <a
                   className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                  href="/contact"
                 >
                   Contato
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -82,7 +72,7 @@ const Footer = () => {
           {/* Contato */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Contato</h3>
-            <div className="space-y-3 text-primary-foreground/80">
+            <div className="space-y-3 text-muted-foreground">
               <div className="flex items-center space-x-2">
                 <MessageCircle className="size-4" />
                 <a

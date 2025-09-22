@@ -9,7 +9,7 @@ import {
   BookOpen,
 } from "lucide-react";
 
-import WhatsAppFloat from '@/components/WhatsAppFloat';
+import WhatsAppFloat from "@/components/WhatsAppFloat";
 
 export const Home = () => {
   return (
@@ -45,8 +45,8 @@ export const Home = () => {
 
             <Link to="/products">
               <div className="bg-gradient-card shadow-card rounded-lg p-8 text-center hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="bg-accent/10 p-4 rounded-lg w-fit mx-auto mb-4">
-                  <Package className="w-8 h-8 text-accent" />
+                <div className="bg-primary/10 p-4 rounded-lg w-fit mx-auto mb-4">
+                  <Package className="w-8 h-8 text-primary" />
                 </div>
                 <h3 className="font-semibold text-xl mb-3">Produtos</h3>
                 <p className="text-muted-foreground mb-4">
@@ -77,8 +77,8 @@ export const Home = () => {
 
             <Link to="/contact">
               <div className="bg-gradient-card shadow-card rounded-lg p-8 text-center hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="bg-whatsapp/10 p-4 rounded-lg w-fit mx-auto mb-4">
-                  <MessageCircle className="w-8 h-8 text-whatsapp" />
+                <div className="bg-primary/10 p-4 rounded-lg w-fit mx-auto mb-4">
+                  <MessageCircle className="w-8 h-8 text-primary" />
                 </div>
                 <h3 className="font-semibold text-xl mb-3">Contato</h3>
                 <p className="text-muted-foreground mb-4">
