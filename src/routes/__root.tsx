@@ -2,8 +2,6 @@ import { createRootRoute, HeadContent, Outlet, ErrorComponent } from "@tanstack/
 import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
-import { CartFloat } from "@/components/CartFloat";
 import { Page404 } from "@/pages/404";
 
 const title = "SeRena Cosméticos";
