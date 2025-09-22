@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,7 +14,17 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Edit, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2, Edit, Trash2, Search, Plus, Filter } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useAdminProducts } from "@/hooks/useAdminProducts";
 import { useAuth } from "@/hooks/useAuth";
@@ -40,13 +50,57 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>;
 
+// Utility function to determine if a product is new (created within last 30 days)
+const isProductNew = (createdAt: string): boolean => {
+  const createdDate = new Date(createdAt);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  return createdDate > thirtyDaysAgo;
+};
+
 export const AdminPanel = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   const { user } = useAuth();
   const { products, isLoading } = useProductsQuery();
   const { createProduct, updateProduct, deleteProduct, isMutating } =
     useAdminProducts();
+
+  // Filter products based on search term and category
+  const filteredProducts = useMemo(() => {
+    let filtered = products;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(
+        (product) => product.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    return filtered;
+  }, [products, searchTerm, selectedCategory]);
+
+  // Get unique categories for filter
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(
+      new Set(products.map((product) => product.category))
+    ).sort();
+    return ["all", ...uniqueCategories];
+  }, [products]);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -98,16 +152,23 @@ export const AdminPanel = () => {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Tem certeza que deseja deletar este produto?")) {
-      try {
-        await deleteProduct(id);
-        toast.success("Produto deletado com sucesso!");
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Erro ao deletar produto",
-        );
-      }
+  const handleDeleteClick = (product: Product) => {
+    setProductToDelete(product);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return;
+    
+    try {
+      await deleteProduct(productToDelete.id);
+      toast.success("Produto deletado com sucesso!");
+      setDeleteDialogOpen(false);
+      setProductToDelete(null);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Erro ao deletar produto",
+      );
     }
   };
 
@@ -144,8 +205,91 @@ export const AdminPanel = () => {
           </TabsList>
 
           <TabsContent value="products" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
+            {/* Search and Filter Controls */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  Filtros e Busca
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Input
+                        placeholder="Buscar produtos..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="sm:w-48">
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category === "all" ? "Todas as categorias" : category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="mt-4 text-sm text-gray-600">
+                  Mostrando {filteredProducts.length} de {products.length} produtos
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Products Grid */}
+            {filteredProducts.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+                      <Search className="h-12 w-12" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Nenhum produto encontrado
+                    </h3>
+                    <p className="text-gray-500 mb-4">
+                      {searchTerm || selectedCategory !== "all"
+                        ? "Tente ajustar os filtros de busca"
+                        : "Comece adicionando seu primeiro produto"}
+                    </p>
+                    {searchTerm || selectedCategory !== "all" ? (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSearchTerm("");
+                          setSelectedCategory("all");
+                        }}
+                      >
+                        Limpar filtros
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => {
+                          // Switch to add product tab
+                          const addProductTab = document.querySelector('[value="add-product"]') as HTMLElement;
+                          addProductTab?.click();
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar Produto
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {filteredProducts.map((product) => (
                 <Card key={product.id} className="overflow-hidden">
                   <div className="aspect-square">
                     <img
@@ -158,7 +302,7 @@ export const AdminPanel = () => {
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-semibold text-lg">{product.name}</h3>
                       <div className="flex gap-1">
-                        {product.is_new && (
+                        {isProductNew(product.created_at) && (
                           <Badge variant="secondary">Novo</Badge>
                         )}
                         {product.rating && (
@@ -184,7 +328,7 @@ export const AdminPanel = () => {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => handleDelete(product.id)}
+                          onClick={() => handleDeleteClick(product)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -192,8 +336,9 @@ export const AdminPanel = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="add-product">
@@ -216,7 +361,7 @@ export const AdminPanel = () => {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
-                        control={form.name}
+                        control={form.control}
                         name="name"
                         render={({ field }) => (
                           <FormItem className="space-y-2">
@@ -228,115 +373,101 @@ export const AdminPanel = () => {
                           </FormItem>
                         )}
                       />
-                      <div className="space-y-2">
-                        <FormLabel>Preço *</FormLabel>
-                        <Input
-                          id="price"
-                          type="number"
-                          step="0.01"
-                          {...form.register("price", { valueAsNumber: true })}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.price && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.price.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FormLabel>Descrição *</FormLabel>
-                      <Textarea
-                        id="description"
-                        {...form.register("description")}
-                        disabled={isMutating}
-                      />
-                      {form.formState.errors.description && (
-                        <p className="text-sm text-red-500">
-                          {form.formState.errors.description.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <FormLabel>URL da Imagem *</FormLabel>
-                        <Input
-                          id="image"
-                          {...form.register("image")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.image && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.image.message}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <FormLabel>Categoria *</FormLabel>
-                        <Input
-                          id="category"
-                          {...form.register("category")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.category && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.category.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
-                        className="space-y-2"
-                        control={form.rate}
-                        name="rate"
+                        control={form.control}
+                        name="price"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Avaliação (0-5)</FormLabel>
-                            <Input
-                              id="rating"
-                              type="number"
-                              min="0"
-                              max="5"
-                              step="0.1"
-                              {...form.register("rating", {
-                                valueAsNumber: true,
-                              })}
-                              disabled={isMutating}
-                            />
-                            {form.formState.errors.rating && (
-                              <p className="text-sm text-red-500">
-                                {form.formState.errors.rating.message}
-                              </p>
-                            )}
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        className="space-y-2"
-                        control={form.is_new}
-                        name="new"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Produto Novo</FormLabel>
+                          <FormItem className="space-y-2">
+                            <FormLabel>Preço *</FormLabel>
                             <FormControl>
-                              <div className="flex items-center space-x-2">
-                                <Input {...field} />
-                                <span className="text-sm">
-                                  Marcar como novo produto
-                                </span>
-                              </div>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                {...field}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                disabled={isMutating}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
+
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel>Descrição *</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              disabled={isMutating}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field }) => (
+                          <FormItem className="space-y-2">
+                            <FormLabel>URL da Imagem *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                disabled={isMutating}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem className="space-y-2">
+                            <FormLabel>Categoria *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                disabled={isMutating}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel>Avaliação (0-5)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="5"
+                              step="0.1"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                              disabled={isMutating}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <div className="flex gap-4">
                       <Button type="submit" disabled={isMutating}>
@@ -366,6 +497,28 @@ export const AdminPanel = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja deletar o produto "{productToDelete?.name}"? 
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Deletar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
