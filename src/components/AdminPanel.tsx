@@ -46,10 +46,17 @@ const productSchema = z.object({
   image: z.string().url("URL da imagem inválida"),
   category: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().min(0).max(5).optional(),
-  is_new: z.boolean().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
+
+// Utility function to determine if a product is new (created within last 30 days)
+const isProductNew = (createdAt: string): boolean => {
+  const createdDate = new Date(createdAt);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  return createdDate > thirtyDaysAgo;
+};
 
 export const AdminPanel = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -104,7 +111,6 @@ export const AdminPanel = () => {
       image: "",
       category: "",
       rating: undefined,
-      is_new: false,
     },
   });
 
@@ -143,7 +149,6 @@ export const AdminPanel = () => {
       image: product.image,
       category: product.category,
       rating: product.rating,
-      is_new: product.is_new || false,
     });
   };
 
@@ -297,7 +302,7 @@ export const AdminPanel = () => {
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-semibold text-lg">{product.name}</h3>
                       <div className="flex gap-1">
-                        {product.is_new && (
+                        {isProductNew(product.created_at) && (
                           <Badge variant="secondary">Novo</Badge>
                         )}
                         {product.rating && (
@@ -442,54 +447,27 @@ export const AdminPanel = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="rating"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel>Avaliação (0-5)</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="5"
-                                step="0.1"
-                                {...field}
-                                onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                                disabled={isMutating}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="is_new"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel>Produto Novo</FormLabel>
-                            <FormControl>
-                              <div className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  checked={field.value || false}
-                                  onChange={(e) => field.onChange(e.target.checked)}
-                                  disabled={isMutating}
-                                  className="h-4 w-4 rounded border-gray-300"
-                                />
-                                <span className="text-sm">
-                                  Marcar como novo produto
-                                </span>
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel>Avaliação (0-5)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="5"
+                              step="0.1"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                              disabled={isMutating}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <div className="flex gap-4">
                       <Button type="submit" disabled={isMutating}>
