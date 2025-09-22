@@ -50,7 +50,7 @@ export function CartFloat() {
 
           <CardContent className="space-y-4">
             <div className="max-h-48 overflow-y-auto space-y-3">
-              {items.map((item: any) => (
+              {items.map((item) => (
                 <div
                   key={item.product.id}
                   className="flex items-center space-x-3"
