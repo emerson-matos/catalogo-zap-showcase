@@ -1,4 +1,4 @@
-import { Package, MessageCircle, Phone, Mail, MapPin } from "lucide-react";
+import { MessageCircle, Phone, Mail, MapPin, Rose } from "lucide-react";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 const Footer = () => {
@@ -14,11 +14,13 @@ const Footer = () => {
           {/* Logo e Descrição */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Package className="w-8 h-8" />
+              <Rose className="size-8" />
               <span className="text-xl font-bold">SeRena Cosméticos</span>
             </div>
             <p className="text-primary-foreground/80 leading-relaxed">
-              Tudo posso naquele que me fortalece.<br />Deus é fiel!
+              Tudo posso naquele que me fortalece.
+              <br />
+              Deus é fiel!
             </p>
           </div>
 
@@ -109,7 +111,8 @@ const Footer = () => {
               <div className="flex items-start space-x-2">
                 <MapPin className="size-4 mt-0.5" />
                 <span className="text-sm">
-                  Av. Sorocaba, 961, Pq João Ramalho<br />
+                  Av. Sorocaba, 961, Pq João Ramalho
+                  <br />
                   Santo André - SP
                 </span>
               </div>
