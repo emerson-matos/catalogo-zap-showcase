@@ -1,6 +1,6 @@
 import React from "react";
 import { ShoppingCart, Plus } from "lucide-react";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
 import { useCart } from "@/contexts/CartContext";
@@ -52,3 +52,4 @@ export const AddToCartButton = ({
     </Button>
   );
 };
+
