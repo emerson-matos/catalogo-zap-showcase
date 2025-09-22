@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { fetchProductsFromGoogleSheet } from "@/lib/googleSheets";
 import { queryKeys } from "@/lib/queryClient";
 import type { Product } from "@/types/product";
@@ -8,7 +8,7 @@ export type SortOption = 'name' | 'price' | 'category' | 'newest' | 'rating';
 export type SortDirection = 'asc' | 'desc';
 
 export interface ProductFilters {
-  searchTerm: string;
+  search: string;
   category: string;
   minPrice?: number;
   maxPrice?: number;
@@ -19,9 +19,8 @@ export interface ProductFilters {
 }
 
 export const useProductsQuery = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("Todos");
   const [filters, setFilters] = useState<ProductFilters>({
-    searchTerm: '',
+    search: '',
     category: 'Todos',
     minPrice: undefined,
     maxPrice: undefined,
@@ -46,93 +45,70 @@ export const useProductsQuery = () => {
     // Use global defaults from queryClient, but can override specific options here if needed
   });
 
-  // Memoized categories derived from products
+  // Helper function to parse price
+  const parsePrice = (price: number | string): number => {
+    if (typeof price === 'number') return price;
+    return parseFloat(price.toString().replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
+  };
+
+  // Helper function to check if product is new (created within last 30 days)
+  const isNewProduct = (product: Product): boolean => {
+    if (!product.createdAt) return false;
+    const createdDate = new Date(product.createdAt);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return createdDate > thirtyDaysAgo;
+  };
+
+  // Memoized categories
   const categories = useMemo(() => {
-    if (!allProducts.length) return ["Todos"];
-
-    const uniqueCategories = Array.from(
-      new Set(
-        allProducts
-          .map((item: Product) => String(item.category || "").trim())
-          .filter((name: string) => name.length > 0),
-      ),
-    );
-
-    const withoutTodos = uniqueCategories.filter(
-      (name: string) => name.toLowerCase() !== "todos",
-    );
-
-    withoutTodos.sort((a: string, b: string) => a.localeCompare(b));
-    return ["Todos", ...withoutTodos];
+    const uniqueCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+    return ['Todos', ...uniqueCategories.sort()];
   }, [allProducts]);
 
   // Memoized filtered and sorted products
-  const filteredProducts = useMemo(() => {
-    let filtered = allProducts;
+  const products = useMemo(() => {
+    let result = allProducts;
 
-    // Search filter
-    if (filters.searchTerm) {
-      const searchLower = filters.searchTerm.toLowerCase();
-      filtered = filtered.filter((product: Product) =>
-        product.name.toLowerCase().includes(searchLower) ||
-        product.description.toLowerCase().includes(searchLower)
+    // Apply filters
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      result = result.filter(p => 
+        p.name.toLowerCase().includes(searchLower) || 
+        p.description.toLowerCase().includes(searchLower)
       );
     }
 
-    // Category filter
-    if (filters.category !== "Todos") {
-      filtered = filtered.filter((product: Product) => 
-        product.category === filters.category
-      );
+    if (filters.category !== 'Todos') {
+      result = result.filter(p => p.category === filters.category);
     }
 
-    // Price range filter
     if (filters.minPrice !== undefined) {
-      filtered = filtered.filter((product: Product) => {
-        const price = typeof product.price === 'string' 
-          ? parseFloat(product.price.replace(/[^\d.,]/g, '').replace(',', '.'))
-          : product.price;
-        return price >= filters.minPrice!;
-      });
+      result = result.filter(p => parsePrice(p.price) >= filters.minPrice!);
     }
 
     if (filters.maxPrice !== undefined) {
-      filtered = filtered.filter((product: Product) => {
-        const price = typeof product.price === 'string' 
-          ? parseFloat(product.price.replace(/[^\d.,]/g, '').replace(',', '.'))
-          : product.price;
-        return price <= filters.maxPrice!;
-      });
+      result = result.filter(p => parsePrice(p.price) <= filters.maxPrice!);
     }
 
-    // Rating filter
     if (filters.minRating !== undefined) {
-      filtered = filtered.filter((product: Product) => 
-        (product.rating || 0) >= filters.minRating!
-      );
+      result = result.filter(p => (p.rating || 0) >= filters.minRating!);
     }
 
-    // New products filter
     if (filters.showNewOnly) {
-      filtered = filtered.filter((product: Product) => product.isNew);
+      result = result.filter(p => isNewProduct(p));
     }
 
-    // Sorting
-    filtered.sort((a: Product, b: Product) => {
+    // Apply sorting
+    result.sort((a, b) => {
       let comparison = 0;
-
+      
       switch (filters.sortBy) {
         case 'name':
           comparison = a.name.localeCompare(b.name);
           break;
         case 'price':
-          const priceA = typeof a.price === 'string' 
-            ? parseFloat(a.price.replace(/[^\d.,]/g, '').replace(',', '.'))
-            : a.price;
-          const priceB = typeof b.price === 'string' 
-            ? parseFloat(b.price.replace(/[^\d.,]/g, '').replace(',', '.'))
-            : b.price;
-          comparison = priceA - priceB;
+          comparison = parsePrice(a.price) - parsePrice(b.price);
           break;
         case 'category':
           comparison = a.category.localeCompare(b.category);
@@ -141,17 +117,14 @@ export const useProductsQuery = () => {
           comparison = (a.rating || 0) - (b.rating || 0);
           break;
         case 'newest':
-          // Assuming newer products have higher IDs or we could add a date field
-          comparison = a.id.localeCompare(b.id);
+          comparison = new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
           break;
-        default:
-          comparison = 0;
       }
 
       return filters.sortDirection === 'desc' ? -comparison : comparison;
     });
 
-    return filtered;
+    return result;
   }, [allProducts, filters]);
 
   // Enhanced error message
@@ -176,14 +149,14 @@ export const useProductsQuery = () => {
     return "Erro desconhecido ao carregar produtos.";
   }, [error]);
 
-  // Helper functions for filter management
-  const updateFilters = (newFilters: Partial<ProductFilters>) => {
-    setFilters((prev: ProductFilters) => ({ ...prev, ...newFilters }));
-  };
+  // Optimized callbacks
+  const updateFilters = useCallback((newFilters: Partial<ProductFilters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  }, []);
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setFilters({
-      searchTerm: '',
+      search: '',
       category: 'Todos',
       minPrice: undefined,
       maxPrice: undefined,
@@ -192,34 +165,40 @@ export const useProductsQuery = () => {
       sortBy: 'name',
       sortDirection: 'asc'
     });
-  };
+  }, []);
 
-  const setSearchTerm = (searchTerm: string) => {
-    updateFilters({ searchTerm });
-  };
+  const setSearch = useCallback((search: string) => {
+    updateFilters({ search });
+  }, [updateFilters]);
 
-  const setSorting = (sortBy: SortOption, sortDirection: SortDirection) => {
+  const setSorting = useCallback((sortBy: SortOption, sortDirection: SortDirection) => {
     updateFilters({ sortBy, sortDirection });
-  };
+  }, [updateFilters]);
+
+  // Computed values
+  const hasActiveFilters = useMemo(() => 
+    filters.search !== '' || 
+    filters.category !== 'Todos' || 
+    filters.minPrice !== undefined || 
+    filters.maxPrice !== undefined || 
+    filters.minRating !== undefined || 
+    filters.showNewOnly
+  , [filters]);
 
   return {
     // Data
-    products: filteredProducts,
+    products,
     allProducts,
     categories,
     totalProducts: allProducts.length,
-    filteredProductsCount: filteredProducts.length,
+    filteredCount: products.length,
 
     // Filter management
     filters,
     updateFilters,
     resetFilters,
-    setSearchTerm,
+    setSearch,
     setSorting,
-
-    // Category management (keeping for backward compatibility)
-    selectedCategory,
-    setSelectedCategory,
 
     // Query states
     isLoading,
@@ -234,12 +213,7 @@ export const useProductsQuery = () => {
     // Computed states
     isEmpty: !isLoading && allProducts.length === 0,
     hasProducts: allProducts.length > 0,
-    hasActiveFilters: filters.searchTerm !== '' || 
-                     filters.category !== 'Todos' || 
-                     filters.minPrice !== undefined || 
-                     filters.maxPrice !== undefined || 
-                     filters.minRating !== undefined || 
-                     filters.showNewOnly,
+    hasActiveFilters,
   };
 };
 

@@ -5,60 +5,27 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Filter, X } from "lucide-react";
-import type { ProductFilters as ProductFiltersType } from "@/hooks/useProductsQuery";
+import type { ProductFilters } from "@/hooks/useProductsQuery";
 
-interface ProductFiltersProps {
-  filters: ProductFiltersType;
-  onFiltersChange: (filters: Partial<ProductFiltersType>) => void;
+interface Props {
+  filters: ProductFilters;
+  onFiltersChange: (filters: Partial<ProductFilters>) => void;
   onResetFilters: () => void;
   categories: string[];
   hasActiveFilters: boolean;
 }
 
-export const ProductFilters = ({
-  filters,
-  onFiltersChange,
-  onResetFilters,
-  categories,
-  hasActiveFilters
-}: ProductFiltersProps) => {
+export const ProductFilters = ({ filters, onFiltersChange, onResetFilters, categories, hasActiveFilters }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const handlePriceRangeChange = (values: number[]) => {
-    onFiltersChange({
-      minPrice: values[0],
-      maxPrice: values[1]
-    });
-  };
-
-  const handleRatingChange = (values: number[]) => {
-    onFiltersChange({
-      minRating: values[0]
-    });
-  };
-
-  // Get price range from all products for slider
-  const getPriceRange = () => {
-    // This would ideally come from the hook, but for now we'll use a reasonable default
-    return [0, 1000];
-  };
-
-  const priceRange = getPriceRange();
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2"
-        >
+        <Button variant="outline" onClick={() => setIsOpen(!isOpen)} className="flex items-center gap-2">
           <Filter className="h-4 w-4" />
           Filtros Avançados
           {hasActiveFilters && (
-            <span className="ml-1 px-1.5 py-0.5 text-xs bg-primary text-primary-foreground rounded-full">
-              !
-            </span>
+            <span className="ml-1 px-1.5 py-0.5 text-xs bg-primary text-primary-foreground rounded-full">!</span>
           )}
         </Button>
         
@@ -98,16 +65,16 @@ export const ProductFilters = ({
               <Label>Faixa de Preço</Label>
               <div className="space-y-2">
                 <Slider
-                  value={[filters.minPrice || priceRange[0], filters.maxPrice || priceRange[1]]}
-                  onValueChange={handlePriceRangeChange}
-                  max={priceRange[1]}
-                  min={priceRange[0]}
+                  value={[filters.minPrice || 0, filters.maxPrice || 1000]}
+                  onValueChange={([min, max]) => onFiltersChange({ minPrice: min, maxPrice: max })}
+                  max={1000}
+                  min={0}
                   step={10}
                   className="w-full"
                 />
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>R$ {filters.minPrice || priceRange[0]}</span>
-                  <span>R$ {filters.maxPrice || priceRange[1]}</span>
+                  <span>R$ {filters.minPrice || 0}</span>
+                  <span>R$ {filters.maxPrice || 1000}</span>
                 </div>
               </div>
             </div>
@@ -118,7 +85,7 @@ export const ProductFilters = ({
               <div className="space-y-2">
                 <Slider
                   value={[filters.minRating || 0]}
-                  onValueChange={handleRatingChange}
+                  onValueChange={([rating]) => onFiltersChange({ minRating: rating })}
                   max={5}
                   min={0}
                   step={0.5}
@@ -137,9 +104,7 @@ export const ProductFilters = ({
               <Checkbox
                 id="new-only"
                 checked={filters.showNewOnly}
-                onCheckedChange={(checked: boolean) => 
-                  onFiltersChange({ showNewOnly: checked })
-                }
+                onCheckedChange={(checked) => onFiltersChange({ showNewOnly: checked as boolean })}
               />
               <Label htmlFor="new-only">Apenas produtos novos</Label>
             </div>

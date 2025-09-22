@@ -11,11 +11,11 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
     products,
     categories,
     totalProducts,
-    filteredProductsCount,
+    filteredCount,
     filters,
     updateFilters,
     resetFilters,
-    setSearchTerm,
+    setSearch,
     setSorting,
     isLoading,
     isFetching,
@@ -81,18 +81,15 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         {/* Product Controls */}
         {!isLoading && (
           <ProductControls
-            searchTerm={filters.searchTerm}
-            onSearchChange={setSearchTerm}
-            sortBy={filters.sortBy}
-            sortDirection={filters.sortDirection}
-            onSortChange={setSorting}
             filters={filters}
             onFiltersChange={updateFilters}
             onResetFilters={resetFilters}
+            setSearch={setSearch}
+            setSorting={setSorting}
             categories={categories}
             hasActiveFilters={hasActiveFilters}
             totalProducts={totalProducts}
-            filteredProductsCount={filteredProductsCount}
+            filteredCount={filteredCount}
           />
         )}
 

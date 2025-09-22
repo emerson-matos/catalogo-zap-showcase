@@ -6,7 +6,7 @@ export interface Product {
   image: string;
   category: string;
   rating?: number;
-  isNew?: boolean;
+  createdAt?: string; // ISO date string
 }
 
 export interface ProductCategory {
