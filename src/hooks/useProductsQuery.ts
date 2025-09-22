@@ -1,9 +1,3 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { SupabaseService } from "@/lib/supabaseService";
-import { queryKeys } from "@/lib/queryClient";
-import type { Product } from "@/lib/supabase";
-
 import { useQuery, useQueryClient, useMutation, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo, useState, useEffect } from "react";
 import { SupabaseService } from "@/lib/supabaseService";
@@ -38,22 +32,15 @@ export const useProductsQuery = (filters?: ProductFilters) => {
   } = useQuery({
     queryKey: queryKeys.products.supabase(stableFilters),
     queryFn: () => SupabaseService.getProducts(),
-    // Optimized stale time for products (they don't change often)
     staleTime: 10 * 60 * 1000, // 10 minutes
-    // Longer garbage collection time for products
     gcTime: 30 * 60 * 1000, // 30 minutes
-    // Enable background refetch for products
     refetchOnWindowFocus: (query) => {
-      // Only refetch if data is older than 5 minutes
       const lastDataUpdate = query.state.dataUpdatedAt;
       const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
       return lastDataUpdate < fiveMinutesAgo;
     },
-    // Add placeholder data for better UX
     placeholderData: (previousData) => previousData,
-    // Custom select for data transformation
     select: (data: Product[]) => {
-      // Apply client-side filtering if needed
       if (stableFilters.search) {
         const searchLower = stableFilters.search.toLowerCase();
         return data.filter(
@@ -66,17 +53,15 @@ export const useProductsQuery = (filters?: ProductFilters) => {
     },
   });
 
-  // Separate query for categories with different caching strategy
+  // Separate query for categories
   const {
     data: categories = ["Todos"],
     isLoading: isCategoriesLoading,
   } = useQuery({
     queryKey: queryKeys.products.categories.list(),
     queryFn: SupabaseService.getCategories,
-    // Categories change less frequently, cache longer
-    staleTime: 15 * 60 * 1000, // 15 minutes
-    gcTime: 60 * 60 * 1000, // 1 hour
-    // Transform data with proper fallback
+    staleTime: 15 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     select: (data: string[]) => {
       if (!data || data.length === 0) return ["Todos"];
       return ["Todos", ...data.filter(cat => cat !== "Todos")];
@@ -87,7 +72,6 @@ export const useProductsQuery = (filters?: ProductFilters) => {
   const switchCategory = (newCategory: string) => {
     setSelectedCategory(newCategory);
     
-    // Prefetch data for the new category if it's not "Todos"
     if (newCategory !== "Todos") {
       queryClient.prefetchQuery({
         queryKey: queryKeys.products.categories.byCategory(newCategory),
@@ -97,23 +81,21 @@ export const useProductsQuery = (filters?: ProductFilters) => {
     }
   };
 
-  // Memoized filtered products based on selected category
+  // Memoized filtered products
   const filteredProducts = useMemo(() => {
     if (selectedCategory === "Todos") {
       return allProducts;
     }
-
     return allProducts.filter(
       (product: Product) => product.category === selectedCategory
     );
   }, [selectedCategory, allProducts]);
 
-  // Enhanced error message with actionable feedback
+  // Enhanced error message
   const errorMessage = useMemo(() => {
     if (!error) return null;
 
     if (error instanceof Error) {
-      // Network errors
       if (error.message.includes("fetch") || error.message.includes("network")) {
         return {
           title: "Erro de Conexão",
@@ -123,7 +105,6 @@ export const useProductsQuery = (filters?: ProductFilters) => {
         };
       }
       
-      // Authentication errors
       if (error.message.includes("403") || error.message.includes("401")) {
         return {
           title: "Acesso Negado",
@@ -133,7 +114,6 @@ export const useProductsQuery = (filters?: ProductFilters) => {
         };
       }
       
-      // Not found errors
       if (error.message.includes("404")) {
         return {
           title: "Dados Não Encontrados",
@@ -143,7 +123,6 @@ export const useProductsQuery = (filters?: ProductFilters) => {
         };
       }
       
-      // Server errors
       if (error.message.includes("5")) {
         return {
           title: "Erro do Servidor",
@@ -171,7 +150,6 @@ export const useProductsQuery = (filters?: ProductFilters) => {
 
   // Prefetch related data
   useEffect(() => {
-    // Prefetch categories if not already loaded
     if (!isCategoriesLoading && categories.length <= 1) {
       queryClient.prefetchQuery({
         queryKey: queryKeys.products.categories.list(),
@@ -206,7 +184,6 @@ export const useProductsQuery = (filters?: ProductFilters) => {
     refetch: async () => {
       const result = await refetch();
       if (result.isSuccess) {
-        // Invalidate related queries after successful refetch
         queryKeyUtils.invalidateProductList(queryClient, stableFilters);
       }
       return result;
@@ -247,10 +224,9 @@ export const useInfiniteProductsQuery = (filters?: ProductFilters & { pageSize?:
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
-      // Continue fetching if the last page has the full page size
       return lastPage.length === pageSize ? lastPageParam + 1 : undefined;
     },
-    maxPages: 10, // Limit to 10 pages to prevent memory issues
+    maxPages: 10,
   });
 
   const allProducts = useMemo(() => {
@@ -279,7 +255,7 @@ export const usePrefetchProducts = () => {
     return queryClient.prefetchQuery({
       queryKey: queryKeys.products.supabase(filters),
       queryFn: () => SupabaseService.getProducts(),
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     });
   };
 
@@ -287,18 +263,17 @@ export const usePrefetchProducts = () => {
     return queryClient.prefetchQuery({
       queryKey: queryKeys.products.categories.list(),
       queryFn: SupabaseService.getCategories,
-      staleTime: 15 * 60 * 1000, // 15 minutes
+      staleTime: 15 * 60 * 1000,
     });
   };
 
   const prefetchPopularProducts = () => {
     return queryKeyUtils.prefetchPopularProducts(
       queryClient,
-      () => SupabaseService.getProducts() // Could be a different endpoint for popular products
+      () => SupabaseService.getProducts()
     );
   };
 
-  // Smart prefetch based on user behavior
   const prefetchByCategory = (category: string) => {
     return queryClient.prefetchQuery({
       queryKey: queryKeys.products.categories.byCategory(category),
@@ -345,17 +320,14 @@ export const useProductsCache = () => {
     return queryKeyUtils.updateProductInCaches(queryClient, productId, updater);
   };
 
-  // Optimistically update product in all relevant caches
   const optimisticallyUpdateProduct = (productId: string, updates: Partial<Product>) => {
     const previousData = getCachedProduct(productId);
     
-    // Update the cache optimistically
     updateProductInCache(productId, (old: Product) => ({
       ...old,
       ...updates,
     }));
 
-    // Return rollback function
     return () => {
       if (previousData) {
         queryKeyUtils.setProductInCache(queryClient, productId, previousData);
@@ -378,7 +350,6 @@ export const useProductsCache = () => {
 export const useProductSearch = (searchTerm: string, debounceMs: number = 300) => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
-  // Debounce the search term
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -396,9 +367,9 @@ export const useProductSearch = (searchTerm: string, debounceMs: number = 300) =
   } = useQuery({
     queryKey: queryKeys.products.search(debouncedSearchTerm),
     queryFn: () => SupabaseService.searchProducts(debouncedSearchTerm),
-    enabled: debouncedSearchTerm.length >= 2, // Only search with 2+ characters
-    staleTime: 2 * 60 * 1000, // 2 minutes for search results
-    gcTime: 5 * 60 * 1000, // 5 minutes garbage collection
+    enabled: debouncedSearchTerm.length >= 2,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 
   return {
@@ -426,10 +397,9 @@ export const useProduct = (productId: string) => {
     queryKey: queryKeys.products.detail(productId),
     queryFn: () => SupabaseService.getProductById(productId),
     enabled: !!productId,
-    staleTime: 10 * 60 * 1000, // Individual products cache longer
+    staleTime: 10 * 60 * 1000,
   });
 
-  // Prefetch related products when this product loads
   useEffect(() => {
     if (product?.category) {
       queryClient.prefetchQuery({
@@ -449,4 +419,3 @@ export const useProduct = (productId: string) => {
     notFound: !isLoading && !product,
   };
 };
-
