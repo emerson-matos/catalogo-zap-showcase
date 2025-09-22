@@ -71,6 +71,44 @@ export interface Database {
           updated_at?: string;
         };
       };
+      // Future: Categories table for refactoring
+      categories: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description?: string;
+          color?: string;
+          icon?: string;
+          is_active: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+          created_by: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          description?: string;
+          color?: string;
+          icon?: string;
+          is_active?: boolean;
+          sort_order?: number;
+          created_by: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          description?: string;
+          color?: string;
+          icon?: string;
+          is_active?: boolean;
+          sort_order?: number;
+          updated_at?: string;
+        };
+      };
       // Note: Using Supabase Auth native invite system instead of custom table
     };
     Views: {
@@ -93,5 +131,9 @@ export type UserRoleInsert =
   Database["public"]["Tables"]["user_roles"]["Insert"];
 export type UserRoleUpdate =
   Database["public"]["Tables"]["user_roles"]["Update"];
+// Future: Category types for refactoring
+export type Category = Database["public"]["Tables"]["categories"]["Row"];
+export type CategoryInsert = Database["public"]["Tables"]["categories"]["Insert"];
+export type CategoryUpdate = Database["public"]["Tables"]["categories"]["Update"];
 // Note: Using Supabase Auth native invite system - no custom types needed
 

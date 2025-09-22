@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Edit, Trash2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Edit, Trash2, Plus, Search, Filter, BarChart3 } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useAdminProducts } from "@/hooks/useAdminProducts";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,17 +37,48 @@ const productSchema = z.object({
   image: z.string().url("URL da imagem inválida"),
   category: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().min(0).max(5).optional(),
+  is_new: z.boolean().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
 
 export const AdminPanel = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("all");
 
   const { user } = useAuth();
-  const { products, isLoading } = useProductsQuery();
+  const { products, isLoading, categories } = useProductsQuery();
   const { createProduct, updateProduct, deleteProduct, isMutating } =
     useAdminProducts();
+
+  // Filter and search products
+  const filteredProducts = useMemo(() => {
+    let filtered = products;
+
+    // Filter by category
+    if (selectedCategoryFilter !== "all") {
+      filtered = filtered.filter(product => product.category === selectedCategoryFilter);
+    }
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchLower) ||
+        product.description.toLowerCase().includes(searchLower) ||
+        product.category.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return filtered;
+  }, [products, selectedCategoryFilter, searchTerm]);
+
+  // Get unique categories for the select dropdown
+  const availableCategories = useMemo(() => {
+    const uniqueCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+    return uniqueCategories.sort();
+  }, [products]);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -57,6 +89,7 @@ export const AdminPanel = () => {
       image: "",
       category: "",
       rating: undefined,
+      is_new: false,
     },
   });
 
@@ -95,6 +128,7 @@ export const AdminPanel = () => {
       image: product.image,
       category: product.category,
       rating: product.rating,
+      is_new: product.is_new || false,
     });
   };
 
@@ -141,11 +175,75 @@ export const AdminPanel = () => {
           <TabsList>
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="add-product">Adicionar Produto</TabsTrigger>
+            <TabsTrigger value="analytics">Estatísticas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products" className="space-y-6">
+            {/* Search and Filter Controls */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  Filtros e Busca
+                </CardTitle>
+                <CardDescription>
+                  Encontre produtos específicos usando os filtros abaixo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Buscar produtos</label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Nome, descrição ou categoria..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Filtrar por categoria</label>
+                    <Select value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todas as categorias" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas as categorias</SelectItem>
+                        {availableCategories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    Mostrando {filteredProducts.length} de {products.length} produtos
+                  </div>
+                  {(searchTerm || selectedCategoryFilter !== "all") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setSelectedCategoryFilter("all");
+                      }}
+                    >
+                      Limpar filtros
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Products Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <Card key={product.id} className="overflow-hidden">
                   <div className="aspect-square">
                     <img
@@ -216,7 +314,7 @@ export const AdminPanel = () => {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
-                        control={form.name}
+                        control={form.control}
                         name="name"
                         render={({ field }) => (
                           <FormItem className="space-y-2">
@@ -228,105 +326,132 @@ export const AdminPanel = () => {
                           </FormItem>
                         )}
                       />
-                      <div className="space-y-2">
-                        <FormLabel>Preço *</FormLabel>
-                        <Input
-                          id="price"
-                          type="number"
-                          step="0.01"
-                          {...form.register("price", { valueAsNumber: true })}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.price && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.price.message}
-                          </p>
+                      <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                          <FormItem className="space-y-2">
+                            <FormLabel>Preço *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                {...field}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                disabled={isMutating}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
                         )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FormLabel>Descrição *</FormLabel>
-                      <Textarea
-                        id="description"
-                        {...form.register("description")}
-                        disabled={isMutating}
                       />
-                      {form.formState.errors.description && (
-                        <p className="text-sm text-red-500">
-                          {form.formState.errors.description.message}
-                        </p>
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2">
+                          <FormLabel>Descrição *</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              disabled={isMutating}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <FormLabel>URL da Imagem *</FormLabel>
-                        <Input
-                          id="image"
-                          {...form.register("image")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.image && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.image.message}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <FormLabel>Categoria *</FormLabel>
-                        <Input
-                          id="category"
-                          {...form.register("category")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.category && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.category.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
-                        className="space-y-2"
-                        control={form.rate}
-                        name="rate"
+                        control={form.control}
+                        name="image"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Avaliação (0-5)</FormLabel>
-                            <Input
-                              id="rating"
-                              type="number"
-                              min="0"
-                              max="5"
-                              step="0.1"
-                              {...form.register("rating", {
-                                valueAsNumber: true,
-                              })}
-                              disabled={isMutating}
-                            />
-                            {form.formState.errors.rating && (
-                              <p className="text-sm text-red-500">
-                                {form.formState.errors.rating.message}
-                              </p>
-                            )}
+                          <FormItem className="space-y-2">
+                            <FormLabel>URL da Imagem *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                disabled={isMutating}
+                              />
+                            </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
 
                       <FormField
-                        className="space-y-2"
-                        control={form.is_new}
-                        name="new"
+                        control={form.control}
+                        name="category"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="space-y-2">
+                            <FormLabel>Categoria *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isMutating}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione uma categoria" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {availableCategories.map((category) => (
+                                  <SelectItem key={category} value={category}>
+                                    {category}
+                                  </SelectItem>
+                                ))}
+                                <SelectItem value="new-category">
+                                  <div className="flex items-center gap-2">
+                                    <Plus className="h-4 w-4" />
+                                    Nova categoria
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="rating"
+                        render={({ field }) => (
+                          <FormItem className="space-y-2">
+                            <FormLabel>Avaliação (0-5)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="5"
+                                step="0.1"
+                                {...field}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                                disabled={isMutating}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="is_new"
+                        render={({ field }) => (
+                          <FormItem className="space-y-2">
                             <FormLabel>Produto Novo</FormLabel>
                             <FormControl>
                               <div className="flex items-center space-x-2">
-                                <Input {...field} />
+                                <input
+                                  type="checkbox"
+                                  checked={field.value || false}
+                                  onChange={(e) => field.onChange(e.target.checked)}
+                                  disabled={isMutating}
+                                  className="h-4 w-4"
+                                />
                                 <span className="text-sm">
                                   Marcar como novo produto
                                 </span>
@@ -361,6 +486,108 @@ export const AdminPanel = () => {
                     </div>
                   </form>
                 </Form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {/* Total Products */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total de Produtos</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{products.length}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Produtos cadastrados
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Categories Count */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Categorias</CardTitle>
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{availableCategories.length}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Categorias diferentes
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* New Products */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Produtos Novos</CardTitle>
+                  <Plus className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {products.filter(p => p.is_new).length}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Marcados como novos
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Average Rating */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Avaliação Média</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {products.filter(p => p.rating).length > 0 
+                      ? (products.reduce((sum, p) => sum + (p.rating || 0), 0) / products.filter(p => p.rating).length).toFixed(1)
+                      : "N/A"
+                    }
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    De {products.filter(p => p.rating).length} produtos avaliados
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Category Breakdown */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Distribuição por Categoria</CardTitle>
+                <CardDescription>
+                  Veja quantos produtos existem em cada categoria
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {availableCategories.map((category) => {
+                    const categoryProducts = products.filter(p => p.category === category);
+                    const percentage = products.length > 0 ? (categoryProducts.length / products.length) * 100 : 0;
+                    
+                    return (
+                      <div key={category} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">{category}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {categoryProducts.length} produtos ({percentage.toFixed(1)}%)
+                          </span>
+                        </div>
+                        <div className="w-full bg-secondary rounded-full h-2">
+                          <div
+                            className="bg-primary h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
