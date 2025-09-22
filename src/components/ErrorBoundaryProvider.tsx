@@ -1,24 +1,30 @@
 import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
+import { useErrorHandler } from './ErrorBoundary';
 
 interface ErrorBoundaryContextType {
   readonly reportError: (error: Error, context?: string) => void;
   readonly clearError: () => void;
+  readonly resetBoundary: () => void;
 }
 
 const ErrorBoundaryContext = createContext<ErrorBoundaryContextType | null>(null);
 
 interface ErrorBoundaryProviderProps {
   readonly children: React.ReactNode;
-  readonly onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  readonly onError?: (error: Error, errorInfo: { componentStack: string }) => void;
   readonly onReset?: () => void;
+  readonly level?: 'page' | 'component' | 'critical';
 }
 
 export function ErrorBoundaryProvider({ 
   children, 
   onError, 
-  onReset 
+  onReset,
+  level = 'page'
 }: ErrorBoundaryProviderProps) {
+  const resetBoundary = useErrorHandler();
+
   const reportError = useCallback((error: Error, context?: string) => {
     // This would integrate with your error reporting service
     console.error(`[${context || 'Unknown'}] Error reported:`, error);
@@ -37,11 +43,16 @@ export function ErrorBoundaryProvider({
   const contextValue = useMemo(() => ({
     reportError,
     clearError,
-  }), [reportError, clearError]);
+    resetBoundary,
+  }), [reportError, clearError, resetBoundary]);
 
   return (
     <ErrorBoundaryContext.Provider value={contextValue}>
-      <ErrorBoundary onError={onError} onReset={onReset}>
+      <ErrorBoundary 
+        level={level}
+        onError={onError} 
+        onReset={onReset}
+      >
         {children}
       </ErrorBoundary>
     </ErrorBoundaryContext.Provider>

@@ -1,4 +1,5 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
+import { useErrorHandler } from '@/components/ErrorBoundary';
 import { reportAsyncError } from '@/components/ErrorBoundaryProvider';
 
 interface UseAsyncErrorOptions {
@@ -22,11 +23,8 @@ interface UseAsyncErrorReturn {
  */
 export function useAsyncError(options: UseAsyncErrorOptions = {}): UseAsyncErrorReturn {
   const { onError, context = 'AsyncOperation' } = options;
-  const errorCountRef = useRef(0);
 
   const handleAsyncError = useCallback((error: Error) => {
-    errorCountRef.current += 1;
-    
     // Report to error service
     reportAsyncError(error, context);
     
@@ -34,7 +32,7 @@ export function useAsyncError(options: UseAsyncErrorOptions = {}): UseAsyncError
     onError?.(error);
     
     // Log for debugging
-    console.error(`[${context}] Async error #${errorCountRef.current}:`, error);
+    console.error(`[${context}] Async error:`, error);
   }, [onError, context]);
 
   const executeAsync = useCallback(async <T>(
@@ -71,7 +69,6 @@ export function useAsyncError(options: UseAsyncErrorOptions = {}): UseAsyncError
  * Integrates with React 19's concurrent features
  */
 export function useAsyncOperation<T>() {
-  const { executeAsync } = useAsyncError();
   
   const executeWithState = useCallback(async (
     asyncFn: () => Promise<T>,
@@ -96,4 +93,19 @@ export function useAsyncOperation<T>() {
   }, []);
 
   return { executeWithState };
+}
+
+/**
+ * Hook for throwing errors to error boundaries
+ * Useful for throwing errors from async operations
+ */
+export function useThrowError() {
+  const resetBoundary = useErrorHandler();
+  
+  const throwError = useCallback((error: Error) => {
+    // This will be caught by the nearest error boundary
+    throw error;
+  }, []);
+
+  return { throwError, resetBoundary };
 }

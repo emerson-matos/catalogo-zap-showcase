@@ -1,6 +1,7 @@
 import React from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
 import { withErrorBoundary } from './ErrorBoundary';
+import { useThrowError } from '@/hooks/useAsyncError';
 
 // Example: Component-level error boundary
 export function ComponentErrorBoundary({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,7 @@ export function CriticalErrorBoundary({ children }: { children: React.ReactNode 
   return (
     <ErrorBoundary 
       level="critical"
-      fallback={
+      fallback={({ resetErrorBoundary }) => (
         <div className="min-h-screen flex items-center justify-center bg-destructive/5">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-destructive mb-4">
@@ -37,15 +38,23 @@ export function CriticalErrorBoundary({ children }: { children: React.ReactNode 
             <p className="text-muted-foreground mb-4">
               A aplicação encontrou um erro crítico. Por favor, recarregue a página.
             </p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90"
-            >
-              Recarregar Página
-            </button>
+            <div className="flex gap-2 justify-center">
+              <button 
+                onClick={resetErrorBoundary}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+              >
+                Tentar Novamente
+              </button>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90"
+              >
+                Recarregar Página
+              </button>
+            </div>
           </div>
         </div>
-      }
+      )}
     >
       {children}
     </ErrorBoundary>
@@ -63,7 +72,7 @@ export const SafeComponent = withErrorBoundary(
 
 // Example: Error boundary with custom error reporting
 export function CustomErrorBoundary({ children }: { children: React.ReactNode }) {
-  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+  const handleError = (error: Error, errorInfo: { componentStack: string }) => {
     // Custom error reporting logic
     console.error('Custom error handler:', error, errorInfo);
     
@@ -90,6 +99,55 @@ export function CustomErrorBoundary({ children }: { children: React.ReactNode })
     >
       {children}
     </ErrorBoundary>
+  );
+}
+
+// Example: Component that can throw errors programmatically
+export function ErrorThrowingComponent() {
+  const { throwError } = useThrowError();
+
+  const handleThrowError = () => {
+    throwError(new Error('This is a programmatically thrown error'));
+  };
+
+  return (
+    <div>
+      <button onClick={handleThrowError}>
+        Throw Error (will be caught by error boundary)
+      </button>
+    </div>
+  );
+}
+
+// Example: Component with async error handling
+export function AsyncErrorComponent() {
+  const { executeAsync } = useAsyncError({ context: 'AsyncComponent' });
+
+  const handleAsyncOperation = async () => {
+    await executeAsync(
+      async () => {
+        // Simulate async operation that might fail
+        const response = await fetch('/api/data');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+      },
+      (data) => {
+        console.log('Success:', data);
+      },
+      (error) => {
+        console.error('Async error handled:', error);
+      }
+    );
+  };
+
+  return (
+    <div>
+      <button onClick={handleAsyncOperation}>
+        Perform Async Operation
+      </button>
+    </div>
   );
 }
 
