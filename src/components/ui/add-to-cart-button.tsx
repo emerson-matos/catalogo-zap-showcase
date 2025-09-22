@@ -45,8 +45,8 @@ export const AddToCartButton = ({
         <Plus className="h-4 w-4" />
       ) : (
         <>
-          <ShoppingCart className="h-4 w-4 mr-2 flex-shrink-0" />
-          <span className="flex-shrink-0">{children}</span>
+          <ShoppingCart className="h-4 w-4 mr-2 shrink-0" />
+          <span className="shrink-0">{children}</span>
         </>
       )}
     </Button>

@@ -47,8 +47,8 @@ export const WhatsAppButton = ({
         <MessageCircle className="h-4 w-4" />
       ) : (
         <>
-          <MessageCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-          <span className="flex-shrink-0">{children}</span>
+          <MessageCircle className="h-4 w-4 mr-2 shrink-0" />
+          <span className="shrink-0">{children}</span>
         </>
       )}
     </Button>
