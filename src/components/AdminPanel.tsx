@@ -1,368 +1,147 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+// Removed unused Card imports since we're using separate components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Edit, Trash2 } from "lucide-react";
+import { Loader2, Plus, Package, Settings } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useAdminProducts } from "@/hooks/useAdminProducts";
 import { useAuth } from "@/hooks/useAuth";
 import type { Product, ProductInsert } from "@/lib/supabase";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
+import type { ProductFormData } from "@/hooks/useProductForm";
+import { ProductCard } from "@/components/admin/ProductCard";
+import { ProductForm } from "@/components/admin/ProductForm";
 import { toast } from "sonner";
-
-const productSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  description: z.string().min(1, "Descrição é obrigatória"),
-  price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
-  image: z.string().url("URL da imagem inválida"),
-  category: z.string().min(1, "Categoria é obrigatória"),
-  rating: z.number().min(0).max(5).optional(),
-});
-
-type ProductFormData = z.infer<typeof productSchema>;
 
 export const AdminPanel = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
   const { user } = useAuth();
   const { products, isLoading } = useProductsQuery();
-  const { createProduct, updateProduct, deleteProduct, isMutating } =
-    useAdminProducts();
+  const { createProduct, updateProduct, deleteProduct, isMutating } = useAdminProducts();
 
-  const form = useForm<ProductFormData>({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
-      image: "",
-      category: "",
-      rating: undefined,
-    },
-  });
-
-  const onSubmit = async (data: ProductFormData) => {
+  const handleSubmit = async (data: ProductFormData) => {
     try {
       if (editingProduct) {
         await updateProduct(editingProduct.id, data);
         toast.success("Produto atualizado com sucesso!");
-        setEditingProduct(null);
-        form.reset();
       } else {
         if (!user) throw new Error("Usuário não autenticado");
-
-        const productData: ProductInsert = {
-          ...data,
-          created_by: user.id,
-        };
-
+        const productData: ProductInsert = { ...data, created_by: user.id };
         await createProduct(productData);
         toast.success("Produto criado com sucesso!");
-        form.reset();
       }
+      setEditingProduct(null);
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Erro ao salvar produto",
-      );
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar produto");
     }
   };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
-    form.reset({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      image: product.image,
-      category: product.category,
-      rating: product.rating,
-    });
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Tem certeza que deseja deletar este produto?")) {
+    const product = products.find(p => p.id === id);
+    const productName = product?.name || "este produto";
+    
+    if (confirm(`Tem certeza que deseja deletar "${productName}"?\n\nEsta ação não pode ser desfeita.`)) {
       try {
         await deleteProduct(id);
-        toast.success("Produto deletado com sucesso!");
+        toast.success(`Produto "${productName}" deletado com sucesso!`);
       } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Erro ao deletar produto",
-        );
+        toast.error(err instanceof Error ? err.message : "Erro ao deletar produto");
       }
     }
   };
 
+  const handleCancel = () => {
+    setEditingProduct(null);
+  };
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Carregando produtos...</h2>
+          <p className="text-gray-600">Aguarde enquanto buscamos os dados</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="shadow-sm border-b">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-accent">
-                Painel Administrativo
-              </h1>
-              <p className="text-sm text-accent-foreground">
-                Bem-vindo, {user?.email}
-              </p>
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Settings className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Painel Administrativo</h1>
+                <p className="text-sm text-gray-600 mt-1">
+                  Bem-vindo, {user?.email} • {products.length} produtos cadastrados
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-medium text-gray-900">Total de Produtos</div>
+              <div className="text-2xl font-bold text-blue-600">{products.length}</div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="products">Produtos</TabsTrigger>
-            <TabsTrigger value="add-product">Adicionar Produto</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="products" className="flex items-center space-x-2">
+              <Package className="h-4 w-4" />
+              <span>Gerenciar Produtos</span>
+            </TabsTrigger>
+            <TabsTrigger value="add-product" className="flex items-center space-x-2">
+              <Plus className="h-4 w-4" />
+              <span>Adicionar Produto</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="products" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
-                <Card key={product.id} className="overflow-hidden">
-                  <div className="aspect-square">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-lg">{product.name}</h3>
-                      <div className="flex gap-1">
-                        {product.is_new && (
-                          <Badge variant="secondary">Novo</Badge>
-                        )}
-                        {product.rating && (
-                          <Badge variant="outline">⭐ {product.rating}</Badge>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-lg">
-                        R$ {product.price}
-                      </span>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(product)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(product.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">Produtos Cadastrados</h2>
+              <div className="text-sm text-gray-500">
+                {products.length} produto{products.length !== 1 ? 's' : ''} encontrado{products.length !== 1 ? 's' : ''}
+              </div>
             </div>
+            
+            {products.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum produto cadastrado</h3>
+                <p className="mt-1 text-sm text-gray-500">Comece adicionando seu primeiro produto.</p>
+              </div>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="add-product">
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {editingProduct ? "Editar Produto" : "Adicionar Novo Produto"}
-                </CardTitle>
-                <CardDescription>
-                  {editingProduct
-                    ? "Atualize as informações do produto"
-                    : "Preencha as informações do novo produto"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.name}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel>Nome</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="space-y-2">
-                        <FormLabel>Preço *</FormLabel>
-                        <Input
-                          id="price"
-                          type="number"
-                          step="0.01"
-                          {...form.register("price", { valueAsNumber: true })}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.price && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.price.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FormLabel>Descrição *</FormLabel>
-                      <Textarea
-                        id="description"
-                        {...form.register("description")}
-                        disabled={isMutating}
-                      />
-                      {form.formState.errors.description && (
-                        <p className="text-sm text-red-500">
-                          {form.formState.errors.description.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <FormLabel>URL da Imagem *</FormLabel>
-                        <Input
-                          id="image"
-                          {...form.register("image")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.image && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.image.message}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <FormLabel>Categoria *</FormLabel>
-                        <Input
-                          id="category"
-                          {...form.register("category")}
-                          disabled={isMutating}
-                        />
-                        {form.formState.errors.category && (
-                          <p className="text-sm text-red-500">
-                            {form.formState.errors.category.message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        className="space-y-2"
-                        control={form.rate}
-                        name="rate"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Avaliação (0-5)</FormLabel>
-                            <Input
-                              id="rating"
-                              type="number"
-                              min="0"
-                              max="5"
-                              step="0.1"
-                              {...form.register("rating", {
-                                valueAsNumber: true,
-                              })}
-                              disabled={isMutating}
-                            />
-                            {form.formState.errors.rating && (
-                              <p className="text-sm text-red-500">
-                                {form.formState.errors.rating.message}
-                              </p>
-                            )}
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        className="space-y-2"
-                        control={form.is_new}
-                        name="new"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Produto Novo</FormLabel>
-                            <FormControl>
-                              <div className="flex items-center space-x-2">
-                                <Input {...field} />
-                                <span className="text-sm">
-                                  Marcar como novo produto
-                                </span>
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="flex gap-4">
-                      <Button type="submit" disabled={isMutating}>
-                        {isMutating && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        {editingProduct ? "Atualizar Produto" : "Criar Produto"}
-                      </Button>
-
-                      {editingProduct && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingProduct(null);
-                            form.reset();
-                          }}
-                        >
-                          Cancelar
-                        </Button>
-                      )}
-                    </div>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
+            <ProductForm
+              editingProduct={editingProduct}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              isSubmitting={isMutating}
+            />
           </TabsContent>
         </Tabs>
       </div>
