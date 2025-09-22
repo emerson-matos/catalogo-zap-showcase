@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Menu,
   X,
@@ -12,17 +12,62 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { Link, useLocation } from "@tanstack/react-router";
+import type { NavigationItem } from "@/types/ui";
 
-const Header = () => {
+interface HeaderProps {
+  readonly className?: string;
+}
+
+const Header = React.memo(({ className }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
-  const isActiveRoute = (path: string) => {
+  const isActiveRoute = useCallback((path: string) => {
     return location.pathname === path;
-  };
+  }, [location.pathname]);
+
+  const navigationItems: readonly NavigationItem[] = useMemo(() => [
+    {
+      id: 'home',
+      label: 'Início',
+      href: '/',
+    },
+    {
+      id: 'products',
+      label: 'Produtos',
+      href: '/products',
+      icon: <ShoppingBag className="w-4 h-4" />,
+    },
+    {
+      id: 'about',
+      label: 'Sobre',
+      href: '/about',
+      icon: <Users className="w-4 h-4" />,
+    },
+    {
+      id: 'flipbook',
+      label: 'Catálogo',
+      href: '/flipbook',
+      icon: <BookOpen className="w-4 h-4" />,
+    },
+    {
+      id: 'contact',
+      label: 'Contato',
+      href: '/contact',
+      icon: <MessageCircle className="w-4 h-4" />,
+    },
+  ], []);
+
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background backdrop-blur supports-backdrop-filter:bg-background/90">
+    <header className={`sticky top-0 z-40 w-full border-b border-border bg-background backdrop-blur supports-backdrop-filter:bg-background/90 ${className ?? ''}`}>
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -37,61 +82,23 @@ const Header = () => {
           </Link>
 
           {/* Navigation Desktop */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/">
-              <Button
-                variant="ghost"
-                className={`hover:text-primary transition-colors ${
-                  isActiveRoute("/") ? "text-primary font-semibold" : ""
-                }`}
-              >
-                Início
-              </Button>
-            </Link>
-            <Link to="/products">
-              <Button
-                variant="ghost"
-                className={`hover:text-primary transition-colors flex items-center gap-2 ${
-                  isActiveRoute("/products") ? "text-primary font-semibold" : ""
-                }`}
-              >
-                <ShoppingBag className="w-4 h-4" />
-                Produtos
-              </Button>
-            </Link>
-            <Link to="/about">
-              <Button
-                variant="ghost"
-                className={`hover:text-primary transition-colors flex items-center gap-2 ${
-                  isActiveRoute("/about") ? "text-primary font-semibold" : ""
-                }`}
-              >
-                <Users className="w-4 h-4" />
-                Sobre
-              </Button>
-            </Link>
-            <Link to="/flipbook">
-              <Button
-                variant="ghost"
-                className={`hover:text-primary transition-colors flex items-center gap-2 ${
-                  isActiveRoute("/flipbook") ? "text-primary font-semibold" : ""
-                }`}
-              >
-                <BookOpen className="w-4 h-4" />
-                Catálogo
-              </Button>
-            </Link>
-            <Link to="/contact">
-              <Button
-                variant="ghost"
-                className={`hover:text-primary transition-colors flex items-center gap-2 ${
-                  isActiveRoute("/contact") ? "text-primary font-semibold" : ""
-                }`}
-              >
-                <MessageCircle className="w-4 h-4" />
-                Contato
-              </Button>
-            </Link>
+          <nav className="hidden md:flex items-center space-x-8" role="navigation" aria-label="Main navigation">
+            {navigationItems.map((item) => (
+              <Link key={item.id} to={item.href}>
+                <Button
+                  variant="ghost"
+                  className={`hover:text-primary transition-colors ${
+                    item.icon ? 'flex items-center gap-2' : ''
+                  } ${
+                    isActiveRoute(item.href) ? "text-primary font-semibold" : ""
+                  }`}
+                  aria-current={isActiveRoute(item.href) ? 'page' : undefined}
+                >
+                  {item.icon}
+                  {item.label}
+                </Button>
+              </Link>
+            ))}
           </nav>
 
           {/* Actions Desktop */}
@@ -109,7 +116,10 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <Button
             className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
           >
             {isMenuOpen ? (
               <X className="size-6" />
@@ -121,68 +131,29 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-border/40 py-4">
+          <div 
+            id="mobile-navigation"
+            className="md:hidden border-t border-border/40 py-4"
+            role="navigation"
+            aria-label="Mobile navigation"
+          >
             <nav className="flex flex-col space-y-4">
-              <Link to="/" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className={`text-left hover:text-primary transition-colors justify-start ${
-                    isActiveRoute("/") ? "text-primary font-semibold" : ""
-                  }`}
-                >
-                  Início
-                </Button>
-              </Link>
-              <Link to="/products" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className={`text-left hover:text-primary transition-colors justify-start flex items-center gap-2 ${
-                    isActiveRoute("/products")
-                      ? "text-primary font-semibold"
-                      : ""
-                  }`}
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  Produtos
-                </Button>
-              </Link>
-              <Link to="/about" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className={`text-left hover:text-primary transition-colors justify-start flex items-center gap-2 ${
-                    isActiveRoute("/about") ? "text-primary font-semibold" : ""
-                  }`}
-                >
-                  <Users className="w-4 h-4" />
-                  Sobre
-                </Button>
-              </Link>
-              <Link to="/flipbook" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className={`text-left hover:text-primary transition-colors justify-start flex items-center gap-2 ${
-                    isActiveRoute("/flipbook")
-                      ? "text-primary font-semibold"
-                      : ""
-                  }`}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  Catálogo
-                </Button>
-              </Link>
-              <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className={`text-left hover:text-primary transition-colors justify-start flex items-center gap-2 ${
-                    isActiveRoute("/contact")
-                      ? "text-primary font-semibold"
-                      : ""
-                  }`}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Contato
-                </Button>
-              </Link>
+              {navigationItems.map((item) => (
+                <Link key={item.id} to={item.href} onClick={closeMenu}>
+                  <Button
+                    variant="ghost"
+                    className={`text-left hover:text-primary transition-colors justify-start ${
+                      item.icon ? 'flex items-center gap-2' : ''
+                    } ${
+                      isActiveRoute(item.href) ? "text-primary font-semibold" : ""
+                    }`}
+                    aria-current={isActiveRoute(item.href) ? 'page' : undefined}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Button>
+                </Link>
+              ))}
               <WhatsAppButton
                 variant="ghost"
                 className="w-fit justify-start hover:text-primary transition-colors bg-transparent hover:bg-whatsapp/10"
@@ -196,6 +167,8 @@ const Header = () => {
       </div>
     </header>
   );
-};
+});
+
+Header.displayName = 'Header';
 
 export default Header;

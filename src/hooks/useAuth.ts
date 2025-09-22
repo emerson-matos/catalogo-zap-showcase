@@ -1,17 +1,7 @@
-import { useEffect, useState } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase, SupabaseService } from "@/lib/supabaseService";
+import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/lib/supabaseService";
 import { jwtDecode } from "jwt-decode";
-
-export interface AuthState {
-  user: User | null;
-  session: Session | null;
-  role: string | null;
-  isLoading: boolean;
-  isAdmin: boolean;
-  isEditor: boolean;
-  isViewer: boolean;
-}
+import type { AuthState, UserRole, JWTPayload } from "@/types/auth";
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -24,57 +14,64 @@ export const useAuth = () => {
     isViewer: false,
   });
 
+  const updateAuthState = useCallback((session: typeof authState.session) => {
+    if (session) {
+      try {
+        const jwt = jwtDecode<JWTPayload>(session.access_token);
+        const role = jwt.user_role as UserRole;
+        
+        setAuthState({
+          session,
+          user: session.user,
+          role,
+          isLoading: false,
+          isAdmin: role === "admin",
+          isEditor: role === "editor" || role === "admin",
+          isViewer: role === "viewer" || role === "editor" || role === "admin",
+        });
+      } catch (error) {
+        console.error("Error decoding JWT:", error);
+        setAuthState(prev => ({ ...prev, isLoading: false }));
+      }
+    } else {
+      setAuthState({
+        user: null,
+        session: null,
+        role: null,
+        isLoading: false,
+        isAdmin: false,
+        isEditor: false,
+        isViewer: false,
+      });
+    }
+  }, []);
+
   useEffect(() => {
     // Get initial session
     supabase.auth
       .getSession()
-      .then(({ data: { session } }) => {
-        if (session) {
-          const jwt = jwtDecode(session.access_token);
-          console.log("jwt", jwt);
-          const role = jwt.user_role;
-          setAuthState((state) => ({
-            ...state,
-            session,
-            user: session!.user,
-            role,
-            isAdmin: role === "admin",
-            isEditor: role === "editor" || role === "admin",
-            isViewer:
-              role === "viewer" || role === "editor" || role === "admin",
-          }));
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          console.error("Error getting session:", error);
+          setAuthState(prev => ({ ...prev, isLoading: false }));
+          return;
         }
-        return session;
+        updateAuthState(session);
       })
       .catch((error) => {
         console.error("Error getting session:", error);
-        setAuthState((prev) => ({ ...prev, isLoading: false }));
-        return;
-      })
-      .finally(() => setAuthState((prev) => ({ ...prev, isLoading: false })));
+        setAuthState(prev => ({ ...prev, isLoading: false }));
+      });
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        const jwt = jwtDecode(session.access_token);
-        console.log("jwt", jwt);
-        const role = jwt.user_role;
-        setAuthState((state) => ({
-          ...state,
-          session,
-          user: session!.user,
-          role,
-          isAdmin: role === "admin",
-          isEditor: role === "editor" || role === "admin",
-          isViewer: role === "viewer" || role === "editor" || role === "admin",
-        }));
-      }
+      updateAuthState(session);
     });
+    
     return () => subscription.unsubscribe();
-  }, []);
-  return {
-    ...authState,
-  };
+  }, [updateAuthState]);
+
+  return authState;
 };
