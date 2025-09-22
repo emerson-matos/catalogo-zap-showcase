@@ -146,36 +146,4 @@ export class SupabaseService {
 
     return user;
   }
-
-  static async getUserRole(userId: string): Promise<string | null> {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .single();
-
-    if (error) {
-      console.error("Error fetching user role:", error);
-      return null;
-    }
-
-    return data?.role || null;
-  }
-
-  static async hasPermission(
-    userId: string,
-    requiredRole: "admin" | "editor" | "viewer",
-  ): Promise<boolean> {
-    const userRole = await this.getUserRole(userId);
-
-    if (!userRole) return false;
-
-    const roleHierarchy = { admin: 3, editor: 2, viewer: 1 };
-    const userLevel =
-      roleHierarchy[userRole as keyof typeof roleHierarchy] || 0;
-    const requiredLevel = roleHierarchy[requiredRole];
-
-    return userLevel >= requiredLevel;
-  }
 }
-

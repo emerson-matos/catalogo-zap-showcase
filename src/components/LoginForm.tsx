@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Auth } from "@supabase/auth-ui-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 import {
   Form,
   FormControl,
@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { supabase } from "@/lib/supabase";
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -35,10 +36,9 @@ interface LoginFormProps {
 }
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
-  const [showPassword, _] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -53,7 +53,8 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     setError(null);
 
     try {
-      await signIn(data.email, data.password);
+      const { error } = await supabase.auth.signInWithPassword(data);
+      if (error) console.log(error);
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login");
@@ -122,4 +123,3 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     </Card>
   );
 };
-

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase, SupabaseService } from "@/lib/supabaseService";
+import { jwtDecode } from "jwt-decode";
 
 export interface AuthState {
   user: User | null;
@@ -28,24 +29,22 @@ export const useAuth = () => {
     supabase.auth
       .getSession()
       .then(({ data: { session } }) => {
-        setAuthState((state) => ({ ...state, session }));
-        return session;
-      })
-      .then((session) => {
         if (session) {
-          SupabaseService.getUserRole(session.user.id)
-            .then((role) =>
-              setAuthState((state) => ({
-                ...state,
-                role,
-                isAdmin: role === "admin",
-                isEditor: role === "editor" || role === "admin",
-                isViewer:
-                  role === "viewer" || role === "editor" || role === "admin",
-              })),
-            )
-            .catch((error) => console.error("Error getting user role:", error));
+          const jwt = jwtDecode(session.access_token);
+          console.log("jwt", jwt);
+          const role = jwt.user_role;
+          setAuthState((state) => ({
+            ...state,
+            session,
+            user: session!.user,
+            role,
+            isAdmin: role === "admin",
+            isEditor: role === "editor" || role === "admin",
+            isViewer:
+              role === "viewer" || role === "editor" || role === "admin",
+          }));
         }
+        return session;
       })
       .catch((error) => {
         console.error("Error getting session:", error);
@@ -57,96 +56,26 @@ export const useAuth = () => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        try {
-          const role = await SupabaseService.getUserRole(session.user.id);
-          setAuthState({
-            user: session.user,
-            session,
-            role,
-            isLoading: false,
-            isAdmin: role === "admin",
-            isEditor: role === "editor" || role === "admin",
-            isViewer:
-              role === "viewer" || role === "editor" || role === "admin",
-          });
-        } catch (error) {
-          console.error("Error getting user role:", error);
-          setAuthState({
-            user: session.user,
-            session,
-            role: null,
-            isLoading: false,
-            isAdmin: false,
-            isEditor: false,
-            isViewer: false,
-          });
-        }
-      } else {
-        setAuthState({
-          user: null,
-          session: null,
-          role: null,
-          isLoading: false,
-          isAdmin: false,
-          isEditor: false,
-          isViewer: false,
-        });
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        const jwt = jwtDecode(session.access_token);
+        console.log("jwt", jwt);
+        const role = jwt.user_role;
+        setAuthState((state) => ({
+          ...state,
+          session,
+          user: session!.user,
+          role,
+          isAdmin: role === "admin",
+          isEditor: role === "editor" || role === "admin",
+          isViewer: role === "viewer" || role === "editor" || role === "admin",
+        }));
       }
     });
-
     return () => subscription.unsubscribe();
   }, []);
-
-  const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
-  };
-
-  const signUp = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return data;
-  };
-
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-  };
-
-  const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-  };
-
+  console.log(authState, "auth");
   return {
     ...authState,
-    signIn,
-    signUp,
-    signOut,
-    resetPassword,
   };
 };
-
