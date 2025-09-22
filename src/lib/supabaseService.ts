@@ -1,7 +1,4 @@
 import {
-  Category,
-  CategoryInsert,
-  CategoryUpdate,
   supabase,
   type Product,
   type ProductInsert,
