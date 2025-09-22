@@ -6,23 +6,25 @@ export const Route = createFileRoute("/flipbook")({
   head: () => ({
     meta: [
       {
-        title: 'Catálogo Interativo - SeRena Cosméticos',
+        title: "Revista Digital - SeRena Cosméticos",
       },
       {
-        name: 'description',
-        content: 'Navegue pelos nossos produtos em um formato interativo de livro. Use as setas do teclado ou os botões para virar as páginas.',
+        name: "description",
+        content:
+          "Navegue pelos nossos produtos em um formato interativo de livro. Use as setas do teclado ou os botões para virar as páginas.",
       },
       {
-        name: 'keywords',
-        content: 'catálogo, produtos, cosméticos, livro interativo, navegação',
+        name: "keywords",
+        content: "catálogo, produtos, cosméticos, livro interativo, navegação",
       },
       {
-        name: 'og:title',
-        content: 'Catálogo Interativo - SeRena Cosméticos',
+        name: "og:title",
+        content: "Revista Digital - SeRena Cosméticos",
       },
       {
-        name: 'og:description',
-        content: 'Navegue pelos nossos produtos em um formato interativo de livro. Use as setas do teclado ou os botões para virar as páginas.',
+        name: "og:description",
+        content:
+          "Navegue pelos nossos produtos em um formato interativo de livro. Use as setas do teclado ou os botões para virar as páginas.",
       },
     ],
   }),
@@ -41,9 +43,11 @@ export const Route = createFileRoute("/flipbook")({
           Erro ao carregar catálogo
         </h1>
         <p className="text-muted-foreground mb-6">
-          {error instanceof Error ? error.message : 'Não foi possível carregar o catálogo de produtos'}
+          {error instanceof Error
+            ? error.message
+            : "Não foi possível carregar o catálogo de produtos"}
         </p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
         >
@@ -53,4 +57,3 @@ export const Route = createFileRoute("/flipbook")({
     </div>
   ),
 });
-

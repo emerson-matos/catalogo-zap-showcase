@@ -31,7 +31,9 @@ export const FlipbookPage = () => {
       {/* Hero Section */}
       <div className="container mx-auto px-4 m-8">
         <div className="text-center">
-          <h1>Catálogo de Produtos</h1>
+          <h2 className="text-4xl font-bold mb-4">
+            Revista Digital de Produtos
+          </h2>
         </div>
         <div className="flex flex-col gap-2 mb-10 text-lg text-muted-foreground max-w-2xl mx-auto p-4 m-2">
           <p>
