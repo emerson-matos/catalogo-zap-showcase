@@ -55,6 +55,11 @@ export const queryKeys = {
     list: () => [...queryKeys.categories.all, "list"] as const,
     byId: (id: string) => [...queryKeys.categories.all, "id", id] as const,
   },
+  categories: {
+    all: ['categories'] as const,
+    list: () => [...queryKeys.categories.all, 'list'] as const,
+    byId: (id: string) => [...queryKeys.categories.all, 'id', id] as const,
+  },
   auth: {
     all: ["auth"] as const,
     user: () => [...queryKeys.auth.all, "user"] as const,
