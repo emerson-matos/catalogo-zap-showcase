@@ -3,9 +3,9 @@ import { useState, useMemo } from "react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { Input } from "@/components/ui/input";
 import ProductCard from "@/components/ProductCard";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useCategoriesQuery } from "@/hooks/useCategoryQuery";
 
 export const Route = createFileRoute("/products/search")({
   component: SearchPage,
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/products/search")({
       category: (search.category as string) || undefined,
       minPrice: Number(search.minPrice) || undefined,
       maxPrice: Number(search.maxPrice) || undefined,
-    }
+    };
   },
 });
 
@@ -24,30 +24,29 @@ function SearchPage() {
   const { products, isLoading, error } = useProductsQuery();
   const [searchQuery, setSearchQuery] = useState(q);
   const [selectedCategory, setSelectedCategory] = useState(category);
-
+  const { data: categories, isLoading: categoriesLoading } =
+    useCategoriesQuery();
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
-    return products.filter(product => {
-      const matchesSearch = !searchQuery || 
+    return products.filter((product) => {
+      const matchesSearch =
+        !searchQuery ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesCategory = !selectedCategory || product.category === selectedCategory;
-      
-      const matchesPrice = (!minPrice || product.price >= minPrice) &&
-                         (!maxPrice || product.price <= maxPrice);
+
+      const matchesCategory =
+        !selectedCategory || product.category_id === selectedCategory;
+
+      const matchesPrice =
+        (!minPrice || product.price >= minPrice) &&
+        (!maxPrice || product.price <= maxPrice);
 
       return matchesSearch && matchesCategory && matchesPrice;
     });
   }, [products, searchQuery, selectedCategory, minPrice, maxPrice]);
 
-  const categories = useMemo(() => {
-    if (!products) return [];
-    return Array.from(new Set(products.map(p => p.category).filter(Boolean)));
-  }, [products]);
-
-  if (isLoading) {
+  if (isLoading || categoriesLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
@@ -71,12 +70,14 @@ function SearchPage() {
       </div>
     );
   }
-
+  const cateSleecteed = (categories || []).find(
+    (c) => c.id === selectedCategory,
+  );
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-4">Buscar Produtos</h1>
-        
+
         {/* Search Input */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -97,14 +98,14 @@ function SearchPage() {
           >
             Todas as categorias
           </Button>
-          {categories.map(cat => (
+          {(categories || []).map((cat) => (
             <Button
-              key={cat}
-              variant={selectedCategory === cat ? "default" : "outline"}
+              key={cat.id}
+              variant={selectedCategory === cat.id ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedCategory(cat)}
+              onClick={() => setSelectedCategory(cat.id)}
             >
-              {cat}
+              {cat.name}
             </Button>
           ))}
         </div>
@@ -112,9 +113,11 @@ function SearchPage() {
         {/* Results Count */}
         <div className="mb-4">
           <p className="text-muted-foreground">
-            {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+            {filteredProducts.length} produto
+            {filteredProducts.length !== 1 ? "s" : ""} encontrado
+            {filteredProducts.length !== 1 ? "s" : ""}
             {searchQuery && ` para "${searchQuery}"`}
-            {selectedCategory && ` na categoria "${selectedCategory}"`}
+            {selectedCategory && ` na categoria "${cateSleecteed.name}"`}
           </p>
         </div>
       </div>
@@ -129,7 +132,9 @@ function SearchPage() {
       ) : (
         <div className="text-center py-12">
           <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-xl font-semibold mb-2">Nenhum produto encontrado</h3>
+          <h3 className="text-xl font-semibold mb-2">
+            Nenhum produto encontrado
+          </h3>
           <p className="text-muted-foreground">
             Tente ajustar os filtros ou buscar por outros termos
           </p>
@@ -138,3 +143,4 @@ function SearchPage() {
     </div>
   );
 }
+
