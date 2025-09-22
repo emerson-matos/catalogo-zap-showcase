@@ -26,7 +26,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               target.src = "/placeholder.svg";
             }}
           />
-          {product.isNew && (
+          {product.is_new && (
             <Badge className="absolute top-3 left-3 bg-gradient-to-r from-accent to-accent/90 text-accent font-bold shadow-lg border border-accent/20 backdrop-blur-sm">
               Novo
             </Badge>

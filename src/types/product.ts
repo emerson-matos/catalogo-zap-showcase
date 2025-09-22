@@ -1,4 +1,8 @@
-export interface Product {
+// Re-export Supabase types for backward compatibility
+export type { Product } from '@/lib/supabase'
+
+// Legacy interface for backward compatibility
+export interface LegacyProduct {
   id: string;
   name: string;
   description: string;

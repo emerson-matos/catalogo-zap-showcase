@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { fetchProductsFromGoogleSheet } from "@/lib/googleSheets";
+import { SupabaseService } from "@/lib/supabaseService";
 import { queryKeys } from "@/lib/queryClient";
-import type { Product } from "@/types/product";
+import type { Product } from "@/lib/supabase";
 
 export const useProductsQuery = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("Todos");
@@ -17,8 +17,8 @@ export const useProductsQuery = () => {
     isFetching,
     isStale,
   } = useQuery({
-    queryKey: queryKeys.products.sheets(),
-    queryFn: fetchProductsFromGoogleSheet,
+    queryKey: queryKeys.products.supabase(),
+    queryFn: SupabaseService.getProducts,
     // Use global defaults from queryClient, but can override specific options here if needed
   });
 
@@ -111,8 +111,8 @@ export const usePrefetchProducts = () => {
 
   const prefetchProducts = () => {
     queryClient.prefetchQuery({
-      queryKey: queryKeys.products.sheets(),
-      queryFn: fetchProductsFromGoogleSheet,
+      queryKey: queryKeys.products.supabase(),
+      queryFn: SupabaseService.getProducts,
     });
   };
 
@@ -131,7 +131,7 @@ export const useInvalidateProducts = () => {
 
   const refetchProducts = () => {
     queryClient.refetchQueries({
-      queryKey: queryKeys.products.sheets(),
+      queryKey: queryKeys.products.supabase(),
     });
   };
 
