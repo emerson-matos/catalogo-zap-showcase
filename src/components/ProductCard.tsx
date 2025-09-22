@@ -13,7 +13,7 @@ interface ProductCardProps {
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
   return (
-    <Card className="group h-full bg-card shadow-lg border border-border transition-all duration-300 hover:scale-105">
+    <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
       <CardContent className="p-0">
         <div className="relative overflow-hidden rounded-t-lg">
           <img
@@ -21,20 +21,18 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             alt={product.name}
             loading="lazy"
             decoding="async"
-            className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-scale-down bg-background"
+            className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-scale-down"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = "/placeholder.svg";
             }}
           />
           {product.is_new && (
-            <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground font-bold shadow border border-border">
+            <Badge className="absolute top-3 left-3 bg-muted text-green-600 font-bold shadow border border-border">
               Novo
             </Badge>
           )}
-          <Badge
-            className="absolute top-3 right-3 bg-muted text-muted-foreground font-semibold shadow border border-border"
-          >
+          <Badge className="absolute top-3 right-3 bg-accent text-green-foreground font-semibold shadow border border-border">
             {product.category}
           </Badge>
         </div>
@@ -52,9 +50,9 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               {formatPriceBRL(product.price)}
             </span>
             {product.rating && (
-              <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded-full">
-                <Star className="size-4 text-accent" />
-                <span className="text-sm font-medium text-accent">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full">
+                <Star className="size-4 text-accent-foreground" />
+                <span className="text-sm font-medium text-primary">
                   {product.rating}
                 </span>
               </div>
@@ -64,13 +62,6 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="p-6 pt-0 space-x-2">
-        <AddToCartButton
-          product={product}
-          className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow hover:shadow-lg transition-all duration-200 bg-primary text-primary-foreground"
-          size="default"
-        >
-          Adicionar
-        </AddToCartButton>
         <WhatsAppButton
           product={product}
           className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow hover:shadow-lg transition-all duration-200 bg-accent text-accent-foreground"
@@ -78,6 +69,13 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
         >
           Consultar
         </WhatsAppButton>
+        <AddToCartButton
+          product={product}
+          className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow hover:shadow-lg transition-all duration-200 bg-primary text-primary-foreground"
+          size="default"
+        >
+          Adicionar
+        </AddToCartButton>
       </CardFooter>
     </Card>
   );

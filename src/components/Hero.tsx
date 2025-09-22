@@ -37,9 +37,7 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
                 className="text-lg px-8 py-4 h-auto"
                 asChild
               >
-                <Link to="/products">
-                  Ver Produtos
-                </Link>
+                <Link to="/products">Ver Produtos</Link>
               </Button>
             </div>
           </div>

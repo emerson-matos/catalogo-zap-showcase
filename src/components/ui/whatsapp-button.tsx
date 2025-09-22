@@ -1,5 +1,5 @@
 import { MessageCircle } from "lucide-react";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
 import { createProductWhatsAppUrl, createWhatsAppUrl } from "@/lib/whatsapp";
@@ -11,7 +11,7 @@ export const WhatsAppButton = ({
   size,
   variant,
   product,
-}: ButtonProps & { product?: Product }) => {
+}: React.ComponentProps<typeof Button> & { product?: Product }) => {
   const whatsappUrl = product
     ? createProductWhatsAppUrl(product.name)
     : createWhatsAppUrl();
@@ -22,11 +22,11 @@ export const WhatsAppButton = ({
   const getVariantClasses = () => {
     switch (variant) {
       case "ghost":
-        return "bg-transparent text-accent hover:bg-accent/10 hover:text-accent";
+        return "bg-transparent hover:bg-green-300/10 hover:text-accent-foreground";
       case "outline":
-        return "border-accent text-accent hover:bg-accent hover:text-accent-foreground";
+        return "border-accent hover:bg-green-300 hover:text-accent-foreground";
       default:
-        return "bg-accent text-accent-foreground hover:bg-accent/90";
+        return "bg-accent text-accent-foreground hover:bg-green-300/90 hover:text-accent-foreground";
     }
   };
 
@@ -47,8 +47,8 @@ export const WhatsAppButton = ({
         <MessageCircle className="h-4 w-4" />
       ) : (
         <>
-          <MessageCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-          <span className="flex-shrink-0">{children}</span>
+          <MessageCircle className="h-4 w-4 mr-2 shrink-0" />
+          <span className="shrink-0">{children}</span>
         </>
       )}
     </Button>

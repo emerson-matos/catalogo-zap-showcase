@@ -22,7 +22,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
   } = useProductsQuery();
 
   return (
-    <section id={sectionId} className="py-20 bg-card text-foreground">
+    <section id={sectionId} className="py-20 text-foreground">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -97,7 +97,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 bg-card">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {isLoading
             ? Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="space-y-3">
@@ -113,7 +113,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         </div>
 
         {/* Statistics */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center bg-background">
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="p-6">
             <div className="text-4xl font-bold text-primary mb-2">
               {totalProducts}+
