@@ -11,6 +11,49 @@ import {
 export { supabase };
 
 export class SupabaseService {
+  // Storage
+  static async uploadImage(file: File, fileName?: string): Promise<string> {
+    const bucketName = 'serenacosmeticoscatalogoimagem';
+    const fileExt = file.name.split('.').pop();
+    const finalFileName = fileName || `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .upload(finalFileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error("Error uploading image:", error);
+      throw new Error(`Erro ao fazer upload da imagem: ${error.message}`);
+    }
+
+    // Get the public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(finalFileName);
+
+    return publicUrl;
+  }
+
+  static async deleteImage(imageUrl: string): Promise<void> {
+    const bucketName = 'serenacosmeticoscatalogoimagem';
+
+    // Extract file name from URL
+    const urlParts = imageUrl.split('/');
+    const fileName = urlParts[urlParts.length - 1];
+
+    const { error } = await supabase.storage
+      .from(bucketName)
+      .remove([fileName]);
+
+    if (error) {
+      console.error("Error deleting image:", error);
+      throw new Error(`Erro ao deletar imagem: ${error.message}`);
+    }
+  }
+
   // Products
   static async getProducts(): Promise<Product[]> {
     const { data, error } = await supabase
@@ -41,10 +84,22 @@ export class SupabaseService {
     return data;
   }
 
-  static async createProduct(product: ProductInsert): Promise<Product> {
+  static async createProduct(product: ProductInsert, imageFile?: File): Promise<Product> {
+    let imageUrl = product.image;
+
+    // If an image file is provided, upload it first
+    if (imageFile) {
+      try {
+        imageUrl = await this.uploadImage(imageFile, `${product.name}-${Date.now()}`);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        throw new Error(`Erro ao fazer upload da imagem: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      }
+    }
+
     const { data, error } = await supabase
       .from("products")
-      .insert(product)
+      .insert({ ...product, image: imageUrl })
       .select()
       .single();
 
@@ -59,10 +114,29 @@ export class SupabaseService {
   static async updateProduct(
     id: string,
     updates: ProductUpdate,
+    imageFile?: File,
   ): Promise<Product> {
+    let imageUrl = updates.image;
+
+    // If an image file is provided, upload it first
+    if (imageFile) {
+      try {
+        // Get current product to get the old image URL for deletion
+        const currentProduct = await this.getProductById(id);
+        if (currentProduct?.image) {
+          await this.deleteImage(currentProduct.image);
+        }
+
+        imageUrl = await this.uploadImage(imageFile, `${updates.name || 'product'}-${Date.now()}`);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        throw new Error(`Erro ao fazer upload da imagem: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      }
+    }
+
     const { data, error } = await supabase
       .from("products")
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update({ ...updates, image: imageUrl, updated_at: new Date().toISOString() })
       .eq("id", id)
       .select()
       .single();
@@ -76,6 +150,12 @@ export class SupabaseService {
   }
 
   static async deleteProduct(id: string): Promise<void> {
+    // Get product first to get image URL for deletion
+    const product = await this.getProductById(id);
+    if (product?.image) {
+      await this.deleteImage(product.image);
+    }
+
     const { error } = await supabase.from("products").delete().eq("id", id);
 
     if (error) {

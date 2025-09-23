@@ -1,9 +1,11 @@
-import { Loader2, PencilIcon } from "lucide-react";
+import { Loader2, PencilIcon, ImageIcon } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useAuth } from "@/hooks/useAuth";
 import ProductCard from "./ProductCard";
 import { Button } from "./ui/button";
 import { Link } from "@tanstack/react-router";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
+import { ImageMigration } from "./ImageMigration";
 
 export const AdminPanel = () => {
   const { user } = useAuth();
@@ -39,11 +41,27 @@ export const AdminPanel = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard product={product} />
-          ))}
-        </div>
+        <Tabs defaultValue="products" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="products">Produtos</TabsTrigger>
+            <TabsTrigger value="migration">
+              <ImageIcon className="h-4 w-4 mr-2" />
+              Migração de Imagens
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="products">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
+                <ProductCard product={product} />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="migration">
+            <ImageMigration />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

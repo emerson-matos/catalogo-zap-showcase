@@ -29,12 +29,13 @@ import {
   SelectValue,
 } from "./ui/select";
 import { StarRating } from "./ui/star-rating";
+import { FileUpload } from "./ui/file-upload";
 import { toast } from "sonner";
 import { Loader2, LoaderIcon, SaveIcon, Trash2Icon, X } from "lucide-react";
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import z from "zod";
 import { useProduct } from "@/hooks/useProductsQuery";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,7 +52,6 @@ const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
   price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
-  image: z.url("URL da imagem inválida"),
   category_id: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().int().min(0).max(5).default(3),
 });
@@ -66,6 +66,7 @@ export function AddProductForm({ id }: { id?: string }) {
     useAdminProducts();
   const canGoBack = useCanGoBack();
   const router = useRouter();
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -81,17 +82,18 @@ export function AddProductForm({ id }: { id?: string }) {
   const onSubmit = async (data: ProductFormData) => {
     try {
       if (product) {
-        await updateProduct(product.id, data);
+        await updateProduct(product.id, data, imageFile || undefined);
         toast.success("Produto atualizado com sucesso!");
       } else {
         const productData: ProductInsert = {
           ...data,
         };
 
-        await createProduct(productData);
+        await createProduct(productData, imageFile || undefined);
         toast.success("Produto criado com sucesso!");
       }
       form.reset();
+      setImageFile(null);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Erro ao salvar produto",
@@ -224,9 +226,13 @@ export function AddProductForm({ id }: { id?: string }) {
                   name="image"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>URL da Imagem</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <FileUpload
+                          value={imageFile}
+                          onChange={setImageFile}
+                          accept="image/*"
+                          maxSize={5}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

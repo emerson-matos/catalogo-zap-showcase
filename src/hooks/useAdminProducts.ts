@@ -7,15 +7,16 @@ export const useAdminProducts = () => {
   const queryClient = useQueryClient();
 
   const createProductMutation = useMutation({
-    mutationFn: SupabaseService.createProduct,
+    mutationFn: ({ productData, imageFile }: { productData: ProductInsert; imageFile?: File }) =>
+      SupabaseService.createProduct(productData, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
     },
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: ProductUpdate }) =>
-      SupabaseService.updateProduct(id, updates),
+    mutationFn: ({ id, updates, imageFile }: { id: string; updates: ProductUpdate; imageFile?: File }) =>
+      SupabaseService.updateProduct(id, updates, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
     },
@@ -28,12 +29,12 @@ export const useAdminProducts = () => {
     },
   });
 
-  const createProduct = async (productData: ProductInsert) => {
-    return createProductMutation.mutateAsync(productData);
+  const createProduct = async (productData: ProductInsert, imageFile?: File) => {
+    return createProductMutation.mutateAsync({ productData, imageFile });
   };
 
-  const updateProduct = async (id: string, updates: ProductUpdate) => {
-    return updateProductMutation.mutateAsync({ id, updates });
+  const updateProduct = async (id: string, updates: ProductUpdate, imageFile?: File) => {
+    return updateProductMutation.mutateAsync({ id, updates, imageFile });
   };
 
   const deleteProduct = async (id: string) => {
