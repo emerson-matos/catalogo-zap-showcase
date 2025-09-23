@@ -29,7 +29,15 @@ import {
 } from "./ui/select";
 import { StarRating } from "./ui/star-rating";
 import { toast } from "sonner";
-import { Loader2, LoaderIcon, SaveIcon, Trash2Icon, X, Upload, ImageIcon } from "lucide-react";
+import {
+  Loader2,
+  LoaderIcon,
+  SaveIcon,
+  Trash2Icon,
+  X,
+  Upload,
+  ImageIcon,
+} from "lucide-react";
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import z from "zod";
 import { useProduct } from "@/hooks/useProductsQuery";
@@ -61,22 +69,22 @@ export function AddProductForm({ id }: { id?: string }) {
   const { data: product, isLoading, isFetching } = useProduct(id || "");
   const { data: categories, isLoading: isCategoriesLoading } =
     useCategoriesQuery();
-  const { 
-    deleteProduct, 
-    createProductWithImages, 
-    updateProductWithImages, 
-    isMutating 
+  const {
+    deleteProduct,
+    createProductWithImages,
+    updateProductWithImages,
+    isMutating,
   } = useAdminProducts();
   const canGoBack = useCanGoBack();
   const router = useRouter();
-  
+
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setSelectedImages(acceptedFiles);
     const previews: string[] = [];
-    
+
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -89,15 +97,16 @@ export function AddProductForm({ id }: { id?: string }) {
     });
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
-    onDrop,
-    accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.webp']
-    },
-    maxFiles: 10,
-    maxSize: 5 * 1024 * 1024, // 5MB per file
-    multiple: true,
-  });
+  const { getRootProps, getInputProps, isDragActive, isDragReject } =
+    useDropzone({
+      onDrop,
+      accept: {
+        "image/*": [".jpeg", ".jpg", ".png", ".webp"],
+      },
+      maxFiles: 10,
+      maxSize: 5 * 1024 * 1024, // 5MB per file
+      multiple: true,
+    });
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -107,17 +116,17 @@ export function AddProductForm({ id }: { id?: string }) {
   });
 
   useEffect(() => {
-    if (product) {
-      form.reset({ 
+    if (product && !isCategoriesLoading && categories) {
+      form.reset({
         name: product.name,
         description: product.description,
         price: product.price,
-        category_id: product.category_id || '',
-        rating: product.rating || 3
+        category_id: product.category_id,
+        rating: product.rating,
       });
       setImagePreviews(product.images || []);
     }
-  }, [product, form]);
+  }, [product, form, isCategoriesLoading, categories]);
 
   const removeImage = (index: number) => {
     const newImages = selectedImages.filter((_, i) => i !== index);
@@ -144,7 +153,9 @@ export function AddProductForm({ id }: { id?: string }) {
       } else {
         // Create new product - at least one image is REQUIRED
         if (selectedImages.length === 0) {
-          toast.error("Por favor, selecione pelo menos uma imagem para o produto");
+          toast.error(
+            "Por favor, selecione pelo menos uma imagem para o produto",
+          );
           return;
         }
         await createProductWithImages(data, selectedImages);
@@ -186,7 +197,7 @@ export function AddProductForm({ id }: { id?: string }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading || isFetching ? (
+          {isLoading || isFetching || isCategoriesLoading ? (
             <div className="min-h-screen mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
               <div className="flex items-center justify-center">
                 <LoaderIcon className="size-8 animate-spin" />
@@ -254,31 +265,33 @@ export function AddProductForm({ id }: { id?: string }) {
                     <FormItem>
                       <FormLabel>Categoria</FormLabel>
                       <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          {isCategoriesLoading ? (
-                            <LoaderIcon className="size-8 animate-spin self-auto" />
-                          ) : (
-                            <>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione a categoria" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {(categories || []).map((c) => (
-                                  <SelectItem key={c.id} value={c.id}>
-                                    {c.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </>
-                          )}
-                        </Select>
+                        {isCategoriesLoading ? (
+                          <div className="flex items-center justify-center p-4">
+                            <LoaderIcon className="size-4 animate-spin mr-2" />
+                            <span className="text-sm text-muted-foreground">Carregando categorias...</span>
+                          </div>
+                        ) : (
+                          <Select
+                            key={`select-${categories?.length || 0}-${field.value}`}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione a categoria" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(categories || []).map((c) => (
+                                <SelectItem key={c.id} value={c.id}>
+                                  {c.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
+                    )}
                 />
                 <FormItem className="col-span-full">
                   <FormLabel>
@@ -290,7 +303,10 @@ export function AddProductForm({ id }: { id?: string }) {
                     {imagePreviews.length > 0 && (
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {imagePreviews.map((preview, index) => (
-                          <div key={`preview-${index}-${preview.slice(-10)}`} className="relative">
+                          <div
+                            key={`preview-${index}-${preview.slice(-10)}`}
+                            className="relative"
+                          >
                             <img
                               src={preview}
                               alt={`Preview ${index + 1}`}
@@ -312,19 +328,20 @@ export function AddProductForm({ id }: { id?: string }) {
                         ))}
                       </div>
                     )}
-                    
+
                     {/* Dropzone */}
                     <div
                       {...getRootProps()}
                       className={`
                         border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-                        ${isDragActive && !isDragReject 
-                          ? 'border-primary bg-primary/5' 
-                          : isDragReject 
-                          ? 'border-red-500 bg-red-50' 
-                          : !product && selectedImages.length === 0 
-                          ? 'border-red-300 bg-red-50 hover:border-red-400' 
-                          : 'border-border hover:border-primary'
+                        ${
+                          isDragActive && !isDragReject
+                            ? "border-primary bg-primary/5"
+                            : isDragReject
+                              ? "border-red-500 bg-red-50"
+                              : !product && selectedImages.length === 0
+                                ? "border-red-300 bg-red-50 hover:border-red-400"
+                                : "border-border hover:border-primary"
                         }
                       `}
                     >
@@ -334,7 +351,9 @@ export function AddProductForm({ id }: { id?: string }) {
                           <div className="flex flex-col items-center gap-2">
                             <Upload className="h-8 w-8 text-primary" />
                             <p className="text-primary font-medium">
-                              {isDragReject ? 'Arquivo não suportado' : 'Solte as imagens aqui...'}
+                              {isDragReject
+                                ? "Arquivo não suportado"
+                                : "Solte as imagens aqui..."}
                             </p>
                           </div>
                         ) : (
@@ -342,27 +361,35 @@ export function AddProductForm({ id }: { id?: string }) {
                             <ImageIcon className="h-8 w-8 text-muted-foreground" />
                             <div>
                               <p className="font-medium">
-                                {selectedImages.length > 0 ? 'Adicionar mais imagens' : 'Arraste imagens aqui ou clique para selecionar'}
+                                {selectedImages.length > 0
+                                  ? "Adicionar mais imagens"
+                                  : "Arraste imagens aqui ou clique para selecionar"}
                               </p>
                               <p className="text-sm text-muted-foreground mt-1">
                                 Formatos aceitos: JPG, PNG, WebP
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 Máximo 10 imagens, 5MB cada
-                                {!product && <span className="text-red-500 ml-1">* Pelo menos uma imagem obrigatória</span>}
+                                {!product && (
+                                  <span className="text-red-500 ml-1">
+                                    * Pelo menos uma imagem obrigatória
+                                  </span>
+                                )}
                               </p>
                             </div>
                           </div>
                         )}
                       </div>
                     </div>
-                    
+
                     {/* Selected Files Info */}
                     {selectedImages.length > 0 && (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">
-                            {selectedImages.length} imagem{selectedImages.length > 1 ? 'ns' : ''} selecionada{selectedImages.length > 1 ? 's' : ''}
+                            {selectedImages.length} imagem
+                            {selectedImages.length > 1 ? "ns" : ""} selecionada
+                            {selectedImages.length > 1 ? "s" : ""}
                           </span>
                           <Button
                             type="button"
@@ -375,9 +402,14 @@ export function AddProductForm({ id }: { id?: string }) {
                         </div>
                         <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
                           {selectedImages.map((file, index) => (
-                            <div key={`file-${index}-${file.name}`} className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-muted rounded">
+                            <div
+                              key={`file-${index}-${file.name}`}
+                              className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-muted rounded"
+                            >
                               <ImageIcon className="h-4 w-4" />
-                              <span className="flex-1 truncate">{file.name}</span>
+                              <span className="flex-1 truncate">
+                                {file.name}
+                              </span>
                               <span className="text-xs">
                                 ({(file.size / 1024 / 1024).toFixed(2)} MB)
                               </span>
@@ -441,7 +473,12 @@ export function AddProductForm({ id }: { id?: string }) {
                       </AlertDialogContent>
                     </AlertDialog>
                   )}
-                  <Button type="submit" disabled={isMutating || (!product && selectedImages.length === 0)}>
+                  <Button
+                    type="submit"
+                    disabled={
+                      isMutating || (!product && selectedImages.length === 0)
+                    }
+                  >
                     {isMutating && (
                       <Loader2 className="mr-2 size-4 animate-spin" />
                     )}

@@ -86,7 +86,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
       <CardFooter className="flex gap-2">
         <ProtectedComponent requiredRole="editor">
           <Button asChild size="sm" variant="outline">
-            <Link to={"/admin/products/$id"} params={{ id: product.id }}>
+            <Link to="/admin/products" search={{ id: product.id }}>
               <Edit className="size-4 mr-2" />
               <span>Editar</span>
             </Link>

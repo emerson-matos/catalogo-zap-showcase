@@ -20,7 +20,6 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ProductsSearchRouteImport } from './routes/products/search'
 import { Route as ProductsIdRouteImport } from './routes/products/$id'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
-import { Route as AdminProductsIdRouteImport } from './routes/admin/products.$id'
 
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
@@ -77,11 +76,6 @@ const AdminProductsRoute = AdminProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminProductsIdRoute = AdminProductsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AdminProductsRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -90,24 +84,22 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
   '/products': typeof ProductsRouteWithChildren
-  '/admin/products': typeof AdminProductsRouteWithChildren
+  '/admin/products': typeof AdminProductsRoute
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
   '/admin/': typeof AdminIndexRoute
   '/products/': typeof ProductsIndexRoute
-  '/admin/products/$id': typeof AdminProductsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
-  '/admin/products': typeof AdminProductsRouteWithChildren
+  '/admin/products': typeof AdminProductsRoute
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
   '/admin': typeof AdminIndexRoute
   '/products': typeof ProductsIndexRoute
-  '/admin/products/$id': typeof AdminProductsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,12 +109,11 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
   '/products': typeof ProductsRouteWithChildren
-  '/admin/products': typeof AdminProductsRouteWithChildren
+  '/admin/products': typeof AdminProductsRoute
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
   '/admin/': typeof AdminIndexRoute
   '/products/': typeof ProductsIndexRoute
-  '/admin/products/$id': typeof AdminProductsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,7 +129,6 @@ export interface FileRouteTypes {
     | '/products/search'
     | '/admin/'
     | '/products/'
-    | '/admin/products/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -150,7 +140,6 @@ export interface FileRouteTypes {
     | '/products/search'
     | '/admin'
     | '/products'
-    | '/admin/products/$id'
   id:
     | '__root__'
     | '/'
@@ -164,7 +153,6 @@ export interface FileRouteTypes {
     | '/products/search'
     | '/admin/'
     | '/products/'
-    | '/admin/products/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -255,35 +243,16 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/products/$id': {
-      id: '/admin/products/$id'
-      path: '/$id'
-      fullPath: '/admin/products/$id'
-      preLoaderRoute: typeof AdminProductsIdRouteImport
-      parentRoute: typeof AdminProductsRoute
-    }
   }
 }
 
-interface AdminProductsRouteChildren {
-  AdminProductsIdRoute: typeof AdminProductsIdRoute
-}
-
-const AdminProductsRouteChildren: AdminProductsRouteChildren = {
-  AdminProductsIdRoute: AdminProductsIdRoute,
-}
-
-const AdminProductsRouteWithChildren = AdminProductsRoute._addFileChildren(
-  AdminProductsRouteChildren,
-)
-
 interface AdminRouteChildren {
-  AdminProductsRoute: typeof AdminProductsRouteWithChildren
+  AdminProductsRoute: typeof AdminProductsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminProductsRoute: AdminProductsRouteWithChildren,
+  AdminProductsRoute: AdminProductsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

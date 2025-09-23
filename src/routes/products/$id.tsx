@@ -14,7 +14,9 @@ export const Route = createFileRoute("/products/$id")({
 function ProductDetailPage() {
   const { id } = Route.useParams();
   const { data: product, isLoading, error } = useProduct(id || "");
-  const { data: category, isLoading: isCategoryLoading } = useCategoryQuery(product?.category_id || "");
+  const { data: category, isLoading: isCategoryLoading } = useCategoryQuery(
+    product?.category_id || "",
+  );
 
   if (isLoading) {
     return (
@@ -59,7 +61,10 @@ function ProductDetailPage() {
 
       <div className="grid gap-8 md:grid-cols-2">
         <div>
-          <ImageGallery images={product.images || []} productName={product.name} />
+          <ImageGallery
+            images={product.images || []}
+            productName={product.name}
+          />
         </div>
 
         <div className="space-y-6">

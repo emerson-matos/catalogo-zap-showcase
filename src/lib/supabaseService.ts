@@ -45,7 +45,9 @@ export class SupabaseService {
   static async createProduct(product: ProductInsert): Promise<Product> {
     // Ensure images are provided for new products
     if (!product.images || product.images.length === 0) {
-      throw new Error("Pelo menos uma imagem é obrigatória para novos produtos");
+      throw new Error(
+        "Pelo menos uma imagem é obrigatória para novos produtos",
+      );
     }
 
     const { data, error } = await supabase
@@ -62,15 +64,19 @@ export class SupabaseService {
     return data;
   }
 
-  static async createProductWithImages(productData: Omit<ProductInsert, 'images'>, imageFiles: File[]): Promise<Product> {
+  static async createProductWithImages(
+    productData: Omit<ProductInsert, "images">,
+    imageFiles: File[],
+  ): Promise<Product> {
     try {
       // Upload images first
-      const uploadResult = await ImageUploadService.uploadMultipleImages(imageFiles);
-      
+      const uploadResult =
+        await ImageUploadService.uploadMultipleImages(imageFiles);
+
       // Create product with the uploaded image URLs
       const product: ProductInsert = {
         ...productData,
-        images: uploadResult.urls
+        images: uploadResult.urls,
       };
 
       return await this.createProduct(product);
@@ -101,15 +107,16 @@ export class SupabaseService {
 
   static async updateProductWithImages(
     id: string,
-    updates: Omit<ProductUpdate, 'images'>,
-    imageFiles?: File[]
+    updates: Omit<ProductUpdate, "images">,
+    imageFiles?: File[],
   ): Promise<Product> {
     try {
       const finalUpdates: ProductUpdate = { ...updates };
 
       // If new images are provided, upload them
       if (imageFiles && imageFiles.length > 0) {
-        const uploadResult = await ImageUploadService.uploadMultipleImages(imageFiles);
+        const uploadResult =
+          await ImageUploadService.uploadMultipleImages(imageFiles);
         finalUpdates.images = uploadResult.urls;
       }
 
@@ -123,7 +130,7 @@ export class SupabaseService {
   static async deleteProduct(id: string): Promise<void> {
     // First get the product to delete its images
     const product = await this.getProductById(id);
-    
+
     if (product?.images && product.images.length > 0) {
       // Delete all images from Supabase Storage
       for (const imageUrl of product.images) {
