@@ -36,8 +36,6 @@ export interface Database {
           image: string;
           category_id?: string;
           rating?: number;
-          is_new?: boolean;
-          created_by: string;
         };
         Update: {
           id?: string;
@@ -47,7 +45,6 @@ export interface Database {
           image?: string;
           category_id?: string;
           rating?: number;
-          is_new?: boolean;
           updated_at?: string;
         };
       };

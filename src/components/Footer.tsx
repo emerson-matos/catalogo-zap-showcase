@@ -66,6 +66,14 @@ const Footer = () => {
                   Contato
                 </a>
               </li>
+              <li>
+                <a
+                  className="text-left hover:text-primary-foreground transition-colors underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                  href="/admin"
+                >
+                  Administrar
+                </a>
+              </li>
             </ul>
           </div>
 

@@ -44,10 +44,10 @@ export const WhatsAppButton = ({
       )}
     >
       {isIconOnly ? (
-        <MessageCircle className="h-4 w-4" />
+        <MessageCircle className="size-4" />
       ) : (
         <>
-          <MessageCircle className="h-4 w-4 mr-2 shrink-0" />
+          <MessageCircle className="size-4 mr-2 shrink-0" />
           <span className="shrink-0">{children}</span>
         </>
       )}

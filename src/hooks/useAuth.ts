@@ -31,7 +31,6 @@ export const useAuth = () => {
       .then(({ data: { session } }) => {
         if (session) {
           const jwt = jwtDecode(session.access_token);
-          console.log("jwt", jwt);
           const role = jwt.user_role;
           setAuthState((state) => ({
             ...state,
@@ -59,7 +58,6 @@ export const useAuth = () => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         const jwt = jwtDecode(session.access_token);
-        console.log("jwt", jwt);
         const role = jwt.user_role;
         setAuthState((state) => ({
           ...state,

@@ -16,7 +16,6 @@ export const StarRating = ({
   className,
 }: StarRatingProps) => {
   const [hoverValue, setHoverValue] = useState<number | null>(value);
-  console.log(hoverValue, "hover");
 
   const handleStarClick = (starIndex: number) => {
     const newValue = starIndex + 1;
@@ -46,7 +45,7 @@ export const StarRating = ({
         >
           <Star
             className={cn(
-              "h-6 w-6",
+              "size-6",
               i < displayValue
                 ? "fill-yellow-400 text-yellow-400"
                 : "fill-gray-200 text-gray-200",

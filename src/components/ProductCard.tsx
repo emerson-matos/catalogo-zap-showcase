@@ -3,11 +3,13 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { AddToCartButton } from "@/components/ui/add-to-cart-button";
-import { Star } from "lucide-react";
+import { Edit, Star, Trash2 } from "lucide-react";
 import { formatPriceBRL } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/types/product";
 import { useCategoryQuery } from "@/hooks/useCategoryQuery";
+import { Button } from "./ui/button";
+import { ProtectedComponent, ProtectedRoute } from "./ProtectedRoute";
 
 interface ProductCardProps {
   product: Product;
@@ -40,10 +42,10 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               }}
             />
             {isNewProduct() && (
-                <Badge className="absolute top-3 left-3 bg-muted text-green-600 font-bold shadow border border-border">
-                  Novo
-                </Badge>
-              )}
+              <Badge className="absolute top-3 left-3 bg-muted text-green-600 font-bold shadow border border-border">
+                Novo
+              </Badge>
+            )}
             <Badge className="absolute top-3 right-3 bg-accent text-green-foreground font-semibold shadow border border-border">
               {category?.name}
             </Badge>
@@ -75,18 +77,18 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
       </CardContent>
 
       <CardFooter className="flex gap-2">
-        <WhatsAppButton
-          product={product}
-          className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow-button hover:shadow-lg transition-all duration-200"
-          size="default"
-        >
+        <ProtectedComponent requiredRole="editor">
+          <Button asChild size="sm" variant="outline">
+            <Link to={"/admin/products/$id"} params={{ id: product.id }}>
+              <Edit className="size-4 mr-2" />
+              <span>Editar</span>
+            </Link>
+          </Button>
+        </ProtectedComponent>
+        <WhatsAppButton product={product} className="flex-1" size="default">
           Consultar
         </WhatsAppButton>
-        <AddToCartButton
-          product={product}
-          className="flex-1 justify-center gap-2 h-11 text-sm font-medium shadow hover:shadow-lg transition-all duration-200 bg-primary text-primary-foreground"
-          size="default"
-        >
+        <AddToCartButton product={product} className="flex-1" size="default">
           Adicionar
         </AddToCartButton>
       </CardFooter>

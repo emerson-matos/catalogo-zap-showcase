@@ -80,3 +80,11 @@ export const useInvalidateProducts = () => {
 
   return { invalidateProducts, refetchProducts };
 };
+
+export const useProduct = (id: string) => {
+  return useQuery({
+    queryKey: queryKeys.products.byId(id),
+    queryFn: () => SupabaseService.getProductById(id),
+    enabled: !!id,
+  });
+};

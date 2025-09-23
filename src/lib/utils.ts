@@ -20,8 +20,6 @@ export function formatPriceBRL(price: number | string): string {
   if (typeof price === "number" && Number.isFinite(price)) {
     return formatter.format(price);
   }
-  console.log(price);
-  console.log(typeof price);
   const raw = String(price || "").trim();
   if (!raw) return formatter.format(0);
 
