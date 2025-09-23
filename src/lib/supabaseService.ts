@@ -11,6 +11,65 @@ import {
 export { supabase };
 
 export class SupabaseService {
+  // Storage configuration
+  private static readonly BUCKET_NAME = 'serenacosmeticoscatalogoimagem';
+
+  // Storage methods
+  static async uploadImage(file: File, productId?: string): Promise<string> {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = productId ? `${productId}/${fileName}` : fileName;
+
+    const { data, error } = await supabase.storage
+      .from(this.BUCKET_NAME)
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('Error uploading image:', error);
+      throw new Error(`Erro ao fazer upload da imagem: ${error.message}`);
+    }
+
+    // Get the public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from(this.BUCKET_NAME)
+      .getPublicUrl(data.path);
+
+    return publicUrl;
+  }
+
+  static async deleteImage(imageUrl: string): Promise<void> {
+    // Extract the file path from the URL
+    const url = new URL(imageUrl);
+    const pathParts = url.pathname.split('/');
+    const bucketIndex = pathParts.findIndex(part => part === this.BUCKET_NAME);
+    
+    if (bucketIndex === -1) {
+      throw new Error('URL da imagem inválida');
+    }
+
+    const filePath = pathParts.slice(bucketIndex + 1).join('/');
+    
+    const { error } = await supabase.storage
+      .from(this.BUCKET_NAME)
+      .remove([filePath]);
+
+    if (error) {
+      console.error('Error deleting image:', error);
+      throw new Error(`Erro ao deletar imagem: ${error.message}`);
+    }
+  }
+
+  static async getImageUrl(imagePath: string): Promise<string> {
+    const { data: { publicUrl } } = supabase.storage
+      .from(this.BUCKET_NAME)
+      .getPublicUrl(imagePath);
+
+    return publicUrl;
+  }
+
   // Products
   static async getProducts(): Promise<Product[]> {
     const { data, error } = await supabase
@@ -59,7 +118,18 @@ export class SupabaseService {
   static async updateProduct(
     id: string,
     updates: ProductUpdate,
+    oldImageUrl?: string,
   ): Promise<Product> {
+    // If updating image and old image exists, delete the old image
+    if (updates.image && oldImageUrl && updates.image !== oldImageUrl) {
+      try {
+        await this.deleteImage(oldImageUrl);
+      } catch (error) {
+        console.warn('Failed to delete old image:', error);
+        // Continue with update even if image deletion fails
+      }
+    }
+
     const { data, error } = await supabase
       .from("products")
       .update({ ...updates, updated_at: new Date().toISOString() })
@@ -75,7 +145,17 @@ export class SupabaseService {
     return data;
   }
 
-  static async deleteProduct(id: string): Promise<void> {
+  static async deleteProduct(id: string, imageUrl?: string): Promise<void> {
+    // Delete the product image if it exists
+    if (imageUrl) {
+      try {
+        await this.deleteImage(imageUrl);
+      } catch (error) {
+        console.warn('Failed to delete product image:', error);
+        // Continue with product deletion even if image deletion fails
+      }
+    }
+
     const { error } = await supabase.from("products").delete().eq("id", id);
 
     if (error) {

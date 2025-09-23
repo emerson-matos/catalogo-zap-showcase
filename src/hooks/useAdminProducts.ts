@@ -14,15 +14,16 @@ export const useAdminProducts = () => {
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: ProductUpdate }) =>
-      SupabaseService.updateProduct(id, updates),
+    mutationFn: ({ id, updates, oldImageUrl }: { id: string; updates: ProductUpdate; oldImageUrl?: string }) =>
+      SupabaseService.updateProduct(id, updates, oldImageUrl),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
     },
   });
 
   const deleteProductMutation = useMutation({
-    mutationFn: SupabaseService.deleteProduct,
+    mutationFn: ({ id, imageUrl }: { id: string; imageUrl?: string }) =>
+      SupabaseService.deleteProduct(id, imageUrl),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
     },
@@ -32,12 +33,12 @@ export const useAdminProducts = () => {
     return createProductMutation.mutateAsync(productData);
   };
 
-  const updateProduct = async (id: string, updates: ProductUpdate) => {
-    return updateProductMutation.mutateAsync({ id, updates });
+  const updateProduct = async (id: string, updates: ProductUpdate, oldImageUrl?: string) => {
+    return updateProductMutation.mutateAsync({ id, updates, oldImageUrl });
   };
 
-  const deleteProduct = async (id: string) => {
-    return deleteProductMutation.mutateAsync(id);
+  const deleteProduct = async (id: string, imageUrl?: string) => {
+    return deleteProductMutation.mutateAsync({ id, imageUrl });
   };
 
   return {

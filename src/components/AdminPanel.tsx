@@ -1,13 +1,16 @@
-import { Loader2, PencilIcon } from "lucide-react";
+import { Loader2, PencilIcon, Database } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useAuth } from "@/hooks/useAuth";
 import ProductCard from "./ProductCard";
 import { Button } from "./ui/button";
 import { Link } from "@tanstack/react-router";
+import { ImageMigrationPanel } from "./ImageMigrationPanel";
+import { useState } from "react";
 
 export const AdminPanel = () => {
   const { user } = useAuth();
   const { products, isLoading } = useProductsQuery();
+  const [activeTab, setActiveTab] = useState<'products' | 'migration'>('products');
 
   if (isLoading) {
     return (
@@ -28,22 +31,42 @@ export const AdminPanel = () => {
                 Bem-vindo, {user?.email}
               </p>
             </div>
-            <Button asChild>
-              <Link to="/admin/products">
-                <PencilIcon className="size-4" />
-                cadastrar
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant={activeTab === 'products' ? 'default' : 'outline'}
+                onClick={() => setActiveTab('products')}
+              >
+                <PencilIcon className="size-4 mr-2" />
+                Produtos
+              </Button>
+              <Button 
+                variant={activeTab === 'migration' ? 'default' : 'outline'}
+                onClick={() => setActiveTab('migration')}
+              >
+                <Database className="size-4 mr-2" />
+                Migração
+              </Button>
+              <Button asChild>
+                <Link to="/admin/products">
+                  <PencilIcon className="size-4" />
+                  cadastrar
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard product={product} />
-          ))}
-        </div>
+        {activeTab === 'products' ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <ImageMigrationPanel />
+        )}
       </div>
     </div>
   );

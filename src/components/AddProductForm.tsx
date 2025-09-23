@@ -46,12 +46,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import { ImageUploadField } from "./ImageUploadField";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
   price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
-  image: z.url("URL da imagem inválida"),
+  image: z.string().min(1, "Imagem é obrigatória"),
   category_id: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().int().min(0).max(5).default(3),
 });
@@ -81,7 +82,7 @@ export function AddProductForm({ id }: { id?: string }) {
   const onSubmit = async (data: ProductFormData) => {
     try {
       if (product) {
-        await updateProduct(product.id, data);
+        await updateProduct(product.id, data, product.image);
         toast.success("Produto atualizado com sucesso!");
       } else {
         const productData: ProductInsert = {
@@ -101,7 +102,7 @@ export function AddProductForm({ id }: { id?: string }) {
 
   const handleDelete = async () => {
     try {
-      await deleteProduct(product?.id || "");
+      await deleteProduct(product?.id || "", product?.image);
       toast.success("Produto deletado com sucesso!");
       router.history.back();
     } catch (err) {
@@ -224,9 +225,15 @@ export function AddProductForm({ id }: { id?: string }) {
                   name="image"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>URL da Imagem</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <ImageUploadField
+                          value={field.value}
+                          onChange={field.onChange}
+                          productId={product?.id}
+                          onError={(error) => {
+                            form.setError('image', { message: error });
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
