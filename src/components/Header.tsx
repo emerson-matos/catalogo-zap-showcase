@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Menu, X, Package, BookOpen, Users, MessageCircle, ShoppingBag } from "lucide-react";
+import {
+  Menu,
+  X,
+  BookOpen,
+  Users,
+  MessageCircle,
+  ShoppingBag,
+  Rose,
+  HomeIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
@@ -14,12 +23,15 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background backdrop-blur supports-backdrop-filter:bg-background/90">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Package className="size-8 text-primary" />
+          <Link
+            to="/"
+            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+          >
+            <Rose className="size-8" />
             <span className="text-xl font-bold bg-gradient-primary bg-clip-text">
               SeRena Cosméticos
             </span>
@@ -31,9 +43,10 @@ const Header = () => {
               <Button
                 variant="ghost"
                 className={`hover:text-primary transition-colors ${
-                  isActiveRoute('/') ? 'text-primary font-semibold' : ''
+                  isActiveRoute("/") ? "text-primary font-semibold" : ""
                 }`}
               >
+                <HomeIcon className="size-4" />
                 Início
               </Button>
             </Link>
@@ -41,7 +54,7 @@ const Header = () => {
               <Button
                 variant="ghost"
                 className={`hover:text-primary transition-colors flex items-center gap-2 ${
-                  isActiveRoute('/products') ? 'text-primary font-semibold' : ''
+                  isActiveRoute("/products") ? "text-primary font-semibold" : ""
                 }`}
               >
                 <ShoppingBag className="w-4 h-4" />
@@ -52,7 +65,7 @@ const Header = () => {
               <Button
                 variant="ghost"
                 className={`hover:text-primary transition-colors flex items-center gap-2 ${
-                  isActiveRoute('/about') ? 'text-primary font-semibold' : ''
+                  isActiveRoute("/about") ? "text-primary font-semibold" : ""
                 }`}
               >
                 <Users className="w-4 h-4" />
@@ -63,18 +76,18 @@ const Header = () => {
               <Button
                 variant="ghost"
                 className={`hover:text-primary transition-colors flex items-center gap-2 ${
-                  isActiveRoute('/flipbook') ? 'text-primary font-semibold' : ''
+                  isActiveRoute("/flipbook") ? "text-primary font-semibold" : ""
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
-                Catálogo
+                Revista Digital
               </Button>
             </Link>
             <Link to="/contact">
               <Button
                 variant="ghost"
                 className={`hover:text-primary transition-colors flex items-center gap-2 ${
-                  isActiveRoute('/contact') ? 'text-primary font-semibold' : ''
+                  isActiveRoute("/contact") ? "text-primary font-semibold" : ""
                 }`}
               >
                 <MessageCircle className="w-4 h-4" />
@@ -116,7 +129,7 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   className={`text-left hover:text-primary transition-colors justify-start ${
-                    isActiveRoute('/') ? 'text-primary font-semibold' : ''
+                    isActiveRoute("/") ? "text-primary font-semibold" : ""
                   }`}
                 >
                   Início
@@ -126,7 +139,9 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   className={`text-left hover:text-primary transition-colors justify-start flex items-center gap-2 ${
-                    isActiveRoute('/products') ? 'text-primary font-semibold' : ''
+                    isActiveRoute("/products")
+                      ? "text-primary font-semibold"
+                      : ""
                   }`}
                 >
                   <ShoppingBag className="w-4 h-4" />
@@ -137,7 +152,7 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   className={`text-left hover:text-primary transition-colors justify-start flex items-center gap-2 ${
-                    isActiveRoute('/about') ? 'text-primary font-semibold' : ''
+                    isActiveRoute("/about") ? "text-primary font-semibold" : ""
                   }`}
                 >
                   <Users className="w-4 h-4" />
@@ -148,18 +163,22 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   className={`text-left hover:text-primary transition-colors justify-start flex items-center gap-2 ${
-                    isActiveRoute('/flipbook') ? 'text-primary font-semibold' : ''
+                    isActiveRoute("/flipbook")
+                      ? "text-primary font-semibold"
+                      : ""
                   }`}
                 >
                   <BookOpen className="w-4 h-4" />
-                  Catálogo
+                  Revista Digital
                 </Button>
               </Link>
               <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                 <Button
                   variant="ghost"
                   className={`text-left hover:text-primary transition-colors justify-start flex items-center gap-2 ${
-                    isActiveRoute('/contact') ? 'text-primary font-semibold' : ''
+                    isActiveRoute("/contact")
+                      ? "text-primary font-semibold"
+                      : ""
                   }`}
                 >
                   <MessageCircle className="w-4 h-4" />
