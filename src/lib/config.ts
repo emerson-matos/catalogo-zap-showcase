@@ -7,6 +7,13 @@ export const APP_CONFIG = {
     anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
   },
 
+  // Storage configuration
+  storage: {
+    bucketName: 'serenacosmeticoscatalogoimagem',
+    maxFileSize: 5 * 1024 * 1024, // 5MB
+    allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  },
+
   // Feature flags
   features: {
     enableAdminPanel: true,

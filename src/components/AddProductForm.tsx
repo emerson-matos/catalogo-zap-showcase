@@ -46,12 +46,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import { ImageUpload } from "./ImageUpload";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
   price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
-  image: z.url("URL da imagem inválida"),
+  image: z.string().min(1, "Imagem é obrigatória"),
   category_id: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().int().min(0).max(5).default(3),
 });
@@ -223,10 +224,20 @@ export function AddProductForm({ id }: { id?: string }) {
                   control={form.control}
                   name="image"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL da Imagem</FormLabel>
+                    <FormItem className="col-span-full">
+                      <FormLabel>Imagem do Produto</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <ImageUpload
+                          onImageUpload={(url) => {
+                            field.onChange(url);
+                          }}
+                          onImageRemove={() => {
+                            field.onChange("");
+                          }}
+                          currentImageUrl={field.value}
+                          productId={product?.id}
+                          disabled={isMutating}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

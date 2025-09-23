@@ -35,10 +35,18 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               alt={product.name}
               loading="lazy"
               decoding="async"
-              className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-scale-down"
+              className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/placeholder.svg";
+                target.className = "w-full h-64 transition-transform duration-300 group-hover:scale-110 object-contain bg-muted";
+              }}
+              onLoad={(e) => {
+                const target = e.target as HTMLImageElement;
+                // Ensure proper object-fit for Supabase Storage images
+                if (product.image.includes('supabase')) {
+                  target.className = "w-full h-64 transition-transform duration-300 group-hover:scale-110 object-cover";
+                }
               }}
             />
             {isNewProduct() && (
