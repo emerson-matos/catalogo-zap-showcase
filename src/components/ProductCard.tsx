@@ -3,13 +3,13 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { AddToCartButton } from "@/components/ui/add-to-cart-button";
-import { Edit, Star, Trash2 } from "lucide-react";
+import { Edit, Star } from "lucide-react";
 import { formatPriceBRL } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/types/product";
 import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 import { Button } from "./ui/button";
-import { ProtectedComponent, ProtectedRoute } from "./ProtectedRoute";
+import { ProtectedComponent } from "./ProtectedRoute";
 
 interface ProductCardProps {
   product: Product;
@@ -31,7 +31,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
         <Link to="/products/$id" params={{ id: product.id }}>
           <div className="relative overflow-hidden rounded-t-lg">
             <img
-              src={product.image}
+              src={product.images?.[0] || "/placeholder.svg"}
               alt={product.name}
               loading="lazy"
               decoding="async"
@@ -46,9 +46,16 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
                 Novo
               </Badge>
             )}
-            <Badge className="absolute top-3 right-3 bg-accent text-green-foreground font-semibold shadow border border-border">
-              {category?.name}
-            </Badge>
+            <div className="absolute top-3 right-3 flex flex-col gap-1">
+              {product.images && product.images.length > 1 && (
+                <Badge className="bg-blue-600 text-white font-bold shadow border border-border text-xs">
+                  +{product.images.length - 1}
+                </Badge>
+              )}
+              <Badge className="bg-accent text-green-foreground font-semibold shadow border border-border">
+                {category?.name}
+              </Badge>
+            </div>
           </div>
 
           <div className="p-6">

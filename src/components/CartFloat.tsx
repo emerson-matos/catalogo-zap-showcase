@@ -56,7 +56,7 @@ export function CartFloat() {
                   className="flex items-center space-x-3"
                 >
                   <img
-                    src={item.product.image}
+                    src={item.product.images?.[0] || "/placeholder.svg"}
                     alt={item.product.name}
                     className="w-12 h-12 rounded-lg object-cover"
                     onError={(e: any) => {

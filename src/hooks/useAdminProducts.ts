@@ -13,9 +13,25 @@ export const useAdminProducts = () => {
     },
   });
 
+  const createProductWithImagesMutation = useMutation({
+    mutationFn: ({ productData, imageFiles }: { productData: Omit<ProductInsert, 'images'>; imageFiles: File[] }) =>
+      SupabaseService.createProductWithImages(productData, imageFiles),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
+    },
+  });
+
   const updateProductMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: ProductUpdate }) =>
       SupabaseService.updateProduct(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
+    },
+  });
+
+  const updateProductWithImagesMutation = useMutation({
+    mutationFn: ({ id, updates, imageFiles }: { id: string; updates: Omit<ProductUpdate, 'images'>; imageFiles?: File[] }) =>
+      SupabaseService.updateProductWithImages(id, updates, imageFiles),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
     },
@@ -32,8 +48,16 @@ export const useAdminProducts = () => {
     return createProductMutation.mutateAsync(productData);
   };
 
+  const createProductWithImages = async (productData: Omit<ProductInsert, 'images'>, imageFiles: File[]) => {
+    return createProductWithImagesMutation.mutateAsync({ productData, imageFiles });
+  };
+
   const updateProduct = async (id: string, updates: ProductUpdate) => {
     return updateProductMutation.mutateAsync({ id, updates });
+  };
+
+  const updateProductWithImages = async (id: string, updates: Omit<ProductUpdate, 'images'>, imageFiles?: File[]) => {
+    return updateProductWithImagesMutation.mutateAsync({ id, updates, imageFiles });
   };
 
   const deleteProduct = async (id: string) => {
@@ -43,22 +67,29 @@ export const useAdminProducts = () => {
   return {
     // Mutations
     createProductMutation,
+    createProductWithImagesMutation,
     updateProductMutation,
+    updateProductWithImagesMutation,
     deleteProductMutation,
 
     // Actions
     createProduct,
+    createProductWithImages,
     updateProduct,
+    updateProductWithImages,
     deleteProduct,
 
     // States
     isCreating: createProductMutation.isPending,
+    isCreatingWithImages: createProductWithImagesMutation.isPending,
     isUpdating: updateProductMutation.isPending,
+    isUpdatingWithImages: updateProductWithImagesMutation.isPending,
     isDeleting: deleteProductMutation.isPending,
     isMutating:
       createProductMutation.isPending ||
+      createProductWithImagesMutation.isPending ||
       updateProductMutation.isPending ||
+      updateProductWithImagesMutation.isPending ||
       deleteProductMutation.isPending,
   };
 };
-

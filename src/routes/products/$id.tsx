@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useProductsQuery } from "@/hooks/useProductsQuery";
+import { useProduct } from "@/hooks/useProductsQuery";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Package } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { formatPriceBRL } from "@/lib/utils";
+import { ImageGallery } from "@/components/ImageGallery";
+import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 
 export const Route = createFileRoute("/products/$id")({
   component: ProductDetailPage,
@@ -11,9 +13,8 @@ export const Route = createFileRoute("/products/$id")({
 
 function ProductDetailPage() {
   const { id } = Route.useParams();
-  const { products, isLoading, error } = useProductsQuery();
-
-  const product = products?.find((p) => p.id === id);
+  const { data: product, isLoading, error } = useProduct(id || "");
+  const { data: category, isLoading: isCategoryLoading } = useCategoryQuery(product?.category_id || "");
 
   if (isLoading) {
     return (
@@ -58,11 +59,7 @@ function ProductDetailPage() {
 
       <div className="grid gap-8 md:grid-cols-2">
         <div>
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-96 object-cover rounded-lg"
-          />
+          <ImageGallery images={product.images || []} productName={product.name} />
         </div>
 
         <div className="space-y-6">
@@ -80,12 +77,12 @@ function ProductDetailPage() {
               </span>
             </div>
 
-            {product.category && (
+            {!isCategoryLoading && category && (
               <div>
                 <span className="text-sm text-muted-foreground">
                   Categoria:{" "}
                 </span>
-                <span className="font-medium">{product.category}</span>
+                <span className="font-medium">{category.name}</span>
               </div>
             )}
           </div>

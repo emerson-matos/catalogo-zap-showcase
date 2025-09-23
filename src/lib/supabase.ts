@@ -20,7 +20,7 @@ export interface Database {
           name: string;
           description: string;
           price: number;
-          image: string;
+          images: string[]; // Array of image URLs
           category_id?: string;
           rating?: number;
           is_new?: boolean;
@@ -33,7 +33,7 @@ export interface Database {
           name: string;
           description: string;
           price: number;
-          image: string;
+          images: string[]; // Array of image URLs
           category_id?: string;
           rating?: number;
         };
@@ -42,7 +42,7 @@ export interface Database {
           name?: string;
           description?: string;
           price?: number;
-          image?: string;
+          images?: string[]; // Array of image URLs
           category_id?: string;
           rating?: number;
           updated_at?: string;

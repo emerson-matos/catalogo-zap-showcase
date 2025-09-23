@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import ProductCard from "./ProductCard";
 import { Button } from "./ui/button";
 import { Link } from "@tanstack/react-router";
+import { ProductMigrationPanel } from "./ProductMigrationPanel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 export const AdminPanel = () => {
   const { user } = useAuth();
@@ -39,11 +41,24 @@ export const AdminPanel = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard product={product} />
-          ))}
-        </div>
+        <Tabs defaultValue="products" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="products">Produtos</TabsTrigger>
+            <TabsTrigger value="migration">Migração</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="products" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="migration">
+            <ProductMigrationPanel />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

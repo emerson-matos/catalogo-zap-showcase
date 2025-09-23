@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAdminProducts } from "@/hooks/useAdminProducts";
-import type { ProductInsert } from "@/lib/supabase";
 import {
   Form,
   FormControl,
@@ -30,11 +29,11 @@ import {
 } from "./ui/select";
 import { StarRating } from "./ui/star-rating";
 import { toast } from "sonner";
-import { Loader2, LoaderIcon, SaveIcon, Trash2Icon, X } from "lucide-react";
+import { Loader2, LoaderIcon, SaveIcon, Trash2Icon, X, Upload, ImageIcon } from "lucide-react";
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import z from "zod";
 import { useProduct } from "@/hooks/useProductsQuery";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,12 +45,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import { useDropzone } from "react-dropzone";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
   price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
-  image: z.url("URL da imagem inválida"),
   category_id: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().int().min(0).max(5).default(3),
 });
@@ -62,10 +61,43 @@ export function AddProductForm({ id }: { id?: string }) {
   const { data: product, isLoading, isFetching } = useProduct(id || "");
   const { data: categories, isLoading: isCategoriesLoading } =
     useCategoriesQuery();
-  const { deleteProduct, createProduct, updateProduct, isMutating } =
-    useAdminProducts();
+  const { 
+    deleteProduct, 
+    createProductWithImages, 
+    updateProductWithImages, 
+    isMutating 
+  } = useAdminProducts();
   const canGoBack = useCanGoBack();
   const router = useRouter();
+  
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    setSelectedImages(acceptedFiles);
+    const previews: string[] = [];
+    
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previews.push(e.target?.result as string);
+        if (previews.length === acceptedFiles.length) {
+          setImagePreviews(previews);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.webp']
+    },
+    maxFiles: 10,
+    maxSize: 5 * 1024 * 1024, // 5MB per file
+    multiple: true,
+  });
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -75,23 +107,52 @@ export function AddProductForm({ id }: { id?: string }) {
   });
 
   useEffect(() => {
-    form.reset({ ...product });
+    if (product) {
+      form.reset({ 
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        category_id: product.category_id || '',
+        rating: product.rating || 3
+      });
+      setImagePreviews(product.images || []);
+    }
   }, [product, form]);
+
+  const removeImage = (index: number) => {
+    const newImages = selectedImages.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    setSelectedImages(newImages);
+    setImagePreviews(newPreviews);
+  };
+
+  const clearAllImages = () => {
+    setSelectedImages([]);
+    setImagePreviews(product?.images || []);
+  };
 
   const onSubmit = async (data: ProductFormData) => {
     try {
       if (product) {
-        await updateProduct(product.id, data);
+        // Update existing product
+        if (selectedImages.length > 0) {
+          await updateProductWithImages(product.id, data, selectedImages);
+        } else {
+          await updateProductWithImages(product.id, data);
+        }
         toast.success("Produto atualizado com sucesso!");
       } else {
-        const productData: ProductInsert = {
-          ...data,
-        };
-
-        await createProduct(productData);
+        // Create new product - at least one image is REQUIRED
+        if (selectedImages.length === 0) {
+          toast.error("Por favor, selecione pelo menos uma imagem para o produto");
+          return;
+        }
+        await createProductWithImages(data, selectedImages);
         toast.success("Produto criado com sucesso!");
       }
       form.reset();
+      setSelectedImages([]);
+      setImagePreviews([]);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Erro ao salvar produto",
@@ -219,19 +280,114 @@ export function AddProductForm({ id }: { id?: string }) {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="image"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL da Imagem</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormItem className="col-span-full">
+                  <FormLabel>
+                    Imagens do Produto
+                    {!product && <span className="text-red-500 ml-1">*</span>}
+                  </FormLabel>
+                  <div className="space-y-4">
+                    {/* Image Previews */}
+                    {imagePreviews.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {imagePreviews.map((preview, index) => (
+                          <div key={`preview-${index}-${preview.slice(-10)}`} className="relative">
+                            <img
+                              src={preview}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border border-border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute -top-2 -right-2 rounded-full p-1 h-6 w-6"
+                              onClick={() => removeImage(index)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                            <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-1 rounded">
+                              {index + 1}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Dropzone */}
+                    <div
+                      {...getRootProps()}
+                      className={`
+                        border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+                        ${isDragActive && !isDragReject 
+                          ? 'border-primary bg-primary/5' 
+                          : isDragReject 
+                          ? 'border-red-500 bg-red-50' 
+                          : !product && selectedImages.length === 0 
+                          ? 'border-red-300 bg-red-50 hover:border-red-400' 
+                          : 'border-border hover:border-primary'
+                        }
+                      `}
+                    >
+                      <input {...getInputProps()} />
+                      <div className="flex flex-col items-center gap-2">
+                        {isDragActive ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload className="h-8 w-8 text-primary" />
+                            <p className="text-primary font-medium">
+                              {isDragReject ? 'Arquivo não suportado' : 'Solte as imagens aqui...'}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2">
+                            <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium">
+                                {selectedImages.length > 0 ? 'Adicionar mais imagens' : 'Arraste imagens aqui ou clique para selecionar'}
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Formatos aceitos: JPG, PNG, WebP
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                Máximo 10 imagens, 5MB cada
+                                {!product && <span className="text-red-500 ml-1">* Pelo menos uma imagem obrigatória</span>}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Selected Files Info */}
+                    {selectedImages.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">
+                            {selectedImages.length} imagem{selectedImages.length > 1 ? 'ns' : ''} selecionada{selectedImages.length > 1 ? 's' : ''}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={clearAllImages}
+                          >
+                            Limpar todas
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
+                          {selectedImages.map((file, index) => (
+                            <div key={`file-${index}-${file.name}`} className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-muted rounded">
+                              <ImageIcon className="h-4 w-4" />
+                              <span className="flex-1 truncate">{file.name}</span>
+                              <span className="text-xs">
+                                ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </FormItem>
                 <FormField
                   control={form.control}
                   name="description"
@@ -285,7 +441,7 @@ export function AddProductForm({ id }: { id?: string }) {
                       </AlertDialogContent>
                     </AlertDialog>
                   )}
-                  <Button type="submit" disabled={isMutating}>
+                  <Button type="submit" disabled={isMutating || (!product && selectedImages.length === 0)}>
                     {isMutating && (
                       <Loader2 className="mr-2 size-4 animate-spin" />
                     )}
