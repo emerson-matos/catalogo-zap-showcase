@@ -41,7 +41,7 @@ import {
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import z from "zod";
 import { useProduct } from "@/hooks/useProductsQuery";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,6 +54,7 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { useDropzone } from "react-dropzone";
+import { useImageManagement } from "@/hooks/useImageManagement";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -78,26 +79,21 @@ export function AddProductForm({ id }: { id?: string }) {
   const canGoBack = useCanGoBack();
   const router = useRouter();
 
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
-  const [originalImages, setOriginalImages] = useState<string[]>([]);
+  const {
+    images,
+    imagesToRemove,
+    addImages,
+    removeImage,
+    clearAllImages,
+    reset: resetImages,
+    getNewFiles,
+    hasImages,
+    hasNewImages,
+  } = useImageManagement({ existingImages: product?.images || [] });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    setSelectedImages(prev => [...prev, ...acceptedFiles]);
-    const previews: string[] = [];
-
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        previews.push(e.target?.result as string);
-        if (previews.length === acceptedFiles.length) {
-          setImagePreviews(prev => [...prev, ...previews]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  }, []);
+    addImages(acceptedFiles);
+  }, [addImages]);
 
   const { getRootProps, getInputProps, isDragActive, isDragReject } =
     useDropzone({
@@ -126,65 +122,30 @@ export function AddProductForm({ id }: { id?: string }) {
         category_id: product.category_id,
         rating: product.rating,
       });
-      setImagePreviews(product.images || []);
-      setOriginalImages(product.images || []);
-      setImagesToRemove([]); // Reset images to remove when loading product
     }
   }, [product, form, isCategoriesLoading, categories]);
-
-  const removeImage = (index: number) => {
-    const imageToRemove = imagePreviews[index];
-    
-    // If it's an existing image (from the product), add it to imagesToRemove
-    if (originalImages.includes(imageToRemove)) {
-      setImagesToRemove(prev => [...prev, imageToRemove]);
-    } else {
-      // If it's a new image, remove it from selectedImages
-      // Find the index in selectedImages by counting how many new images come before this one
-      let newImageIndex = 0;
-      for (let i = 0; i < index; i++) {
-        if (!originalImages.includes(imagePreviews[i])) {
-          newImageIndex++;
-        }
-      }
-      setSelectedImages(prev => prev.filter((_, i) => i !== newImageIndex));
-    }
-    
-    // Remove from previews
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const clearAllImages = () => {
-    // If editing existing product, mark all existing images for removal
-    if (originalImages.length > 0) {
-      setImagesToRemove(originalImages);
-    }
-    setSelectedImages([]);
-    setImagePreviews([]);
-  };
 
   const onSubmit = async (data: ProductFormData) => {
     try {
       if (product) {
         // Update existing product
-        await updateProductWithImages(product.id, data, selectedImages, imagesToRemove);
+        const newFiles = getNewFiles();
+        await updateProductWithImages(product.id, data, newFiles, imagesToRemove);
         toast.success("Produto atualizado com sucesso!");
       } else {
         // Create new product - at least one image is REQUIRED
-        if (selectedImages.length === 0) {
+        const newFiles = getNewFiles();
+        if (newFiles.length === 0) {
           toast.error(
             "Por favor, selecione pelo menos uma imagem para o produto",
           );
           return;
         }
-        await createProductWithImages(data, selectedImages);
+        await createProductWithImages(data, newFiles);
         toast.success("Produto criado com sucesso!");
       }
       form.reset();
-      setSelectedImages([]);
-      setImagePreviews([]);
-      setImagesToRemove([]);
-      setOriginalImages([]);
+      resetImages();
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Erro ao salvar produto",
@@ -321,15 +282,15 @@ export function AddProductForm({ id }: { id?: string }) {
                   </FormLabel>
                   <div className="space-y-4">
                     {/* Image Previews */}
-                    {imagePreviews.length > 0 && (
+                    {hasImages && (
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {imagePreviews.map((preview, index) => (
+                        {images.map((image, index) => (
                           <div
-                            key={`preview-${index}-${preview.slice(-10)}`}
+                            key={image.id}
                             className="relative"
                           >
                             <img
-                              src={preview}
+                              src={image.url}
                               alt={`Preview ${index + 1}`}
                               className="w-full h-24 object-cover rounded-lg border border-border"
                             />
@@ -338,7 +299,7 @@ export function AddProductForm({ id }: { id?: string }) {
                               variant="destructive"
                               size="sm"
                               className="absolute -top-2 -right-2 rounded-full p-1 h-6 w-6"
-                              onClick={() => removeImage(index)}
+                              onClick={() => removeImage(image.id)}
                             >
                               <X className="h-3 w-3" />
                             </Button>
@@ -355,12 +316,12 @@ export function AddProductForm({ id }: { id?: string }) {
                       {...getRootProps()}
                       className={`
                         border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-                        ${
+                                ${
                           isDragActive && !isDragReject
                             ? "border-primary bg-primary/5"
                             : isDragReject
                               ? "border-red-500 bg-red-50"
-                              : !product && selectedImages.length === 0
+                              : !product && !hasImages
                                 ? "border-red-300 bg-red-50 hover:border-red-400"
                                 : "border-border hover:border-primary"
                         }
@@ -382,7 +343,7 @@ export function AddProductForm({ id }: { id?: string }) {
                             <ImageIcon className="h-8 w-8 text-muted-foreground" />
                             <div>
                               <p className="font-medium">
-                                {selectedImages.length > 0
+                                {hasNewImages
                                   ? "Adicionar mais imagens"
                                   : "Arraste imagens aqui ou clique para selecionar"}
                               </p>
@@ -404,13 +365,13 @@ export function AddProductForm({ id }: { id?: string }) {
                     </div>
 
                     {/* Selected Files Info */}
-                    {selectedImages.length > 0 && (
+                    {hasNewImages && (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">
-                            {selectedImages.length} imagem
-                            {selectedImages.length > 1 ? "ns" : ""} selecionada
-                            {selectedImages.length > 1 ? "s" : ""}
+                            {images.filter(img => !img.isExisting).length} nova imagem
+                            {images.filter(img => !img.isExisting).length > 1 ? "ns" : ""} selecionada
+                            {images.filter(img => !img.isExisting).length > 1 ? "s" : ""}
                           </span>
                           <Button
                             type="button"
@@ -422,17 +383,19 @@ export function AddProductForm({ id }: { id?: string }) {
                           </Button>
                         </div>
                         <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
-                          {selectedImages.map((file, index) => (
+                          {images
+                            .filter(img => !img.isExisting && img.file)
+                            .map((image) => (
                             <div
-                              key={`file-${index}-${file.name}`}
+                              key={image.id}
                               className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-muted rounded"
                             >
                               <ImageIcon className="h-4 w-4" />
                               <span className="flex-1 truncate">
-                                {file.name}
+                                {image.file!.name}
                               </span>
                               <span className="text-xs">
-                                ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                ({(image.file!.size / 1024 / 1024).toFixed(2)} MB)
                               </span>
                             </div>
                           ))}
@@ -497,7 +460,7 @@ export function AddProductForm({ id }: { id?: string }) {
                   <Button
                     type="submit"
                     disabled={
-                      isMutating || (!product && selectedImages.length === 0)
+                      isMutating || (!product && !hasImages)
                     }
                   >
                     {isMutating && (
