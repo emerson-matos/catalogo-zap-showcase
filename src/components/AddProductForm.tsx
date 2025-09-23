@@ -29,12 +29,13 @@ import {
   SelectValue,
 } from "./ui/select";
 import { StarRating } from "./ui/star-rating";
+import { ImageUpload } from "./ui/image-upload";
 import { toast } from "sonner";
 import { Loader2, LoaderIcon, SaveIcon, Trash2Icon, X } from "lucide-react";
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import z from "zod";
 import { useProduct } from "@/hooks/useProductsQuery";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,7 +52,6 @@ const productSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().min(1, "Descrição é obrigatória"),
   price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
-  image: z.url("URL da imagem inválida"),
   category_id: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().int().min(0).max(5).default(3),
 });
@@ -62,10 +62,18 @@ export function AddProductForm({ id }: { id?: string }) {
   const { data: product, isLoading, isFetching } = useProduct(id || "");
   const { data: categories, isLoading: isCategoriesLoading } =
     useCategoriesQuery();
-  const { deleteProduct, createProduct, updateProduct, isMutating } =
-    useAdminProducts();
+  const { 
+    deleteProduct, 
+    createProduct, 
+    updateProduct, 
+    createProductWithImage,
+    updateProductWithImage,
+    isMutating 
+  } = useAdminProducts();
   const canGoBack = useCanGoBack();
   const router = useRouter();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -80,18 +88,33 @@ export function AddProductForm({ id }: { id?: string }) {
 
   const onSubmit = async (data: ProductFormData) => {
     try {
+      setImageError(null);
+      
+      // Validate image requirement
+      if (!product && !imageFile) {
+        setImageError("Imagem é obrigatória para novos produtos");
+        toast.error("Por favor, selecione uma imagem para o produto");
+        return;
+      }
+
       if (product) {
-        await updateProduct(product.id, data);
+        // Update existing product
+        if (imageFile) {
+          // Update with new image
+          await updateProductWithImage(product.id, data, imageFile);
+        } else {
+          // Update without changing image
+          await updateProduct(product.id, data);
+        }
         toast.success("Produto atualizado com sucesso!");
       } else {
-        const productData: ProductInsert = {
-          ...data,
-        };
-
-        await createProduct(productData);
+        // Create new product with image
+        await createProductWithImage(data, imageFile!);
         toast.success("Produto criado com sucesso!");
       }
+      
       form.reset();
+      setImageFile(null);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Erro ao salvar produto",
@@ -219,19 +242,19 @@ export function AddProductForm({ id }: { id?: string }) {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="image"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL da Imagem</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                <FormItem>
+                  <ImageUpload
+                    value={product?.image}
+                    onChange={setImageFile}
+                    onError={setImageError}
+                    disabled={isMutating}
+                  />
+                  {imageError && (
+                    <div className="text-sm text-destructive mt-1">
+                      {imageError}
+                    </div>
                   )}
-                />
+                </FormItem>
                 <FormField
                   control={form.control}
                   name="description"

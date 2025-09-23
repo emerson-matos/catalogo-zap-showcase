@@ -28,6 +28,27 @@ export const useAdminProducts = () => {
     },
   });
 
+  const createProductWithImageMutation = useMutation({
+    mutationFn: ({ productData, imageFile }: { 
+      productData: Omit<ProductInsert, 'image'>; 
+      imageFile: File 
+    }) => SupabaseService.createProductWithImage(productData, imageFile),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
+    },
+  });
+
+  const updateProductWithImageMutation = useMutation({
+    mutationFn: ({ id, updates, imageFile }: { 
+      id: string; 
+      updates: Omit<ProductUpdate, 'image'>; 
+      imageFile: File 
+    }) => SupabaseService.updateProductWithImage(id, updates, imageFile),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
+    },
+  });
+
   const createProduct = async (productData: ProductInsert) => {
     return createProductMutation.mutateAsync(productData);
   };
@@ -40,25 +61,41 @@ export const useAdminProducts = () => {
     return deleteProductMutation.mutateAsync(id);
   };
 
+  const createProductWithImage = async (productData: Omit<ProductInsert, 'image'>, imageFile: File) => {
+    return createProductWithImageMutation.mutateAsync({ productData, imageFile });
+  };
+
+  const updateProductWithImage = async (id: string, updates: Omit<ProductUpdate, 'image'>, imageFile: File) => {
+    return updateProductWithImageMutation.mutateAsync({ id, updates, imageFile });
+  };
+
   return {
     // Mutations
     createProductMutation,
     updateProductMutation,
     deleteProductMutation,
+    createProductWithImageMutation,
+    updateProductWithImageMutation,
 
     // Actions
     createProduct,
     updateProduct,
     deleteProduct,
+    createProductWithImage,
+    updateProductWithImage,
 
     // States
     isCreating: createProductMutation.isPending,
     isUpdating: updateProductMutation.isPending,
     isDeleting: deleteProductMutation.isPending,
+    isCreatingWithImage: createProductWithImageMutation.isPending,
+    isUpdatingWithImage: updateProductWithImageMutation.isPending,
     isMutating:
       createProductMutation.isPending ||
       updateProductMutation.isPending ||
-      deleteProductMutation.isPending,
+      deleteProductMutation.isPending ||
+      createProductWithImageMutation.isPending ||
+      updateProductWithImageMutation.isPending,
   };
 };
 

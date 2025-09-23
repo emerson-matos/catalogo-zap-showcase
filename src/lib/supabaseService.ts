@@ -7,6 +7,7 @@ import {
   type CategoryInsert,
   type CategoryUpdate,
 } from "./supabase";
+import { StorageService } from "./storage";
 
 export { supabase };
 
@@ -56,6 +57,52 @@ export class SupabaseService {
     return data;
   }
 
+  static async createProductWithImage(
+    productData: Omit<ProductInsert, 'image'>,
+    imageFile: File
+  ): Promise<Product> {
+    try {
+      // First create the product to get the ID
+      const { data: product, error: productError } = await supabase
+        .from("products")
+        .insert({ ...productData, image: 'temp' }) // Temporary image URL
+        .select()
+        .single();
+
+      if (productError) {
+        console.error("Error creating product:", productError);
+        throw new Error(`Erro ao criar produto: ${productError.message}`);
+      }
+
+      // Upload image to storage
+      const imageUrl = await StorageService.uploadProductImage(imageFile, product.id);
+
+      // Update product with the actual image URL
+      const { data: updatedProduct, error: updateError } = await supabase
+        .from("products")
+        .update({ image: imageUrl })
+        .eq("id", product.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Error updating product with image:", updateError);
+        // Try to clean up the uploaded image
+        try {
+          await StorageService.deleteProductImage(imageUrl);
+        } catch (cleanupError) {
+          console.error("Error cleaning up uploaded image:", cleanupError);
+        }
+        throw new Error(`Erro ao atualizar produto com imagem: ${updateError.message}`);
+      }
+
+      return updatedProduct;
+    } catch (error) {
+      console.error("Error creating product with image:", error);
+      throw error;
+    }
+  }
+
   static async updateProduct(
     id: string,
     updates: ProductUpdate,
@@ -75,12 +122,101 @@ export class SupabaseService {
     return data;
   }
 
-  static async deleteProduct(id: string): Promise<void> {
-    const { error } = await supabase.from("products").delete().eq("id", id);
+  static async updateProductWithImage(
+    id: string,
+    updates: Omit<ProductUpdate, 'image'>,
+    imageFile: File
+  ): Promise<Product> {
+    try {
+      // Get current product to check if it has an existing image
+      const { data: currentProduct, error: fetchError } = await supabase
+        .from("products")
+        .select("image")
+        .eq("id", id)
+        .single();
 
-    if (error) {
+      if (fetchError) {
+        console.error("Error fetching current product:", fetchError);
+        throw new Error(`Erro ao buscar produto atual: ${fetchError.message}`);
+      }
+
+      // Upload new image
+      const imageUrl = await StorageService.uploadProductImage(imageFile, id);
+
+      // Update product with new image URL
+      const { data: updatedProduct, error: updateError } = await supabase
+        .from("products")
+        .update({ 
+          ...updates, 
+          image: imageUrl,
+          updated_at: new Date().toISOString() 
+        })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Error updating product with image:", updateError);
+        // Try to clean up the uploaded image
+        try {
+          await StorageService.deleteProductImage(imageUrl);
+        } catch (cleanupError) {
+          console.error("Error cleaning up uploaded image:", cleanupError);
+        }
+        throw new Error(`Erro ao atualizar produto com imagem: ${updateError.message}`);
+      }
+
+      // Delete old image if it's from Supabase storage
+      if (currentProduct?.image && StorageService.isSupabaseStorageUrl(currentProduct.image)) {
+        try {
+          await StorageService.deleteProductImage(currentProduct.image);
+        } catch (deleteError) {
+          console.error("Error deleting old image:", deleteError);
+          // Don't throw here, as the main operation succeeded
+        }
+      }
+
+      return updatedProduct;
+    } catch (error) {
+      console.error("Error updating product with image:", error);
+      throw error;
+    }
+  }
+
+  static async deleteProduct(id: string): Promise<void> {
+    try {
+      // Get product image before deleting
+      const { data: product, error: fetchError } = await supabase
+        .from("products")
+        .select("image")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching product for deletion:", fetchError);
+        throw new Error(`Erro ao buscar produto para deletar: ${fetchError.message}`);
+      }
+
+      // Delete product from database
+      const { error } = await supabase.from("products").delete().eq("id", id);
+
+      if (error) {
+        console.error("Error deleting product:", error);
+        throw new Error(`Erro ao deletar produto: ${error.message}`);
+      }
+
+      // Delete associated image if it's from Supabase storage
+      if (product?.image && StorageService.isSupabaseStorageUrl(product.image)) {
+        try {
+          await StorageService.deleteProductImage(product.image);
+        } catch (deleteError) {
+          console.error("Error deleting product image:", deleteError);
+          // Don't throw here, as the main operation succeeded
+        }
+      }
+    } catch (error) {
       console.error("Error deleting product:", error);
-      throw new Error(`Erro ao deletar produto: ${error.message}`);
+      throw error;
     }
   }
 

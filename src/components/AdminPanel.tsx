@@ -2,7 +2,9 @@ import { Loader2, PencilIcon } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useAuth } from "@/hooks/useAuth";
 import ProductCard from "./ProductCard";
+import { ImageMigrationPanel } from "./ImageMigrationPanel";
 import { Button } from "./ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Link } from "@tanstack/react-router";
 
 export const AdminPanel = () => {
@@ -39,11 +41,24 @@ export const AdminPanel = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard product={product} />
-          ))}
-        </div>
+        <Tabs defaultValue="products" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="products">Produtos</TabsTrigger>
+            <TabsTrigger value="migration">Migração de Imagens</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="products" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="migration" className="space-y-6">
+            <ImageMigrationPanel />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
