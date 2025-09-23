@@ -70,17 +70,58 @@ export const useProductMigration = () => {
     setProgress(null);
   }, []);
 
+  const resetMigrationState = useCallback(async () => {
+    try {
+      await ProductImageMigration.resetMigrationState();
+      await loadStats(); // Reload stats after reset
+      resetMigration(); // Clear UI state
+      return true;
+    } catch (error) {
+      console.error('Failed to reset migration state:', error);
+      throw error;
+    }
+  }, [loadStats, resetMigration]);
+
+  const revertMigration = useCallback(async () => {
+    setIsMigrating(true);
+    setResults([]);
+    setProgress(null);
+
+    try {
+      const revertResults = await ProductImageMigration.revertMigration(
+        (progressUpdate) => {
+          setProgress(progressUpdate);
+        },
+        (result) => {
+          setResults(prev => [...prev, result]);
+        }
+      );
+
+      // Reload stats after revert
+      await loadStats();
+
+      return revertResults;
+    } catch (error) {
+      console.error('Revert migration failed:', error);
+      throw error;
+    } finally {
+      setIsMigrating(false);
+    }
+  }, [loadStats]);
+
   return {
     // State
     isMigrating,
     progress,
     results,
     stats,
-    
+
     // Actions
     loadStats,
     migrateAllProducts,
     migrateProductById,
     resetMigration,
+    resetMigrationState,
+    revertMigration,
   };
 };

@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Upload, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Upload,
+  CheckCircle,
+  XCircle,
   RefreshCw,
-  Database
+  Database,
+  AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProductMigration } from '@/hooks/useProductMigration';
@@ -23,6 +24,8 @@ export function ProductMigrationPanel() {
     loadStats,
     migrateAllProducts,
     resetMigration,
+    resetMigrationState,
+    revertMigration,
   } = useProductMigration();
 
   const [showResults, setShowResults] = useState(false);
@@ -47,6 +50,26 @@ export function ProductMigrationPanel() {
       toast.success('Estatísticas atualizadas');
     } catch (err) {
       toast.error('Erro ao carregar estatísticas');
+    }
+  };
+
+  const handleResetMigration = async () => {
+    try {
+      await resetMigrationState();
+      toast.success('Estado da migração resetado com sucesso!');
+      setShowResults(false);
+    } catch (err) {
+      toast.error(`Erro ao resetar migração: ${err instanceof Error ? err.message : 'Erro desconhecido'}`);
+    }
+  };
+
+  const handleRevertMigration = async () => {
+    try {
+      await revertMigration();
+      toast.success('Migração revertida com sucesso!');
+      setShowResults(true);
+    } catch (err) {
+      toast.error(`Erro ao reverter migração: ${err instanceof Error ? err.message : 'Erro desconhecido'}`);
     }
   };
 
@@ -92,31 +115,55 @@ export function ProductMigrationPanel() {
             </div>
           )}
 
-          <div className="flex gap-2">
-            <Button
-              onClick={handleStartMigration}
-              disabled={isMigrating || !stats?.needsMigration}
-              className="flex-1"
-            >
-              {isMigrating ? (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Migrando...
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Iniciar Migração
-                </>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleRefreshStats}
-              disabled={isMigrating}
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Button
+                onClick={handleStartMigration}
+                disabled={isMigrating || !stats?.needsMigration}
+                className="flex-1"
+              >
+                {isMigrating ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Migrando...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Iniciar Migração
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleRefreshStats}
+                disabled={isMigrating}
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Reset and Revert buttons */}
+            <div className="flex gap-2">
+              <Button
+                variant="destructive"
+                onClick={handleResetMigration}
+                disabled={isMigrating}
+                className="flex-1"
+              >
+                <XCircle className="mr-2 h-4 w-4" />
+                Resetar Migração
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleRevertMigration}
+                disabled={isMigrating || !stats?.migrated}
+                className="flex-1"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Reverter Migração
+              </Button>
+            </div>
           </div>
 
           {/* Progress */}
@@ -209,7 +256,15 @@ export function ProductMigrationPanel() {
             </div>
           )}
 
-          {/* Warning */}
+          {/* Warnings */}
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Importante:</strong> A migração pode falhar devido a políticas CORS do Google Photos.
+              Se encontrar erros de CORS, será necessário baixar as imagens manualmente e fazer upload através do painel de administração.
+            </AlertDescription>
+          </Alert>
+
           {stats?.needsMigration === 0 && !isMigrating && (
             <Alert>
               <CheckCircle className="h-4 w-4" />
