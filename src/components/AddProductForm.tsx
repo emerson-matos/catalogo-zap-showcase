@@ -80,9 +80,11 @@ export function AddProductForm({ id }: { id?: string }) {
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
+  const [originalImages, setOriginalImages] = useState<string[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    setSelectedImages(acceptedFiles);
+    setSelectedImages(prev => [...prev, ...acceptedFiles]);
     const previews: string[] = [];
 
     acceptedFiles.forEach((file) => {
@@ -90,7 +92,7 @@ export function AddProductForm({ id }: { id?: string }) {
       reader.onload = (e) => {
         previews.push(e.target?.result as string);
         if (previews.length === acceptedFiles.length) {
-          setImagePreviews(previews);
+          setImagePreviews(prev => [...prev, ...previews]);
         }
       };
       reader.readAsDataURL(file);
@@ -125,30 +127,47 @@ export function AddProductForm({ id }: { id?: string }) {
         rating: product.rating,
       });
       setImagePreviews(product.images || []);
+      setOriginalImages(product.images || []);
+      setImagesToRemove([]); // Reset images to remove when loading product
     }
   }, [product, form, isCategoriesLoading, categories]);
 
   const removeImage = (index: number) => {
-    const newImages = selectedImages.filter((_, i) => i !== index);
-    const newPreviews = imagePreviews.filter((_, i) => i !== index);
-    setSelectedImages(newImages);
-    setImagePreviews(newPreviews);
+    const imageToRemove = imagePreviews[index];
+    
+    // If it's an existing image (from the product), add it to imagesToRemove
+    if (originalImages.includes(imageToRemove)) {
+      setImagesToRemove(prev => [...prev, imageToRemove]);
+    } else {
+      // If it's a new image, remove it from selectedImages
+      // Find the index in selectedImages by counting how many new images come before this one
+      let newImageIndex = 0;
+      for (let i = 0; i < index; i++) {
+        if (!originalImages.includes(imagePreviews[i])) {
+          newImageIndex++;
+        }
+      }
+      setSelectedImages(prev => prev.filter((_, i) => i !== newImageIndex));
+    }
+    
+    // Remove from previews
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const clearAllImages = () => {
+    // If editing existing product, mark all existing images for removal
+    if (originalImages.length > 0) {
+      setImagesToRemove(originalImages);
+    }
     setSelectedImages([]);
-    setImagePreviews(product?.images || []);
+    setImagePreviews([]);
   };
 
   const onSubmit = async (data: ProductFormData) => {
     try {
       if (product) {
         // Update existing product
-        if (selectedImages.length > 0) {
-          await updateProductWithImages(product.id, data, selectedImages);
-        } else {
-          await updateProductWithImages(product.id, data);
-        }
+        await updateProductWithImages(product.id, data, selectedImages, imagesToRemove);
         toast.success("Produto atualizado com sucesso!");
       } else {
         // Create new product - at least one image is REQUIRED
@@ -164,6 +183,8 @@ export function AddProductForm({ id }: { id?: string }) {
       form.reset();
       setSelectedImages([]);
       setImagePreviews([]);
+      setImagesToRemove([]);
+      setOriginalImages([]);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Erro ao salvar produto",
