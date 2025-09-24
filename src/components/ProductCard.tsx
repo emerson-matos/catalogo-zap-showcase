@@ -78,20 +78,22 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
         </Link>
       </CardContent>
 
-      <CardFooter className="flex gap-2 p-4">
+      <CardFooter className="flex flex-wrap gap-2 p-4">
         <ProtectedComponent requiredRole="editor">
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="sm" variant="outline" className="flex-shrink-0">
             <Link to="/admin/products" search={{ id: product.id }}>
-              <Edit className="size-4 mr-2" />
-              <span>Editar</span>
+              <Edit className="size-4 mr-1" />
+              <span className="hidden sm:inline">Editar</span>
             </Link>
           </Button>
         </ProtectedComponent>
-        <WhatsAppButton product={product} className="flex-1" size="default">
-          Consultar
+        <WhatsAppButton product={product} className="flex-1 min-w-0" size="sm">
+          <span className="hidden sm:inline">Consultar</span>
+          <span className="sm:hidden">WhatsApp</span>
         </WhatsAppButton>
-        <AddToCartButton product={product} className="flex-1" size="default">
-          Adicionar
+        <AddToCartButton product={product} className="flex-1 min-w-0" size="sm">
+          <span className="hidden sm:inline">Adicionar</span>
+          <span className="sm:hidden">Carrinho</span>
         </AddToCartButton>
       </CardFooter>
     </Card>
