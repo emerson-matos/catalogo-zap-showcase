@@ -64,7 +64,7 @@ export const useProductFilters = (products: Product[]) => {
       }
 
       // New products filter
-      if (filters.showNewOnly && !product.isNew) {
+      if (filters.showNewOnly && !product.is_new) {
         return false;
       }
 
@@ -79,4 +79,3 @@ export const useProductFilters = (products: Product[]) => {
     filteredProducts,
   };
 };
-

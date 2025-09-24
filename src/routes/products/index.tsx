@@ -43,14 +43,17 @@ import { CartFloat } from "@/components/CartFloat";
 function ProductsPage() {
   return (
     <div className="min-h-screen">
-      <ProductGrid
-        sectionId="products"
-        title="Nossos Produtos"
-        subtitle="Descubra nossa seleção cuidadosa de produtos de alta qualidade"
-        showStatistics={true}
-        isAdmin={false}
-        searchPlaceholder="Pesquisar produtos..."
-      />
+      <section>
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <h2 className="text-4xl font-bold text-primary">Nossos Produtos</h2>
+          </div>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Descubra nossa seleção cuidadosa de produtos de alta qualidade
+          </p>
+        </div>
+      </section>
+      <ProductGrid />
       <CartFloat />
     </div>
   );

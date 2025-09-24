@@ -6,13 +6,25 @@ import { SearchInput } from "@/components/ui/search-input";
 import { SortSelect } from "@/components/ui/sort-select";
 import { FilterPanel } from "@/components/ui/filter-panel";
 import { CategoryFilters } from "@/components/CategoryFilters";
-import { AlertTriangle, RefreshCw, Wifi, Filter, PencilIcon } from "lucide-react";
+import {
+  AlertTriangle,
+  RefreshCw,
+  Wifi,
+  Filter,
+  PencilIcon,
+  ChevronDown,
+  FunnelIcon,
+} from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useProductSort } from "@/hooks/useProductSort";
 import { useProductFilters } from "@/hooks/useProductFilters";
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useId } from "react";
 import { Link } from "@tanstack/react-router";
+import { Separator } from "@radix-ui/react-context-menu";
+import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Funnel } from "recharts";
 
 interface ProductGridProps {
   // Layout
@@ -20,41 +32,24 @@ interface ProductGridProps {
   title?: string;
   subtitle?: string;
   showStatistics?: boolean;
-  
+
   // Admin specific
   isAdmin?: boolean;
   adminActions?: ReactNode;
-  
+
   // Customization
   searchPlaceholder?: string;
   emptyStateMessage?: string;
   emptyStateAction?: ReactNode;
 }
 
-export const ProductGrid = ({
-  sectionId,
-  title = "Nossos Produtos",
-  subtitle = "Descubra nossa seleção cuidadosa de produtos de alta qualidade",
-  showStatistics = true,
-  isAdmin = false,
-  adminActions,
-  searchPlaceholder = "Pesquisar produtos...",
-  emptyStateMessage,
-  emptyStateAction,
-}: ProductGridProps) => {
+export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
+  const sectionId = useId();
   const [showFilters, setShowFilters] = useState(false);
 
   // Main data query
-  const {
-    products,
-    isLoading,
-    isFetching,
-    error,
-    isError,
-    refetch,
-    isEmpty,
-    isStale,
-  } = useProductsQuery();
+  const { products, isLoading, isFetching, error, isError, refetch, isEmpty } =
+    useProductsQuery();
 
   // Search functionality
   const {
@@ -75,48 +70,9 @@ export const ProductGrid = ({
   const { sortOption, setSortOption, sortedProducts } =
     useProductSort(filterResults);
 
-  const defaultEmptyMessage = isAdmin 
-    ? "Nenhum produto cadastrado ainda." 
-    : "Nenhum produto encontrado. Verifique a configuração da planilha.";
-
-  const defaultEmptyAction = isAdmin ? (
-    <Button asChild>
-      <Link to="/admin/products">
-        <PencilIcon className="size-4 mr-2" />
-        Cadastrar primeiro produto
-      </Link>
-    </Button>
-  ) : null;
-
   return (
     <section id={sectionId} className="py-20 text-foreground">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <h2 className="text-4xl font-bold text-primary">{title}</h2>
-            {isFetching && !isLoading && (
-              <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
-            )}
-            {isStale && (
-              <Wifi
-                className="h-4 w-4 text-yellow-500"
-                title="Dados podem estar desatualizados"
-              />
-            )}
-          </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {subtitle}
-          </p>
-        </div>
-
-        {/* Admin Actions */}
-        {isAdmin && adminActions && (
-          <div className="mb-8">
-            {adminActions}
-          </div>
-        )}
-
         {/* Error State */}
         {isError && error && (
           <Alert className="mb-8 border-destructive/50 bg-destructive/10">
@@ -147,66 +103,71 @@ export const ProductGrid = ({
           <Alert className="mb-8">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              {emptyStateMessage || defaultEmptyMessage}
+              Oops, nenhum Produto encontrado.
             </AlertDescription>
           </Alert>
         )}
 
         {/* Search */}
-        <div className="mb-8">
-          <div className="max-w-md mx-auto mb-6">
-            <SearchInput 
-              value={searchQuery} 
+        <section>
+          <div className="flex items-center m-auto p-3">
+            <SearchInput
+              value={searchQuery}
               onChange={setSearchQuery}
-              placeholder={searchPlaceholder}
+              placeholder="Pesquisar produtos..."
             />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  Filtros <FunnelIcon />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent asChild align="end">
+                <FilterPanel
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  maxPrice={priceRange.max}
+                  minPrice={priceRange.min}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-          <CategoryFilters
-            selectedCategory={filters.category}
-            onCategoryChange={(category) =>
-              setFilters({ ...filters, category })
-            }
-            isLoading={isLoading}
-          />
-        </div>
+          <div className="flex flex-col lg:flex-row gap-4 items-center align-middle justify-between mb-8">
+            <CategoryFilters
+              selectedCategory={filters.category}
+              onCategoryChange={(category) =>
+                setFilters({ ...filters, category })
+              }
+              isLoading={isLoading}
+            />
 
-        {/* Controls */}
-        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-8">
-          <SortSelect value={sortOption} onValueChange={setSortOption} />
+            {/* Controls */}
+            <SortSelect value={sortOption} onValueChange={setSortOption} />
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden"
-          >
-            <Filter className="h-4 w-4 mr-2" />
-            Filtros
-          </Button>
-        </div>
-
-        {/* Results Count */}
-        {!isLoading && (
-          <div className="text-center text-sm text-muted-foreground mb-8">
-            {sortedProducts.length} de {products.length} produtos encontrados
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className="lg:hidden"
+            >
+              <Filter className="size-4" />
+              Filtros
+            </Button>
+            {/* Results Count */}
+            {!isLoading && (
+              <div className="text-sm text-muted-foreground">
+                {sortedProducts.length} de {products.length} produtos
+                encontrados
+              </div>
+            )}
           </div>
-        )}
 
+          {/* Filters */}
+        </section>
         {/* Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Filters */}
-          <div
-            className={`lg:col-span-1 ${showFilters ? "block" : "hidden lg:block"}`}
-          >
-            <FilterPanel
-              filters={filters}
-              onFiltersChange={setFilters}
-              maxPrice={priceRange.max}
-              minPrice={priceRange.min}
-            />
-          </div>
-
+          <Separator />
           {/* Products */}
           <div
             className={`lg:col-span-3 ${showFilters ? "lg:col-span-3" : "lg:col-span-4"}`}
@@ -218,11 +179,12 @@ export const ProductGrid = ({
                   Nenhum produto encontrado
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  {products.length === 0 
-                    ? (emptyStateMessage || defaultEmptyMessage)
+                  {products.length === 0
+                    ? emptyStateMessage || defaultEmptyMessage
                     : "Tente ajustar os filtros ou termos de pesquisa."}
                 </p>
-                {products.length === 0 && (emptyStateAction || defaultEmptyAction)}
+                {products.length === 0 &&
+                  (emptyStateAction || defaultEmptyAction)}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -268,3 +230,4 @@ export const ProductGrid = ({
 };
 
 export default ProductGrid;
+
