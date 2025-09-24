@@ -9,14 +9,23 @@ export interface ProductFilters {
   showNewOnly: boolean;
 }
 
+/**
+ * Safely parses price values from various formats (number, string with currency symbols)
+ * @param price - Price value to parse (number or string)
+ * @returns Parsed price as number, or 0 if parsing fails
+ */
 const parsePrice = (price: number | string): number => {
-  if (typeof price === "number") return price;
-  const parsed = parseFloat(
-    String(price)
-      .replace(/[^\d.,]/g, "")
-      .replace(",", "."),
-  );
-  return isNaN(parsed) ? 0 : parsed;
+  if (typeof price === "number" && Number.isFinite(price)) {
+    return Math.max(0, price); // Ensure non-negative
+  }
+  
+  const cleanedPrice = String(price || "")
+    .trim()
+    .replace(/[^\d.,]/g, "")
+    .replace(",", ".");
+    
+  const parsed = parseFloat(cleanedPrice);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
 };
 
 export const useProductFilters = (products: Product[]) => {

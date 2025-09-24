@@ -31,6 +31,7 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
     searchQuery,
     setSearchQuery,
     filteredProducts: searchResults,
+    isSearching,
   } = useProductSearch(products);
 
   // Filter functionality
@@ -90,6 +91,7 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
               value={searchQuery}
               onChange={setSearchQuery}
               placeholder="Pesquisar produtos..."
+              isLoading={isSearching}
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

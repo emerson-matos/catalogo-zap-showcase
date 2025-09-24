@@ -209,7 +209,7 @@ export class ImageUploadService {
       return null;
     }
 
-    const match = url.match(/\/storage\/v1\/object\/public\/[^\/]+\/(.+)$/);
+    const match = url.match(/\/storage\/v1\/object\/public\/[^/]+\/(.+)$/);
     return match ? match[1] : null;
   }
 }

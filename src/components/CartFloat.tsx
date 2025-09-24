@@ -3,9 +3,10 @@ import { ShoppingCart, X, Plus, Minus, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/hooks/useCart";
 import { formatPriceBRL } from "@/lib/utils";
 import { createCartWhatsAppUrl } from "@/lib/whatsapp";
+import { DEFAULT_PLACEHOLDER_IMAGE } from "@/constants/app";
 
 export function CartFloat() {
   const { items, removeItem, updateQuantity, getTotalItems, getTotalPrice } =
@@ -56,12 +57,12 @@ export function CartFloat() {
                   className="flex items-center space-x-3"
                 >
                   <img
-                    src={item.product.images?.[0] || "/placeholder.svg"}
+                    src={item.product.images?.[0] || DEFAULT_PLACEHOLDER_IMAGE}
                     alt={item.product.name}
                     className="w-12 h-12 rounded-lg object-cover"
-                    onError={(e: any) => {
+                    onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = "/placeholder.svg";
+                      target.src = DEFAULT_PLACEHOLDER_IMAGE;
                     }}
                   />
 
