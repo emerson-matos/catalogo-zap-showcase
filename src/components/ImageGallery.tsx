@@ -48,7 +48,7 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
             <img
               src={images[currentIndex]}
               alt={`${productName} - Imagem ${currentIndex + 1}`}
-              className="w-full h-96 object-cover rounded-lg cursor-pointer transition-transform hover:scale-105"
+              className="w-full h-96 object-scale-down rounded-lg cursor-pointer transition-transform hover:scale-105"
               onClick={openFullscreen}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -112,7 +112,7 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
                 <img
                   src={image}
                   alt={`Thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-scale-down"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = "/placeholder.svg";
@@ -187,7 +187,7 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
                     <img
                       src={image}
                       alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-scale-down"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = "/placeholder.svg";
