@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -10,6 +10,10 @@ interface ImageGalleryProps {
 export function ImageGallery({ images, productName }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const swipeThreshold = 50; // Minimum distance for a swipe
+  const swipeTimeout = 300; // Maximum time for a swipe in ms
 
   if (!images || images.length === 0) {
     return (
@@ -39,12 +43,57 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
     setIsFullscreen(false);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Only handle if we have multiple images
+    if (images.length <= 1) return;
+    
+    const touch = e.touches[0];
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // Only handle if we have multiple images
+    if (images.length <= 1) return;
+    
+    const touch = e.changedTouches[0];
+    const touchEndX = touch.clientX;
+    const touchEndY = touch.clientY;
+    
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    
+    const deltaX = touchEndX - touchStartX.current;
+    const deltaY = touchEndY - touchStartY.current;
+    
+    // Check if this is more of a horizontal swipe than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > swipeThreshold) {
+      // Prevent default to avoid any scrolling
+      e.preventDefault();
+      
+      if (deltaX > 0) {
+        // Swipe right - go to previous image
+        prevImage();
+      } else {
+        // Swipe left - go to next image
+        nextImage();
+      }
+    }
+    
+    // Reset touch coordinates
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   return (
     <>
       {/* Main Gallery */}
       <div className="space-y-4">
         {/* Main Image */}
-        <div className="relative group">
+        <div 
+          className="relative group"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
             <img
               src={images[currentIndex]}
               alt={`${productName} - Imagem ${currentIndex + 1}`}
@@ -127,7 +176,11 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
       {/* Fullscreen Modal */}
       {isFullscreen && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <div className="relative max-w-7xl max-h-full">
+          <div 
+            className="relative max-w-7xl max-h-full"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <img
               src={images[currentIndex]}
               alt={`${productName} - Imagem ${currentIndex + 1}`}
