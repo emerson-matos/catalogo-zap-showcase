@@ -67,3 +67,25 @@ export const ProtectedRoute = ({
 
   return <>{children}</>;
 };
+
+interface ProtectedComponentProps {
+  children: React.ReactNode;
+  requiredRole?: "admin" | "editor" | "viewer";
+}
+export const ProtectedComponent = ({
+  children,
+  requiredRole = "viewer",
+}: ProtectedComponentProps) => {
+  const { user, isLoading, isAdmin, isEditor, isViewer } = useAuth();
+
+  const hasPermission =
+    (requiredRole === "admin" && isAdmin) ||
+    (requiredRole === "editor" && (isEditor || isAdmin)) ||
+    (requiredRole === "viewer" && (isViewer || isEditor || isAdmin));
+
+  if (isLoading || !user || !hasPermission) {
+    return <></>;
+  }
+
+  return <>{children}</>;
+};

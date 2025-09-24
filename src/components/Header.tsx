@@ -7,6 +7,7 @@ import {
   MessageCircle,
   ShoppingBag,
   Rose,
+  HomeIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -45,6 +46,7 @@ const Header = () => {
                   isActiveRoute("/") ? "text-primary font-semibold" : ""
                 }`}
               >
+                <HomeIcon className="size-4" />
                 Início
               </Button>
             </Link>
@@ -78,7 +80,7 @@ const Header = () => {
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
-                Catálogo
+                Revista Digital
               </Button>
             </Link>
             <Link to="/contact">
@@ -167,7 +169,7 @@ const Header = () => {
                   }`}
                 >
                   <BookOpen className="w-4 h-4" />
-                  Catálogo
+                  Revista Digital
                 </Button>
               </Link>
               <Link to="/contact" onClick={() => setIsMenuOpen(false)}>

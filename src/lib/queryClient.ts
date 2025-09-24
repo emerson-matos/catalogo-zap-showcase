@@ -177,13 +177,20 @@ export const queryKeys = {
     sheets: (filters?: ProductFilters) => [...queryKeys.products.list(filters), 'sheets'] as const,
     supabase: (filters?: ProductFilters) => [...queryKeys.products.list(filters), 'supabase'] as const,
     
-    // Category-based queries
+    // Category-based queries (combined from both versions)
     categories: {
       all: () => [...queryKeys.products.all, 'categories'] as const,
       list: () => [...queryKeys.products.categories.all(), 'list'] as const,
       byCategory: (category: string, filters?: ProductFilters) => 
         [...queryKeys.products.list(filters), 'category', category] as const,
     },
+    
+    // Legacy support for main branch patterns
+    byCategory: (category: string) =>
+      [...queryKeys.products.all, "category", category] as const,
+    byCategoryId: (categoryId: string) =>
+      [...queryKeys.products.all, "categoryId", categoryId] as const,
+    byId: (id: string) => [...queryKeys.products.all, "id", id] as const,
     
     // Search queries
     search: (query: string, filters?: ProductFilters) => 
@@ -193,6 +200,13 @@ export const queryKeys = {
     stats: () => [...queryKeys.products.all, 'stats'] as const,
     popularProducts: (limit: number = 10) => 
       [...queryKeys.products.stats(), 'popular', limit] as const,
+  },
+  
+  // Categories domain (from main branch)
+  categories: {
+    all: ["categories"] as const,
+    list: () => [...queryKeys.categories.all, "list"] as const,
+    byId: (id: string) => [...queryKeys.categories.all, "id", id] as const,
   },
   
   // Authentication domain

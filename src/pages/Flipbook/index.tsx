@@ -1,9 +1,15 @@
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import Flipbook from "@/components/Flipbook";
 import { BookOpen, Loader2 } from "lucide-react";
+import { useProductSort } from "@/hooks/useProductSort";
+import { SortSelect } from "@/components/ui/sort-select";
 
 export const FlipbookPage = () => {
   const { products, isLoading, error } = useProductsQuery();
+
+  // Sort functionality
+  const { sortOption, setSortOption, sortedProducts } =
+    useProductSort(products);
 
   if (isLoading) {
     return (
@@ -29,9 +35,11 @@ export const FlipbookPage = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="container mx-auto px-4 m-8">
+      <div className=" container mx-auto px-4 m-8">
         <div className="text-center">
-          <h1>Catálogo de Produtos</h1>
+          <h2 className="text-4xl font-bold mb-4">
+            Revista Digital de Produtos
+          </h2>
         </div>
         <div className="flex flex-col gap-2 mb-10 text-lg text-muted-foreground max-w-2xl mx-auto p-4 m-2">
           <p>
@@ -40,10 +48,13 @@ export const FlipbookPage = () => {
           </p>
           <br />
           <p>Arraste para visualizar</p>
+          <div className="text-primary">
+            <SortSelect value={sortOption} onValueChange={setSortOption} />
+          </div>
         </div>
       </div>
 
-      <Flipbook products={products} />
+      <Flipbook products={sortedProducts} />
     </div>
   );
 };

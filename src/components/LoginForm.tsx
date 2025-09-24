@@ -53,8 +53,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword(data);
-      if (error) console.log(error);
+      await supabase.auth.signInWithPassword(data);
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login");

@@ -53,13 +53,27 @@ export const useProductsQuery = (filters?: ProductFilters) => {
     },
   });
 
-  // Separate query for categories
+  // Separate query for categories using the new categories keys from main
   const {
     data: categories = ["Todos"],
     isLoading: isCategoriesLoading,
   } = useQuery({
-    queryKey: queryKeys.products.categories.list(),
-    queryFn: SupabaseService.getCategories,
+    queryKey: queryKeys.categories.list(),
+    queryFn: async () => {
+      try {
+        return await SupabaseService.getCategories();
+      } catch (error) {
+        // Fallback to deriving categories from products if getCategories doesn't exist
+        const uniqueCategories = Array.from(
+          new Set(
+            allProducts
+              .map((item: Product) => String(item.category || "").trim())
+              .filter((name) => name.length > 0),
+          )
+        );
+        return ["Todos", ...uniqueCategories.sort()];
+      }
+    },
     staleTime: 15 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     select: (data: string[]) => {
@@ -74,7 +88,7 @@ export const useProductsQuery = (filters?: ProductFilters) => {
     
     if (newCategory !== "Todos") {
       queryClient.prefetchQuery({
-        queryKey: queryKeys.products.categories.byCategory(newCategory),
+        queryKey: queryKeys.products.byCategory(newCategory),
         queryFn: () => SupabaseService.getProductsByCategory(newCategory),
         staleTime: 5 * 60 * 1000,
       });
@@ -91,7 +105,7 @@ export const useProductsQuery = (filters?: ProductFilters) => {
     );
   }, [selectedCategory, allProducts]);
 
-  // Enhanced error message
+  // Enhanced error message (keeping our improved version)
   const errorMessage = useMemo(() => {
     if (!error) return null;
 
@@ -152,8 +166,14 @@ export const useProductsQuery = (filters?: ProductFilters) => {
   useEffect(() => {
     if (!isCategoriesLoading && categories.length <= 1) {
       queryClient.prefetchQuery({
-        queryKey: queryKeys.products.categories.list(),
-        queryFn: SupabaseService.getCategories,
+        queryKey: queryKeys.categories.list(),
+        queryFn: async () => {
+          try {
+            return await SupabaseService.getCategories();
+          } catch (error) {
+            return ["Todos"];
+          }
+        },
       });
     }
   }, [queryClient, isCategoriesLoading, categories.length]);
@@ -261,8 +281,14 @@ export const usePrefetchProducts = () => {
 
   const prefetchCategories = () => {
     return queryClient.prefetchQuery({
-      queryKey: queryKeys.products.categories.list(),
-      queryFn: SupabaseService.getCategories,
+      queryKey: queryKeys.categories.list(),
+      queryFn: async () => {
+        try {
+          return await SupabaseService.getCategories();
+        } catch (error) {
+          return ["Todos"];
+        }
+      },
       staleTime: 15 * 60 * 1000,
     });
   };
@@ -276,7 +302,7 @@ export const usePrefetchProducts = () => {
 
   const prefetchByCategory = (category: string) => {
     return queryClient.prefetchQuery({
-      queryKey: queryKeys.products.categories.byCategory(category),
+      queryKey: queryKeys.products.byCategory(category),
       queryFn: () => SupabaseService.getProductsByCategory(category),
       staleTime: 5 * 60 * 1000,
     });
@@ -403,7 +429,7 @@ export const useProduct = (productId: string) => {
   useEffect(() => {
     if (product?.category) {
       queryClient.prefetchQuery({
-        queryKey: queryKeys.products.categories.byCategory(product.category),
+        queryKey: queryKeys.products.byCategory(product.category),
         queryFn: () => SupabaseService.getProductsByCategory(product.category),
         staleTime: 5 * 60 * 1000,
       });

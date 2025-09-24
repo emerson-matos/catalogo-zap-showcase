@@ -61,6 +61,58 @@ export const useAdminProducts = () => {
     },
   })
 
+  // Enhanced create with images mutation (from main branch)
+  const createProductWithImagesMutation = useMutation({
+    mutationKey: ['products', 'create', 'with-images'],
+    mutationFn: ({ productData, imageFiles }: { productData: Omit<ProductInsert, 'images'>; imageFiles: File[] }) =>
+      SupabaseService.createProductWithImages(productData, imageFiles),
+    onMutate: async ({ productData, imageFiles }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.products.all })
+
+      const previousProducts = queryClient.getQueryData(queryKeys.products.supabase())
+
+      // Create optimistic product with placeholder images
+      const optimisticProduct: Product = {
+        id: `temp-${Date.now()}`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        ...productData,
+        images: imageFiles.map((file, index) => ({
+          url: URL.createObjectURL(file),
+          alt: `Image ${index + 1}`,
+          isPrimary: index === 0,
+        })),
+      } as Product
+
+      queryClient.setQueryData(queryKeys.products.supabase(), (old: Product[] = []) => [
+        optimisticProduct,
+        ...old,
+      ])
+
+      return { previousProducts, optimisticProduct }
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousProducts) {
+        queryClient.setQueryData(queryKeys.products.supabase(), context.previousProducts)
+      }
+      toast.error('Erro ao criar produto com imagens. Tente novamente.')
+    },
+    onSuccess: (createdProduct, variables, context) => {
+      if (context?.optimisticProduct) {
+        queryClient.setQueryData(queryKeys.products.supabase(), (old: Product[] = []) =>
+          old.map(product => 
+            product.id === context.optimisticProduct.id ? createdProduct : product
+          )
+        )
+      }
+      queryKeyUtils.invalidateProductQueries(queryClient)
+      toast.success('Produto criado com imagens!')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.all })
+    },
+  })
+
   // Enhanced update mutation with optimistic updates
   const updateProductMutation = useMutation({
     mutationKey: ['products', 'update'],
@@ -102,6 +154,64 @@ export const useAdminProducts = () => {
     },
   })
 
+  // Enhanced update with images mutation (from main branch)
+  const updateProductWithImagesMutation = useMutation({
+    mutationKey: ['products', 'update', 'with-images'],
+    mutationFn: ({ id, updates, imageFiles, imagesToRemove }: { id: string; updates: Omit<ProductUpdate, 'images'>; imageFiles?: File[]; imagesToRemove?: string[] }) =>
+      SupabaseService.updateProductWithImages(id, updates, imageFiles, imagesToRemove),
+    onMutate: async ({ id, updates, imageFiles, imagesToRemove }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.products.all })
+
+      const previousProducts = queryClient.getQueryData(queryKeys.products.supabase())
+      const previousProduct = queryKeyUtils.getCachedProduct(queryClient, id)
+
+      // Optimistically update with new images
+      queryKeyUtils.updateProductInCaches(queryClient, id, (old: Product) => {
+        let newImages = [...(old.images || [])]
+        
+        // Remove images that are marked for removal
+        if (imagesToRemove) {
+          newImages = newImages.filter(img => !imagesToRemove.includes(img.url))
+        }
+        
+        // Add new images as placeholders
+        if (imageFiles) {
+          const placeholderImages = imageFiles.map((file, index) => ({
+            url: URL.createObjectURL(file),
+            alt: `New Image ${index + 1}`,
+            isPrimary: newImages.length === 0 && index === 0,
+          }))
+          newImages = [...newImages, ...placeholderImages]
+        }
+
+        return {
+          ...old,
+          ...updates,
+          images: newImages,
+          updated_at: new Date().toISOString(),
+        }
+      })
+
+      return { previousProducts, previousProduct, id }
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousProducts) {
+        queryClient.setQueryData(queryKeys.products.supabase(), context.previousProducts)
+      }
+      if (context?.previousProduct && context?.id) {
+        queryKeyUtils.setProductInCache(queryClient, context.id, context.previousProduct)
+      }
+      toast.error('Erro ao atualizar produto com imagens. Tente novamente.')
+    },
+    onSuccess: (updatedProduct, variables, context) => {
+      if (updatedProduct && variables.id) {
+        queryKeyUtils.setProductInCache(queryClient, variables.id, updatedProduct)
+      }
+      queryKeyUtils.invalidateProductQueries(queryClient)
+      toast.success('Produto atualizado com imagens!')
+    },
+  })
+
   // Enhanced delete mutation with optimistic updates
   const deleteProductMutation = useMutation({
     mutationKey: ['products', 'delete'],
@@ -139,45 +249,21 @@ export const useAdminProducts = () => {
     },
   })
 
-  // Batch operations for efficiency
-  const batchUpdateProducts = useMutation({
-    mutationKey: ['products', 'batch-update'],
-    mutationFn: async (updates: { id: string; updates: ProductUpdate }[]) => {
-      const promises = updates.map(({ id, updates }) => 
-        SupabaseService.updateProduct(id, updates)
-      )
-      return Promise.all(promises)
-    },
-    onSuccess: () => {
-      queryKeyUtils.invalidateProductQueries(queryClient)
-      toast.success(`${batchUpdateProducts.variables?.length || 0} produtos atualizados!`)
-    },
-    onError: () => {
-      toast.error('Erro ao atualizar produtos em lote.')
-    },
-  })
-
-  const batchDeleteProducts = useMutation({
-    mutationKey: ['products', 'batch-delete'],
-    mutationFn: async (productIds: string[]) => {
-      const promises = productIds.map(id => SupabaseService.deleteProduct(id))
-      return Promise.all(promises)
-    },
-    onSuccess: (_, productIds) => {
-      queryKeyUtils.invalidateProductQueries(queryClient)
-      toast.success(`${productIds.length} produtos deletados!`)
-    },
-    onError: () => {
-      toast.error('Erro ao deletar produtos em lote.')
-    },
-  })
-
   // Helper functions with enhanced error handling
   const createProduct = async (productData: ProductInsert) => {
     try {
       return await createProductMutation.mutateAsync(productData)
     } catch (error) {
       console.error('Create product failed:', error)
+      throw error
+    }
+  }
+
+  const createProductWithImages = async (productData: Omit<ProductInsert, 'images'>, imageFiles: File[]) => {
+    try {
+      return await createProductWithImagesMutation.mutateAsync({ productData, imageFiles })
+    } catch (error) {
+      console.error('Create product with images failed:', error)
       throw error
     }
   }
@@ -191,6 +277,15 @@ export const useAdminProducts = () => {
     }
   }
 
+  const updateProductWithImages = async (id: string, updates: Omit<ProductUpdate, 'images'>, imageFiles?: File[], imagesToRemove?: string[]) => {
+    try {
+      return await updateProductWithImagesMutation.mutateAsync({ id, updates, imageFiles, imagesToRemove })
+    } catch (error) {
+      console.error('Update product with images failed:', error)
+      throw error
+    }
+  }
+
   const deleteProduct = async (id: string) => {
     try {
       return await deleteProductMutation.mutateAsync(id)
@@ -200,51 +295,33 @@ export const useAdminProducts = () => {
     }
   }
 
-  const updateMultipleProducts = async (updates: { id: string; updates: ProductUpdate }[]) => {
-    try {
-      return await batchUpdateProducts.mutateAsync(updates)
-    } catch (error) {
-      console.error('Batch update failed:', error)
-      throw error
-    }
-  }
-
-  const deleteMultipleProducts = async (productIds: string[]) => {
-    try {
-      return await batchDeleteProducts.mutateAsync(productIds)
-    } catch (error) {
-      console.error('Batch delete failed:', error)
-      throw error
-    }
-  }
-
   return {
-    // Mutations
+    // Mutations (enhanced with optimistic updates + image support from main)
     createProductMutation,
+    createProductWithImagesMutation,
     updateProductMutation,
+    updateProductWithImagesMutation,
     deleteProductMutation,
-    batchUpdateProducts,
-    batchDeleteProducts,
     
     // Actions with better error handling
     createProduct,
-    updateProduct,
+    createProductWithImages,
+    updateProduct,  
+    updateProductWithImages,
     deleteProduct,
-    updateMultipleProducts,
-    deleteMultipleProducts,
     
-    // Enhanced states
+    // Enhanced states (combined from both versions)
     isCreating: createProductMutation.isPending,
+    isCreatingWithImages: createProductWithImagesMutation.isPending,
     isUpdating: updateProductMutation.isPending,
+    isUpdatingWithImages: updateProductWithImagesMutation.isPending,
     isDeleting: deleteProductMutation.isPending,
-    isBatchUpdating: batchUpdateProducts.isPending,
-    isBatchDeleting: batchDeleteProducts.isPending,
     isMutating: 
       createProductMutation.isPending || 
-      updateProductMutation.isPending || 
-      deleteProductMutation.isPending ||
-      batchUpdateProducts.isPending ||
-      batchDeleteProducts.isPending,
+      createProductWithImagesMutation.isPending ||
+      updateProductMutation.isPending ||
+      updateProductWithImagesMutation.isPending ||
+      deleteProductMutation.isPending,
 
     // Error states for better UX
     createError: createProductMutation.error,
@@ -252,10 +329,10 @@ export const useAdminProducts = () => {
     deleteError: deleteProductMutation.error,
     hasErrors: !!(
       createProductMutation.error ||
+      createProductWithImagesMutation.error ||
       updateProductMutation.error ||
-      deleteProductMutation.error ||
-      batchUpdateProducts.error ||
-      batchDeleteProducts.error
+      updateProductWithImagesMutation.error ||
+      deleteProductMutation.error
     ),
   }
 }
