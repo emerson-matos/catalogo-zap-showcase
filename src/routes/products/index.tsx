@@ -44,7 +44,7 @@ function ProductsPage() {
   return (
     <div className="min-h-screen">
       <section>
-        <div className="text-center mb-12">
+        <div className="text-center m-12">
           <div className="flex items-center justify-center gap-2 mb-4">
             <h2 className="text-4xl font-bold text-primary">Nossos Produtos</h2>
           </div>
