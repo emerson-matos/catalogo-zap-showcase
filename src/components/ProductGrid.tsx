@@ -6,41 +6,19 @@ import { SearchInput } from "@/components/ui/search-input";
 import { SortSelect } from "@/components/ui/sort-select";
 import { FilterPanel } from "@/components/ui/filter-panel";
 import { CategoryFilters } from "@/components/CategoryFilters";
-import {
-  AlertTriangle,
-  RefreshCw,
-  Wifi,
-  Filter,
-  PencilIcon,
-  ChevronDown,
-  FunnelIcon,
-} from "lucide-react";
+import { AlertTriangle, RefreshCw, Filter, FunnelIcon } from "lucide-react";
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useProductSort } from "@/hooks/useProductSort";
 import { useProductFilters } from "@/hooks/useProductFilters";
-import { useState, ReactNode, useId } from "react";
-import { Link } from "@tanstack/react-router";
-import { Separator } from "@radix-ui/react-context-menu";
+import { useState, useId } from "react";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { Funnel } from "recharts";
+import { Separator } from "./ui/separator";
 
 interface ProductGridProps {
   // Layout
-  sectionId?: string;
-  title?: string;
-  subtitle?: string;
   showStatistics?: boolean;
-
-  // Admin specific
-  isAdmin?: boolean;
-  adminActions?: ReactNode;
-
-  // Customization
-  searchPlaceholder?: string;
-  emptyStateMessage?: string;
-  emptyStateAction?: ReactNode;
 }
 
 export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
@@ -164,9 +142,10 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
 
           {/* Filters */}
         </section>
+
+        <Separator className="my-4" />
         {/* Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <Separator />
           {/* Products */}
           <div
             className={`lg:col-span-3 ${showFilters ? "lg:col-span-3" : "lg:col-span-4"}`}
@@ -178,12 +157,9 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
                   Nenhum produto encontrado
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  {products.length === 0
-                    ? emptyStateMessage || defaultEmptyMessage
-                    : "Tente ajustar os filtros ou termos de pesquisa."}
+                  {products.length === 0 &&
+                    "Tente ajustar os filtros ou termos de pesquisa."}
                 </p>
-                {products.length === 0 &&
-                  (emptyStateAction || defaultEmptyAction)}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -229,4 +205,3 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
 };
 
 export default ProductGrid;
-
