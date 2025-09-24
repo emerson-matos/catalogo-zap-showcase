@@ -35,27 +35,22 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               alt={product.name}
               loading="lazy"
               decoding="async"
-              className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-scale-down"
+              className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-contain"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/placeholder.svg";
               }}
             />
             {isNewProduct() && (
-              <Badge className="absolute top-3 left-3 bg-muted text-green-600 font-bold shadow border border-border">
+              <Badge className="absolute top-2 left-2 bg-muted text-green-600 font-bold shadow border border-border">
                 Novo
               </Badge>
             )}
-            <div className="absolute top-3 right-3 flex flex-col gap-1">
-              {product.images && product.images.length > 1 && (
-                <Badge className="bg-blue-600 text-white font-bold shadow border border-border text-xs">
-                  +{product.images.length - 1}
-                </Badge>
-              )}
-              <Badge className="bg-accent text-green-foreground font-semibold shadow border border-border">
-                {category?.name}
+            {category?.name && (
+              <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground font-semibold shadow border border-border">
+                {category.name}
               </Badge>
-            </div>
+            )}
           </div>
 
           <div className="p-6">
@@ -83,20 +78,22 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
         </Link>
       </CardContent>
 
-      <CardFooter className="flex gap-2">
+      <CardFooter className="flex flex-wrap gap-2 p-4">
         <ProtectedComponent requiredRole="editor">
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="sm" variant="outline" className="flex-shrink-0">
             <Link to="/admin/products" search={{ id: product.id }}>
-              <Edit className="size-4 mr-2" />
-              <span>Editar</span>
+              <Edit className="size-4 mr-1" />
+              <span className="hidden sm:inline">Editar</span>
             </Link>
           </Button>
         </ProtectedComponent>
-        <WhatsAppButton product={product} className="flex-1" size="default">
-          Consultar
+        <WhatsAppButton product={product} className="flex-1 min-w-0" size="sm">
+          <span className="hidden sm:inline">Consultar</span>
+          <span className="sm:hidden">WhatsApp</span>
         </WhatsAppButton>
-        <AddToCartButton product={product} className="flex-1" size="default">
-          Adicionar
+        <AddToCartButton product={product} className="flex-1 min-w-0" size="sm">
+          <span className="hidden sm:inline">Adicionar</span>
+          <span className="sm:hidden">Carrinho</span>
         </AddToCartButton>
       </CardFooter>
     </Card>
