@@ -12,8 +12,7 @@ import { useProductSearch } from "@/hooks/useProductSearch";
 import { useProductSort } from "@/hooks/useProductSort";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { useState, useId } from "react";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import { DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Separator } from "./ui/separator";
 
 interface ProductGridProps {
@@ -99,7 +98,7 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
                   Filtros <FunnelIcon />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent asChild align="end">
+              <DropdownMenuContent align="end" className="w-80 p-0">
                 <FilterPanel
                   filters={filters}
                   onFiltersChange={setFilters}

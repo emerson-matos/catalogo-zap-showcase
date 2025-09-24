@@ -1,6 +1,5 @@
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -35,10 +34,10 @@ export const FilterPanel = ({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
+    <div className="w-full">
+      <div className="p-4 border-b">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <h3 className="flex items-center gap-2 text-lg font-semibold">
             <Filter className="h-5 w-5" />
             Filtros
             {hasActiveFilters && (
@@ -46,7 +45,7 @@ export const FilterPanel = ({
                 Ativo
               </Badge>
             )}
-          </CardTitle>
+          </h3>
           {hasActiveFilters && (
             <Button
               variant="outline"
@@ -59,9 +58,9 @@ export const FilterPanel = ({
             </Button>
           )}
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="space-y-6">
+      <div className="p-4 space-y-6">
         {/* Price Range */}
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Faixa de Preço</h4>
@@ -126,8 +125,8 @@ export const FilterPanel = ({
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
