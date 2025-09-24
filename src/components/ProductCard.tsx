@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
@@ -17,14 +17,15 @@ interface ProductCardProps {
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
   const { data: category } = useCategoryQuery(product.category_id || "");
-  const isNewProduct = () => {
+  
+  const isNewProduct = useMemo(() => {
     if (!product.created_at) return false;
     const createdDate = new Date(product.created_at);
     const today = new Date();
     const diffTime = today.getTime() - createdDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays <= 7;
-  };
+  }, [product.created_at]);
   return (
     <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
       <CardContent className="p-0">
@@ -36,12 +37,12 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               loading="lazy"
               decoding="async"
               className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-contain"
-              onError={(e) => {
+              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/placeholder.svg";
               }}
             />
-            {isNewProduct() && (
+            {isNewProduct && (
               <Badge className="absolute top-2 left-2 bg-muted text-green-600 font-bold shadow border border-border">
                 Novo
               </Badge>

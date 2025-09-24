@@ -1,7 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Users, Star, Award } from "lucide-react";
 
-const About = ({ sectionId }: { sectionId: string }) => {
+interface AboutProps {
+  sectionId: string;
+}
+
+const About = ({ sectionId }: AboutProps) => {
   return (
     <section id={sectionId} className="container">
       <div className="mx-auto px-4">
