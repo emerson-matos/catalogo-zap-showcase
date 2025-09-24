@@ -11,7 +11,7 @@ import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useProductSort } from "@/hooks/useProductSort";
 import { useProductFilters } from "@/hooks/useProductFilters";
-import { useState, useId } from "react";
+import { useId } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Separator } from "./ui/separator";
 
@@ -22,7 +22,6 @@ interface ProductGridProps {
 
 export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
   const sectionId = useId();
-  const [showFilters, setShowFilters] = useState(false);
 
   // Main data query
   const { products, isLoading, isFetching, error, isError, refetch, isEmpty } =
@@ -121,15 +120,6 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
             {/* Controls */}
             <SortSelect value={sortOption} onValueChange={setSortOption} />
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden"
-            >
-              <Filter className="size-4" />
-              Filtros
-            </Button>
             {/* Results Count */}
             {!isLoading && (
               <div className="text-sm text-muted-foreground">
@@ -147,7 +137,7 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Products */}
           <div
-            className={`lg:col-span-3 ${showFilters ? "lg:col-span-3" : "lg:col-span-4"}`}
+            className="lg:col-span-4"
           >
             {!isLoading && sortedProducts.length === 0 ? (
               <div className="text-center py-12">
