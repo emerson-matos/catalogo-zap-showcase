@@ -21,25 +21,16 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           <TooltipProvider>
             <CartProvider>
               {children}
-              <Toaster 
-                richColors 
-                position="top-right"
-                duration={4000}
-                toastOptions={{
-                  style: {
-                    background: 'hsl(var(--background))',
-                    border: '1px solid hsl(var(--border))',
-                    color: 'hsl(var(--foreground))',
-                  },
-                }}
+              <Toaster richColors position="top-right" duration={4000} />
+              <QueryStatusIndicator
+                showInProduction={process.env.NODE_ENV === "development"}
               />
-              <QueryStatusIndicator showInProduction={process.env.NODE_ENV === 'development'} />
             </CartProvider>
           </TooltipProvider>
           <Analytics />
           <SpeedInsights />
           <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-          {process.env.NODE_ENV === 'development' && <TanStackRouterDevtools />}
+          <TanStackRouterDevtools />
         </QueryClientProvider>
       </ThemeProvider>
     </ErrorBoundary>
