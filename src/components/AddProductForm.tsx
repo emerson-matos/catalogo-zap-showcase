@@ -41,7 +41,7 @@ import {
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import z from "zod";
 import { useProduct } from "@/hooks/useProductsQuery";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -79,6 +79,12 @@ export function AddProductForm({ id }: { id?: string }) {
   const canGoBack = useCanGoBack();
   const router = useRouter();
 
+  // Memoize existingImages to prevent infinite re-renders
+  const existingImages = useMemo(
+    () => product?.images || [],
+    [product?.images],
+  );
+
   const {
     images,
     imagesToRemove,
@@ -89,11 +95,14 @@ export function AddProductForm({ id }: { id?: string }) {
     getNewFiles,
     hasImages,
     hasNewImages,
-  } = useImageManagement({ existingImages: product?.images || [] });
+  } = useImageManagement({ existingImages });
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    addImages(acceptedFiles);
-  }, [addImages]);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      addImages(acceptedFiles);
+    },
+    [addImages],
+  );
 
   const { getRootProps, getInputProps, isDragActive, isDragReject } =
     useDropzone({
@@ -130,7 +139,12 @@ export function AddProductForm({ id }: { id?: string }) {
       if (product) {
         // Update existing product
         const newFiles = getNewFiles();
-        await updateProductWithImages(product.id, data, newFiles, imagesToRemove);
+        await updateProductWithImages(
+          product.id,
+          data,
+          newFiles,
+          imagesToRemove,
+        );
         toast.success("Produto atualizado com sucesso!");
       } else {
         // Create new product - at least one image is REQUIRED
@@ -250,7 +264,9 @@ export function AddProductForm({ id }: { id?: string }) {
                         {isCategoriesLoading ? (
                           <div className="flex items-center justify-center p-4">
                             <LoaderIcon className="size-4 animate-spin mr-2" />
-                            <span className="text-sm text-muted-foreground">Carregando categorias...</span>
+                            <span className="text-sm text-muted-foreground">
+                              Carregando categorias...
+                            </span>
                           </div>
                         ) : (
                           <Select
@@ -273,7 +289,7 @@ export function AddProductForm({ id }: { id?: string }) {
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                    )}
+                  )}
                 />
                 <FormItem className="col-span-full">
                   <FormLabel>
@@ -285,10 +301,7 @@ export function AddProductForm({ id }: { id?: string }) {
                     {hasImages && (
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {images.map((image, index) => (
-                          <div
-                            key={image.id}
-                            className="relative"
-                          >
+                          <div key={image.id} className="relative">
                             <img
                               src={image.url}
                               alt={`Preview ${index + 1}`}
@@ -317,14 +330,14 @@ export function AddProductForm({ id }: { id?: string }) {
                       className={`
                         border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
                                 ${
-                          isDragActive && !isDragReject
-                            ? "border-primary bg-primary/5"
-                            : isDragReject
-                              ? "border-red-500 bg-red-50"
-                              : !product && !hasImages
-                                ? "border-red-300 bg-red-50 hover:border-red-400"
-                                : "border-border hover:border-primary"
-                        }
+                                  isDragActive && !isDragReject
+                                    ? "border-primary bg-primary/5"
+                                    : isDragReject
+                                      ? "border-red-500 bg-red-50"
+                                      : !product && !hasImages
+                                        ? "border-red-300 bg-red-50 hover:border-red-400"
+                                        : "border-border hover:border-primary"
+                                }
                       `}
                     >
                       <input {...getInputProps()} />
@@ -369,9 +382,15 @@ export function AddProductForm({ id }: { id?: string }) {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">
-                            {images.filter(img => !img.isExisting).length} nova imagem
-                            {images.filter(img => !img.isExisting).length > 1 ? "ns" : ""} selecionada
-                            {images.filter(img => !img.isExisting).length > 1 ? "s" : ""}
+                            {images.filter((img) => !img.isExisting).length}{" "}
+                            nova imagem
+                            {images.filter((img) => !img.isExisting).length > 1
+                              ? "ns"
+                              : ""}{" "}
+                            selecionada
+                            {images.filter((img) => !img.isExisting).length > 1
+                              ? "s"
+                              : ""}
                           </span>
                           <Button
                             type="button"
@@ -384,21 +403,25 @@ export function AddProductForm({ id }: { id?: string }) {
                         </div>
                         <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
                           {images
-                            .filter(img => !img.isExisting && img.file)
+                            .filter((img) => !img.isExisting && img.file)
                             .map((image) => (
-                            <div
-                              key={image.id}
-                              className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-muted rounded"
-                            >
-                              <ImageIcon className="h-4 w-4" />
-                              <span className="flex-1 truncate">
-                                {image.file!.name}
-                              </span>
-                              <span className="text-xs">
-                                ({(image.file!.size / 1024 / 1024).toFixed(2)} MB)
-                              </span>
-                            </div>
-                          ))}
+                              <div
+                                key={image.id}
+                                className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-muted rounded"
+                              >
+                                <ImageIcon className="h-4 w-4" />
+                                <span className="flex-1 truncate">
+                                  {image.file?.name || "Unknown file"}
+                                </span>
+                                <span className="text-xs">
+                                  (
+                                  {image.file
+                                    ? (image.file.size / 1024 / 1024).toFixed(2)
+                                    : "0.00"}{" "}
+                                  MB)
+                                </span>
+                              </div>
+                            ))}
                         </div>
                       </div>
                     )}
@@ -430,11 +453,7 @@ export function AddProductForm({ id }: { id?: string }) {
                   {product && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          onClick={() => handleDelete}
-                        >
+                        <Button type="button" variant="destructive">
                           <Trash2Icon /> Deletar
                         </Button>
                       </AlertDialogTrigger>
@@ -459,9 +478,7 @@ export function AddProductForm({ id }: { id?: string }) {
                   )}
                   <Button
                     type="submit"
-                    disabled={
-                      isMutating || (!product && !hasImages)
-                    }
+                    disabled={isMutating || (!product && !hasImages)}
                   >
                     {isMutating && (
                       <Loader2 className="mr-2 size-4 animate-spin" />
