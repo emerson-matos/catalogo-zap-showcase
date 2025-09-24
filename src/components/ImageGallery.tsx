@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -10,6 +10,10 @@ interface ImageGalleryProps {
 export function ImageGallery({ images, productName }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [hasMoved, setHasMoved] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   if (!images || images.length === 0) {
     return (
@@ -39,6 +43,42 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
     setIsFullscreen(false);
   };
 
+  // Swipe detection functions
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    setHasMoved(false);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+    if (touchStart && Math.abs(e.targetTouches[0].clientX - touchStart) > 10) {
+      setHasMoved(true);
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && images.length > 1 && hasMoved) {
+      nextImage();
+    }
+    if (isRightSwipe && images.length > 1 && hasMoved) {
+      prevImage();
+    }
+    
+    // Reset states
+    setTouchStart(null);
+    setTouchEnd(null);
+    setHasMoved(false);
+  };
+
   return (
     <>
       {/* Main Gallery */}
@@ -46,16 +86,25 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
         {/* Main Image */}
         <div className="relative group">
             <img
+              ref={imageRef}
               src={images[currentIndex]}
               alt={`${productName} - Imagem ${currentIndex + 1}`}
-              className="w-full h-96 object-scale-down rounded-lg cursor-pointer transition-transform hover:scale-105"
-              onClick={openFullscreen}
+              className="w-full h-96 object-scale-down rounded-lg cursor-pointer transition-all duration-200 hover:scale-105"
+              onClick={() => {
+                // Only open fullscreen if there was no swipe movement
+                if (!hasMoved) {
+                  openFullscreen();
+                }
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   openFullscreen();
                 }
               }}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
               tabIndex={0}
               role="button"
               aria-label="Abrir imagem em tela cheia"
@@ -91,6 +140,13 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
           {images.length > 1 && (
             <div className="absolute bottom-2 right-2 bg-black/50 text-white text-sm px-2 py-1 rounded">
               {currentIndex + 1} / {images.length}
+            </div>
+          )}
+
+          {/* Swipe Indicator */}
+          {images.length > 1 && (
+            <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded opacity-75">
+              ← Deslize →
             </div>
           )}
         </div>
@@ -132,6 +188,9 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
               src={images[currentIndex]}
               alt={`${productName} - Imagem ${currentIndex + 1}`}
               className="max-w-full max-h-full object-contain"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/placeholder.svg";
