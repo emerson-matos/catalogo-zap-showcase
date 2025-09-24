@@ -1,24 +1,31 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import type { Product } from "@/types/product";
+import { useDebounce } from "./useDebounce";
 
 export const useProductSearch = (products: Product[]) => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const debouncedSearchQuery = useDebounce(searchQuery);
 
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products;
+    if (!debouncedSearchQuery.trim()) return products;
 
-    const query = searchQuery.toLowerCase().trim();
+    const query = debouncedSearchQuery.toLowerCase().trim();
     return products.filter(
       (product) =>
         product.name.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query),
     );
-  }, [products, searchQuery]);
+  }, [products, debouncedSearchQuery]);
+
+  const handleSearchChange = useCallback((newQuery: string) => {
+    setSearchQuery(newQuery);
+  }, []);
 
   return {
     searchQuery,
-    setSearchQuery,
+    setSearchQuery: handleSearchChange,
     filteredProducts,
+    isSearching: searchQuery !== debouncedSearchQuery,
   };
 };
 

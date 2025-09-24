@@ -91,7 +91,7 @@ const Header = () => {
           </Link>
 
           {/* Navigation Desktop */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8" aria-label="Menu de navegação principal">
             {navigationItems.map((item) => (
               <NavLink key={item.to} item={item} />
             ))}
@@ -111,8 +111,13 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <Button
+            variant="ghost"
+            size="icon"
             className="md:hidden"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
           >
             {isMenuOpen ? (
               <X className="size-6" />
@@ -124,8 +129,8 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-border/40 py-4">
-            <nav className="flex flex-col space-y-4">
+          <div className="md:hidden border-t border-border/40 py-4" id="mobile-navigation">
+            <nav className="flex flex-col space-y-4" aria-label="Menu de navegação mobile">
               {navigationItems.map((item) => (
                 <MobileNavLink key={item.to} item={item} />
               ))}
