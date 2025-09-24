@@ -36,7 +36,7 @@ export const AddToCartButton = ({
       size={size ?? "default"}
       variant={variant}
       className={cn(
-        "bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200",
+        "transition-all duration-200",
         isIconOnly && size === "icon" ? "p-2" : "min-w-fit whitespace-nowrap",
         className,
       )}
@@ -46,7 +46,7 @@ export const AddToCartButton = ({
       ) : (
         <>
           <ShoppingCart className="h-4 w-4 mr-2 shrink-0" />
-          <span className="shrink-0">{children}</span>
+          <span className="shrink-0">{children || "Adicionar"}</span>
         </>
       )}
     </Button>
