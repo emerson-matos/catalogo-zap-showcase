@@ -109,16 +109,47 @@ export class SupabaseService {
     id: string,
     updates: Omit<ProductUpdate, "images">,
     imageFiles?: File[],
+    imagesToRemove?: string[],
   ): Promise<Product> {
     try {
       const finalUpdates: ProductUpdate = { ...updates };
 
-      // If new images are provided, upload them
+      // Get current product to access existing images
+      const currentProduct = await this.getProductById(id);
+      if (!currentProduct) {
+        throw new Error("Produto não encontrado");
+      }
+
+      let finalImages = [...(currentProduct.images || [])];
+
+      // Remove specified images from storage and from the images array
+      if (imagesToRemove && imagesToRemove.length > 0) {
+        for (const imageUrl of imagesToRemove) {
+          if (ImageUploadService.isSupabaseImageUrl(imageUrl)) {
+            try {
+              const imagePath = ImageUploadService.extractStoragePath(imageUrl);
+              if (imagePath) {
+                await ImageUploadService.deleteImage(imagePath);
+              }
+            } catch (error) {
+              console.warn("Failed to delete image from storage:", error);
+              // Continue even if storage deletion fails
+            }
+          }
+          // Remove from images array
+          finalImages = finalImages.filter(img => img !== imageUrl);
+        }
+      }
+
+      // If new images are provided, upload them and add to the array
       if (imageFiles && imageFiles.length > 0) {
         const uploadResult =
           await ImageUploadService.uploadMultipleImages(imageFiles);
-        finalUpdates.images = uploadResult.urls;
+        finalImages = [...finalImages, ...uploadResult.urls];
       }
+
+      // Update the product with the final images array
+      finalUpdates.images = finalImages;
 
       return await this.updateProduct(id, finalUpdates);
     } catch (error) {

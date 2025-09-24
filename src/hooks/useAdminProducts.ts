@@ -30,8 +30,8 @@ export const useAdminProducts = () => {
   });
 
   const updateProductWithImagesMutation = useMutation({
-    mutationFn: ({ id, updates, imageFiles }: { id: string; updates: Omit<ProductUpdate, 'images'>; imageFiles?: File[] }) =>
-      SupabaseService.updateProductWithImages(id, updates, imageFiles),
+    mutationFn: ({ id, updates, imageFiles, imagesToRemove }: { id: string; updates: Omit<ProductUpdate, 'images'>; imageFiles?: File[]; imagesToRemove?: string[] }) =>
+      SupabaseService.updateProductWithImages(id, updates, imageFiles, imagesToRemove),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
     },
@@ -56,8 +56,8 @@ export const useAdminProducts = () => {
     return updateProductMutation.mutateAsync({ id, updates });
   };
 
-  const updateProductWithImages = async (id: string, updates: Omit<ProductUpdate, 'images'>, imageFiles?: File[]) => {
-    return updateProductWithImagesMutation.mutateAsync({ id, updates, imageFiles });
+  const updateProductWithImages = async (id: string, updates: Omit<ProductUpdate, 'images'>, imageFiles?: File[], imagesToRemove?: string[]) => {
+    return updateProductWithImagesMutation.mutateAsync({ id, updates, imageFiles, imagesToRemove });
   };
 
   const deleteProduct = async (id: string) => {
