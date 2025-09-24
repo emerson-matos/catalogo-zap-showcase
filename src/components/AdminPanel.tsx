@@ -1,21 +1,11 @@
-import { Loader2, PencilIcon } from "lucide-react";
-import { useProductsQuery } from "@/hooks/useProductsQuery";
+import { PencilIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import ProductCard from "./ProductCard";
+import ProductGrid from "./ProductGrid";
 import { Button } from "./ui/button";
 import { Link } from "@tanstack/react-router";
 
 export const AdminPanel = () => {
   const { user } = useAuth();
-  const { products, isLoading } = useProductsQuery();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen">
@@ -37,14 +27,7 @@ export const AdminPanel = () => {
           </div>
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </div>
+      <ProductGrid />
     </div>
   );
 };

@@ -13,9 +13,14 @@ interface FilterPanelProps {
   minPrice: number;
 }
 
-export const FilterPanel = ({ filters, onFiltersChange, maxPrice, minPrice }: FilterPanelProps) => {
-  const hasActiveFilters = 
-    filters.priceRange[0] !== minPrice || 
+export const FilterPanel = ({
+  filters,
+  onFiltersChange,
+  maxPrice,
+  minPrice,
+}: FilterPanelProps) => {
+  const hasActiveFilters =
+    filters.priceRange[0] !== minPrice ||
     filters.priceRange[1] !== maxPrice ||
     filters.minRating > 0 ||
     filters.showNewOnly;
@@ -43,14 +48,19 @@ export const FilterPanel = ({ filters, onFiltersChange, maxPrice, minPrice }: Fi
             )}
           </CardTitle>
           {hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={resetFilters} className="text-xs">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={resetFilters}
+              className="text-xs"
+            >
               <X className="h-3 w-3 mr-1" />
               Limpar
             </Button>
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         {/* Price Range */}
         <div className="space-y-3">
@@ -58,7 +68,12 @@ export const FilterPanel = ({ filters, onFiltersChange, maxPrice, minPrice }: Fi
           <div className="px-2">
             <Slider
               value={filters.priceRange}
-              onValueChange={(value) => onFiltersChange({ ...filters, priceRange: [value[0], value[1]] })}
+              onValueChange={(value) =>
+                onFiltersChange({
+                  ...filters,
+                  priceRange: [value[0], value[1]],
+                })
+              }
               min={minPrice}
               max={maxPrice}
               step={1}
@@ -77,14 +92,18 @@ export const FilterPanel = ({ filters, onFiltersChange, maxPrice, minPrice }: Fi
           <div className="px-2">
             <Slider
               value={[filters.minRating]}
-              onValueChange={(value) => onFiltersChange({ ...filters, minRating: value[0] })}
+              onValueChange={(value) =>
+                onFiltersChange({ ...filters, minRating: value[0] })
+              }
               min={0}
               max={5}
               step={0.5}
               className="w-full"
             />
             <div className="text-xs text-muted-foreground mt-2 text-center">
-              {filters.minRating > 0 ? `${filters.minRating} estrelas ou mais` : 'Qualquer avaliação'}
+              {filters.minRating > 0
+                ? `${filters.minRating} estrelas ou mais`
+                : "Qualquer avaliação"}
             </div>
           </div>
         </div>
@@ -97,7 +116,9 @@ export const FilterPanel = ({ filters, onFiltersChange, maxPrice, minPrice }: Fi
               <Checkbox
                 id="new-only"
                 checked={filters.showNewOnly}
-                onCheckedChange={(checked) => onFiltersChange({ ...filters, showNewOnly: !!checked })}
+                onCheckedChange={(checked) =>
+                  onFiltersChange({ ...filters, showNewOnly: !!checked })
+                }
               />
               <label htmlFor="new-only" className="text-sm font-medium">
                 Apenas produtos novos
@@ -109,3 +130,4 @@ export const FilterPanel = ({ filters, onFiltersChange, maxPrice, minPrice }: Fi
     </Card>
   );
 };
+
