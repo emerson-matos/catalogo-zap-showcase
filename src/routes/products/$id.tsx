@@ -13,7 +13,7 @@ export const Route = createFileRoute("/products/$id")({
 
 function ProductDetailPage() {
   const { id } = Route.useParams();
-  const { data: product, isLoading, error } = useProduct(id || "");
+  const { product, isLoading, error } = useProduct(id || "");
   const { data: category, isLoading: isCategoryLoading } = useCategoryQuery(
     product?.category_id || "",
   );
