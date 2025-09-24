@@ -26,11 +26,10 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
     return diffDays <= 7;
   };
   return (
-    <Card className="group h-full bg-gray-800 border-gray-700 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-sm mx-auto">
+    <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
       <CardContent className="p-0">
         <Link to="/products/$id" params={{ id: product.id }}>
-          {/* Image Container with proper positioning */}
-          <div className="relative overflow-hidden rounded-t-lg bg-white">
+          <div className="relative overflow-hidden rounded-t-lg">
             <img
               src={product.images?.[0] || "/placeholder.svg"}
               alt={product.name}
@@ -42,8 +41,6 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
                 target.src = "/placeholder.svg";
               }}
             />
-            
-            {/* Tags positioned correctly - overlapping slightly */}
             {isNewProduct() && (
               <Badge className="absolute top-2 left-2 bg-green-700 text-white font-bold text-xs px-2 py-1 rounded shadow-lg z-10">
                 Novo
@@ -54,26 +51,24 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             </Badge>
           </div>
 
-          {/* Product Details */}
-          <div className="p-4 bg-gray-800">
-            <h3 className="text-lg font-bold mb-2 text-white line-clamp-2 group-hover:text-gray-300 transition-colors">
+          <div className="p-6">
+            <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2 text-foreground">
               {product.name}
             </h3>
             
-            {/* Price and Rating Row */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex flex-col">
-                <span className="text-sm text-gray-400 mb-1">
+                <span className="text-sm text-muted-foreground mb-1">
                   A partir 25 unid.
                 </span>
-                <span className="text-xl font-bold text-white">
+                <span className="text-2xl font-bold text-primary">
                   {formatPriceBRL(product.price)}
                 </span>
               </div>
               {product.rating && (
                 <div className="flex items-center gap-1">
-                  <Star className="size-4 text-gray-400 fill-current" />
-                  <span className="text-sm font-medium text-gray-400">
+                  <Star className="size-4 text-muted-foreground fill-current" />
+                  <span className="text-sm font-medium text-muted-foreground">
                     {product.rating}
                   </span>
                 </div>
@@ -83,37 +78,21 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
         </Link>
       </CardContent>
 
-      {/* Action Buttons */}
-      <CardFooter className="p-4 pt-0 bg-gray-800">
-        <div className="flex gap-2 w-full">
-          <ProtectedComponent requiredRole="editor">
-            <Button 
-              asChild 
-              size="sm" 
-              variant="outline"
-              className="flex-1 bg-gray-600 border-gray-500 text-white hover:bg-gray-500 hover:text-white text-xs"
-            >
-              <Link to="/admin/products" search={{ id: product.id }}>
-                <Edit className="size-3 mr-1" />
-                <span>Editar</span>
-              </Link>
-            </Button>
-          </ProtectedComponent>
-          <WhatsAppButton 
-            product={product} 
-            className="flex-1 bg-gray-600 border-gray-500 text-white hover:bg-gray-500 hover:text-white text-xs"
-            size="sm"
-          >
-            Consultar
-          </WhatsAppButton>
-          <AddToCartButton 
-            product={product} 
-            className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-100 border-gray-300 text-xs"
-            size="sm"
-          >
-            Adicionar
-          </AddToCartButton>
-        </div>
+      <CardFooter className="flex gap-2 p-4">
+        <ProtectedComponent requiredRole="editor">
+          <Button asChild size="sm" variant="outline">
+            <Link to="/admin/products" search={{ id: product.id }}>
+              <Edit className="size-4 mr-2" />
+              <span>Editar</span>
+            </Link>
+          </Button>
+        </ProtectedComponent>
+        <WhatsAppButton product={product} className="flex-1" size="default">
+          Consultar
+        </WhatsAppButton>
+        <AddToCartButton product={product} className="flex-1" size="default">
+          Adicionar
+        </AddToCartButton>
       </CardFooter>
     </Card>
   );

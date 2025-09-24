@@ -24,9 +24,9 @@ export const WhatsAppButton = ({
       case "ghost":
         return "bg-transparent hover:bg-green-300/10 hover:text-accent-foreground";
       case "outline":
-        return "border-gray-500 bg-gray-600 text-white hover:bg-gray-500 hover:text-white";
+        return "border-accent hover:bg-green-300 hover:text-accent-foreground";
       default:
-        return "bg-gray-600 text-white hover:bg-gray-500 hover:text-white";
+        return "bg-accent text-accent-foreground hover:bg-green-300/90 hover:text-accent-foreground";
     }
   };
 
