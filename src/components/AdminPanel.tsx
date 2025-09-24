@@ -1,5 +1,4 @@
-import { Loader2, PencilIcon } from "lucide-react";
-import { useProductsQuery } from "@/hooks/useProductsQuery";
+import { PencilIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import ProductGrid from "./ProductGrid";
 import { Button } from "./ui/button";
@@ -7,24 +6,6 @@ import { Link } from "@tanstack/react-router";
 
 export const AdminPanel = () => {
   const { user } = useAuth();
-  const { 
-    products, 
-    isLoading, 
-    isFetching, 
-    error, 
-    isError, 
-    refetch, 
-    isEmpty, 
-    isStale 
-  } = useProductsQuery();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
 
   const adminActions = (
     <div className="shadow-sm border-b">
@@ -50,14 +31,6 @@ export const AdminPanel = () => {
   return (
     <div className="min-h-screen">
       <ProductGrid
-        products={products}
-        isLoading={isLoading}
-        isFetching={isFetching}
-        error={error}
-        isError={isError}
-        isEmpty={isEmpty}
-        isStale={isStale}
-        onRefetch={refetch}
         title="Produtos"
         subtitle="Gerencie todos os produtos da sua loja"
         showStatistics={false}

@@ -7,24 +7,14 @@ import { SortSelect } from "@/components/ui/sort-select";
 import { FilterPanel } from "@/components/ui/filter-panel";
 import { CategoryFilters } from "@/components/CategoryFilters";
 import { AlertTriangle, RefreshCw, Wifi, Filter, PencilIcon } from "lucide-react";
+import { useProductsQuery } from "@/hooks/useProductsQuery";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useProductSort } from "@/hooks/useProductSort";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { useState, ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import type { Product } from "@/types/product";
 
 interface ProductGridProps {
-  // Data
-  products: Product[];
-  isLoading?: boolean;
-  isFetching?: boolean;
-  error?: string | null;
-  isError?: boolean;
-  isEmpty?: boolean;
-  isStale?: boolean;
-  onRefetch?: () => void;
-  
   // Layout
   sectionId?: string;
   title?: string;
@@ -42,14 +32,6 @@ interface ProductGridProps {
 }
 
 export const ProductGrid = ({
-  products,
-  isLoading = false,
-  isFetching = false,
-  error,
-  isError = false,
-  isEmpty = false,
-  isStale = false,
-  onRefetch,
   sectionId,
   title = "Nossos Produtos",
   subtitle = "Descubra nossa seleção cuidadosa de produtos de alta qualidade",
@@ -61,6 +43,18 @@ export const ProductGrid = ({
   emptyStateAction,
 }: ProductGridProps) => {
   const [showFilters, setShowFilters] = useState(false);
+
+  // Main data query
+  const {
+    products,
+    isLoading,
+    isFetching,
+    error,
+    isError,
+    refetch,
+    isEmpty,
+    isStale,
+  } = useProductsQuery();
 
   // Search functionality
   const {
@@ -129,11 +123,11 @@ export const ProductGrid = ({
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
               <span>Erro ao carregar produtos: {error}</span>
-              {onRefetch && (
+              {refetch && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={onRefetch}
+                  onClick={refetch}
                   disabled={isFetching}
                 >
                   {isFetching ? (
