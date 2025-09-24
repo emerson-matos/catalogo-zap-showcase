@@ -42,33 +42,33 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
               }}
             />
             {isNewProduct() && (
-              <Badge className="absolute top-2 left-2 bg-green-700 text-white font-bold text-xs px-2 py-1 rounded shadow-lg z-10">
+              <Badge className="absolute top-2 left-2 bg-muted text-green-600 font-bold shadow border border-border">
                 Novo
               </Badge>
             )}
-            <Badge className="absolute top-2 right-2 bg-gray-600 text-white font-semibold text-xs px-2 py-1 rounded shadow-lg z-10">
-              {category?.name || "Beleza"}
-            </Badge>
+            {category?.name && (
+              <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground font-semibold shadow border border-border">
+                {category.name}
+              </Badge>
+            )}
           </div>
 
           <div className="p-6">
             <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2 text-foreground">
               {product.name}
             </h3>
-            
+            <p className="text-muted-foreground mb-4 line-clamp-2 text-sm leading-relaxed">
+              {product.description}
+            </p>
+
             <div className="flex items-center justify-between mb-4">
-              <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground mb-1">
-                  A partir 25 unid.
-                </span>
-                <span className="text-2xl font-bold text-primary">
-                  {formatPriceBRL(product.price)}
-                </span>
-              </div>
+              <span className="text-2xl font-bold text-primary">
+                {formatPriceBRL(product.price)}
+              </span>
               {product.rating && (
-                <div className="flex items-center gap-1">
-                  <Star className="size-4 text-muted-foreground fill-current" />
-                  <span className="text-sm font-medium text-muted-foreground">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full">
+                  <Star className="size-4 text-accent-foreground" />
+                  <span className="text-sm font-medium text-primary">
                     {product.rating}
                   </span>
                 </div>
