@@ -65,20 +65,19 @@ export class SupabaseService {
   }
 
   static async createProductWithImages(
-    productData: Omit<ProductInsert, "images">,
-    imageFiles: File[],
+    productData: Omit<ProductInsert, 'images'>,
+    imageFiles: File[]
   ): Promise<Product> {
     try {
       // Upload images first
-      const uploadResult =
-        await ImageUploadService.uploadMultipleImages(imageFiles);
-
-      // Create product with the uploaded image URLs
+      const uploadedImages = await ImageUploadService.uploadImages(imageFiles);
+      
+      // Create product with uploaded images
       const product: ProductInsert = {
         ...productData,
-        images: uploadResult.urls,
+        images: uploadedImages,
       };
-
+      
       return await this.createProduct(product);
     } catch (error) {
       console.error("Error creating product with images:", error);
@@ -107,51 +106,57 @@ export class SupabaseService {
 
   static async updateProductWithImages(
     id: string,
-    updates: Omit<ProductUpdate, "images">,
+    updates: Omit<ProductUpdate, 'images'>,
     imageFiles?: File[],
-    imagesToRemove?: string[],
+    imagesToRemove?: string[]
   ): Promise<Product> {
     try {
-      const finalUpdates: ProductUpdate = { ...updates };
-
-      // Get current product to access existing images
+      // Get current product to preserve existing images
       const currentProduct = await this.getProductById(id);
       if (!currentProduct) {
-        throw new Error("Produto não encontrado");
+        throw new Error("Product not found");
       }
 
       let finalImages = [...(currentProduct.images || [])];
 
-      // Remove specified images from storage and from the images array
+      // Remove specified images
       if (imagesToRemove && imagesToRemove.length > 0) {
+        finalImages = finalImages.filter(img => !imagesToRemove.includes(img.url));
+        
+        // Delete removed images from storage
         for (const imageUrl of imagesToRemove) {
-          if (ImageUploadService.isSupabaseImageUrl(imageUrl)) {
-            try {
-              const imagePath = ImageUploadService.extractStoragePath(imageUrl);
-              if (imagePath) {
-                await ImageUploadService.deleteImage(imagePath);
-              }
-            } catch (error) {
-              console.warn("Failed to delete image from storage:", error);
-              // Continue even if storage deletion fails
-            }
+          try {
+            await ImageUploadService.deleteImageByUrl(imageUrl);
+          } catch (error) {
+            console.warn("Failed to delete image from storage:", imageUrl, error);
           }
-          // Remove from images array
-          finalImages = finalImages.filter(img => img !== imageUrl);
         }
       }
 
-      // If new images are provided, upload them and add to the array
+      // Upload new images if provided
       if (imageFiles && imageFiles.length > 0) {
-        const uploadResult =
-          await ImageUploadService.uploadMultipleImages(imageFiles);
-        finalImages = [...finalImages, ...uploadResult.urls];
+        const uploadedImages = await ImageUploadService.uploadImages(imageFiles);
+        
+        // Set the first new image as primary if there are no existing images
+        if (finalImages.length === 0 && uploadedImages.length > 0) {
+          uploadedImages[0].isPrimary = true;
+        }
+        
+        finalImages = [...finalImages, ...uploadedImages];
       }
 
-      // Update the product with the final images array
-      finalUpdates.images = finalImages;
+      // Ensure at least one image exists
+      if (finalImages.length === 0) {
+        throw new Error("Pelo menos uma imagem é obrigatória");
+      }
 
-      return await this.updateProduct(id, finalUpdates);
+      // Update product with new images
+      const productUpdate: ProductUpdate = {
+        ...updates,
+        images: finalImages,
+      };
+
+      return await this.updateProduct(id, productUpdate);
     } catch (error) {
       console.error("Error updating product with images:", error);
       throw error;
@@ -159,35 +164,98 @@ export class SupabaseService {
   }
 
   static async deleteProduct(id: string): Promise<void> {
-    // First get the product to delete its images
+    // Get product to clean up images
     const product = await this.getProductById(id);
-
-    if (product?.images && product.images.length > 0) {
-      // Delete all images from Supabase Storage
-      for (const imageUrl of product.images) {
-        if (ImageUploadService.isSupabaseImageUrl(imageUrl)) {
-          try {
-            const imagePath = ImageUploadService.extractStoragePath(imageUrl);
-            if (imagePath) {
-              await ImageUploadService.deleteImage(imagePath);
-            }
-          } catch (error) {
-            console.warn("Failed to delete product image:", error);
-            // Continue with product deletion even if image deletion fails
-          }
-        }
-      }
-    }
-
+    
     const { error } = await supabase.from("products").delete().eq("id", id);
 
     if (error) {
       console.error("Error deleting product:", error);
       throw new Error(`Erro ao deletar produto: ${error.message}`);
     }
+
+    // Clean up images after successful deletion
+    if (product?.images) {
+      for (const image of product.images) {
+        try {
+          await ImageUploadService.deleteImageByUrl(image.url);
+        } catch (error) {
+          console.warn("Failed to delete image from storage:", image.url, error);
+        }
+      }
+    }
   }
 
-  static async getProductsByCategory(categoryId: string): Promise<Product[]> {
+  // Enhanced pagination method (from our improvements)
+  static async getProductsPaginated(options: {
+    offset?: number;
+    limit?: number;
+    category?: string;
+    categoryId?: string;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}): Promise<Product[]> {
+    const {
+      offset = 0,
+      limit = 20,
+      category,
+      categoryId,
+      search,
+      sortBy = 'created_at',
+      sortOrder = 'desc'
+    } = options;
+
+    let query = supabase
+      .from("products")
+      .select("*");
+
+    // Apply filters - support both category name and ID for backward compatibility
+    if (categoryId) {
+      query = query.eq("category_id", categoryId);
+    } else if (category && category !== 'Todos') {
+      query = query.eq("category", category);
+    }
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    // Apply sorting
+    query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Error fetching paginated products:", error);
+      throw new Error(`Erro ao buscar produtos: ${error.message}`);
+    }
+
+    return data || [];
+  }
+
+  static async getProductsByCategory(category: string): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("category", category)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching products by category:", error);
+      throw new Error(
+        `Erro ao buscar produtos por categoria: ${error.message}`,
+      );
+    }
+
+    return data || [];
+  }
+
+  // New method for category ID (from main branch)
+  static async getProductsByCategoryId(categoryId: string): Promise<Product[]> {
     const { data, error } = await supabase
       .from("products")
       .select(
@@ -229,7 +297,7 @@ export class SupabaseService {
     return data || [];
   }
 
-  // Categories
+  // Categories (enhanced from main branch)
   static async getCategories(): Promise<Category[]> {
     const { data, error } = await supabase
       .from("categories")
