@@ -51,7 +51,6 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
   const { products, isLoading, isFetching, error, isError, refetch, isEmpty } =
     useProductsQuery();
 
-  // Search functionality
   const {
     searchQuery,
     setSearchQuery,
@@ -71,7 +70,7 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
     useProductSort(filterResults);
 
   return (
-    <section id={sectionId} className="py-20 text-foreground">
+    <section id={sectionId} className="text-foreground">
       <div className="container mx-auto px-4">
         {/* Error State */}
         {isError && error && (
