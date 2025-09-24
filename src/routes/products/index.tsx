@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ProductGrid from "@/components/ProductGrid";
+import { useProductsQuery } from "@/hooks/useProductsQuery";
 
 export const Route = createFileRoute("/products/")({
   component: ProductsPage,
@@ -41,11 +42,35 @@ export const Route = createFileRoute("/products/")({
 import { CartFloat } from "@/components/CartFloat";
 
 function ProductsPage() {
+  const { 
+    products, 
+    isLoading, 
+    isFetching, 
+    error, 
+    isError, 
+    refetch, 
+    isEmpty, 
+    isStale 
+  } = useProductsQuery();
+
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <ProductGrid sectionId="products" />
-      </div>
+      <ProductGrid
+        sectionId="products"
+        products={products}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        error={error}
+        isError={isError}
+        isEmpty={isEmpty}
+        isStale={isStale}
+        onRefetch={refetch}
+        title="Nossos Produtos"
+        subtitle="Descubra nossa seleção cuidadosa de produtos de alta qualidade"
+        showStatistics={true}
+        isAdmin={false}
+        searchPlaceholder="Pesquisar produtos..."
+      />
       <CartFloat />
     </div>
   );

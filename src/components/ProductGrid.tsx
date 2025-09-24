@@ -6,27 +6,61 @@ import { SearchInput } from "@/components/ui/search-input";
 import { SortSelect } from "@/components/ui/sort-select";
 import { FilterPanel } from "@/components/ui/filter-panel";
 import { CategoryFilters } from "@/components/CategoryFilters";
-import { AlertTriangle, RefreshCw, Wifi, Filter } from "lucide-react";
-import { useProductsQuery } from "@/hooks/useProductsQuery";
+import { AlertTriangle, RefreshCw, Wifi, Filter, PencilIcon } from "lucide-react";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useProductSort } from "@/hooks/useProductSort";
 import { useProductFilters } from "@/hooks/useProductFilters";
-import { useState } from "react";
+import { useState, ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import type { Product } from "@/types/product";
 
-const ProductGrid = ({ sectionId }: { sectionId: string }) => {
+interface ProductGridProps {
+  // Data
+  products: Product[];
+  isLoading?: boolean;
+  isFetching?: boolean;
+  error?: string | null;
+  isError?: boolean;
+  isEmpty?: boolean;
+  isStale?: boolean;
+  onRefetch?: () => void;
+  
+  // Layout
+  sectionId?: string;
+  title?: string;
+  subtitle?: string;
+  showStatistics?: boolean;
+  
+  // Admin specific
+  isAdmin?: boolean;
+  adminActions?: ReactNode;
+  
+  // Customization
+  searchPlaceholder?: string;
+  emptyStateMessage?: string;
+  emptyStateAction?: ReactNode;
+}
+
+export const ProductGrid = ({
+  products,
+  isLoading = false,
+  isFetching = false,
+  error,
+  isError = false,
+  isEmpty = false,
+  isStale = false,
+  onRefetch,
+  sectionId,
+  title = "Nossos Produtos",
+  subtitle = "Descubra nossa seleção cuidadosa de produtos de alta qualidade",
+  showStatistics = true,
+  isAdmin = false,
+  adminActions,
+  searchPlaceholder = "Pesquisar produtos...",
+  emptyStateMessage,
+  emptyStateAction,
+}: ProductGridProps) => {
   const [showFilters, setShowFilters] = useState(false);
-
-  // Main data query
-  const {
-    products,
-    isLoading,
-    isFetching,
-    error,
-    isError,
-    refetch,
-    isEmpty,
-    isStale,
-  } = useProductsQuery();
 
   // Search functionality
   const {
@@ -47,12 +81,26 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
   const { sortOption, setSortOption, sortedProducts } =
     useProductSort(filterResults);
 
+  const defaultEmptyMessage = isAdmin 
+    ? "Nenhum produto cadastrado ainda." 
+    : "Nenhum produto encontrado. Verifique a configuração da planilha.";
+
+  const defaultEmptyAction = isAdmin ? (
+    <Button asChild>
+      <Link to="/admin/products">
+        <PencilIcon className="size-4 mr-2" />
+        Cadastrar primeiro produto
+      </Link>
+    </Button>
+  ) : null;
+
   return (
     <section id={sectionId} className="py-20 text-foreground">
       <div className="container mx-auto px-4">
+        {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <h2 className="text-4xl font-bold text-primary">Nossos Produtos</h2>
+            <h2 className="text-4xl font-bold text-primary">{title}</h2>
             {isFetching && !isLoading && (
               <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
             )}
@@ -64,9 +112,16 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
             )}
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Descubra nossa seleção cuidadosa de produtos de alta qualidade
+            {subtitle}
           </p>
         </div>
+
+        {/* Admin Actions */}
+        {isAdmin && adminActions && (
+          <div className="mb-8">
+            {adminActions}
+          </div>
+        )}
 
         {/* Error State */}
         {isError && error && (
@@ -74,19 +129,21 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
               <span>Erro ao carregar produtos: {error}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetch()}
-                disabled={isFetching}
-              >
-                {isFetching ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-4 w-4" />
-                )}
-                Tentar Novamente
-              </Button>
+              {onRefetch && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onRefetch}
+                  disabled={isFetching}
+                >
+                  {isFetching ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
+                  Tentar Novamente
+                </Button>
+              )}
             </AlertDescription>
           </Alert>
         )}
@@ -96,7 +153,7 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
           <Alert className="mb-8">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Nenhum produto encontrado. Verifique a configuração da planilha.
+              {emptyStateMessage || defaultEmptyMessage}
             </AlertDescription>
           </Alert>
         )}
@@ -104,7 +161,11 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         {/* Search */}
         <div className="mb-8">
           <div className="max-w-md mx-auto mb-6">
-            <SearchInput value={searchQuery} onChange={setSearchQuery} />
+            <SearchInput 
+              value={searchQuery} 
+              onChange={setSearchQuery}
+              placeholder={searchPlaceholder}
+            />
           </div>
 
           <CategoryFilters
@@ -162,9 +223,12 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
                 <h3 className="text-lg font-medium mb-2">
                   Nenhum produto encontrado
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  Tente ajustar os filtros ou termos de pesquisa
+                <p className="text-sm text-muted-foreground mb-4">
+                  {products.length === 0 
+                    ? (emptyStateMessage || defaultEmptyMessage)
+                    : "Tente ajustar os filtros ou termos de pesquisa."}
                 </p>
+                {products.length === 0 && (emptyStateAction || defaultEmptyAction)}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -186,22 +250,24 @@ const ProductGrid = ({ sectionId }: { sectionId: string }) => {
         </div>
 
         {/* Statistics */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div className="p-6">
-            <div className="text-4xl font-bold text-primary mb-2">
-              {products.length}+
+        {showStatistics && (
+          <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="p-6">
+              <div className="text-4xl font-bold text-primary mb-2">
+                {products.length}+
+              </div>
+              <div className="text-muted-foreground">Produtos Disponíveis</div>
             </div>
-            <div className="text-muted-foreground">Produtos Disponíveis</div>
+            <div className="p-6">
+              <div className="text-4xl font-bold text-primary mb-2">1000+</div>
+              <div className="text-muted-foreground">Clientes Satisfeitos</div>
+            </div>
+            <div className="p-6">
+              <div className="text-4xl font-bold text-primary mb-2">24h</div>
+              <div className="text-muted-foreground">Atendimento Rápido</div>
+            </div>
           </div>
-          <div className="p-6">
-            <div className="text-4xl font-bold text-primary mb-2">1000+</div>
-            <div className="text-muted-foreground">Clientes Satisfeitos</div>
-          </div>
-          <div className="p-6">
-            <div className="text-4xl font-bold text-primary mb-2">24h</div>
-            <div className="text-muted-foreground">Atendimento Rápido</div>
-          </div>
-        </div>
+        )}
       </div>
     </section>
   );
