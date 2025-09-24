@@ -49,53 +49,57 @@ function ProductDetailPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Link to="/products">
-          <Button variant="ghost" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar aos Produtos
-          </Button>
-        </Link>
-      </div>
-
-      <div className="grid gap-8 md:grid-cols-2">
-        <div>
-          <ImageGallery
-            images={product.images || []}
-            productName={product.name}
-          />
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-6">
+          <Link to="/products">
+            <Button variant="ghost" className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar aos Produtos
+            </Button>
+          </Link>
         </div>
 
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-            <p className="text-lg text-muted-foreground">
-              {product.description}
-            </p>
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="w-full overflow-hidden">
+            <ImageGallery
+              images={product.images || []}
+              productName={product.name}
+            />
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-primary">
-                {formatPriceBRL(product.price)}
-              </span>
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold mb-2 break-words">
+                {product.name}
+              </h1>
+              <p className="text-base md:text-lg text-muted-foreground break-words">
+                {product.description}
+              </p>
             </div>
 
-            {!isCategoryLoading && category && (
-              <div>
-                <span className="text-sm text-muted-foreground">
-                  Categoria:{" "}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xl md:text-2xl font-bold text-primary">
+                  {formatPriceBRL(product.price)}
                 </span>
-                <span className="font-medium">{category.name}</span>
               </div>
-            )}
-          </div>
 
-          <div className="pt-4">
-            <Button size="lg" className="w-full">
-              Entrar em Contato via WhatsApp
-            </Button>
+              {!isCategoryLoading && category && (
+                <div>
+                  <span className="text-sm text-muted-foreground">
+                    Categoria:{" "}
+                  </span>
+                  <span className="font-medium">{category.name}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-4">
+              <Button size="lg" className="w-full">
+                Entrar em Contato via WhatsApp
+              </Button>
+            </div>
           </div>
         </div>
       </div>
