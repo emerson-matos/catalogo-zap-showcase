@@ -3,7 +3,7 @@ import { ShoppingCart, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
 
 interface AddToCartButtonProps extends React.ComponentProps<typeof Button> {

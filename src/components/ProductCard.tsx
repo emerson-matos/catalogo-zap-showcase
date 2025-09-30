@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
@@ -10,6 +10,7 @@ import type { Product } from "@/types/product";
 import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 import { Button } from "./ui/button";
 import { ProtectedComponent } from "./ProtectedRoute";
+import { NEW_PRODUCT_DAYS_THRESHOLD, DEFAULT_PLACEHOLDER_IMAGE } from "@/constants/app";
 
 interface ProductCardProps {
   product: Product;
@@ -17,32 +18,47 @@ interface ProductCardProps {
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
   const { data: category } = useCategoryQuery(product.category_id || "");
-  const isNewProduct = () => {
+  
+  const isNewProduct = useMemo(() => {
     if (!product.created_at) return false;
-    const createdDate = new Date(product.created_at);
-    const today = new Date();
-    const diffTime = today.getTime() - createdDate.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= 7;
-  };
+    
+    try {
+      const createdDate = new Date(product.created_at);
+      if (isNaN(createdDate.getTime())) return false; // Invalid date
+      
+      const today = new Date();
+      const diffTime = today.getTime() - createdDate.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays <= NEW_PRODUCT_DAYS_THRESHOLD && diffDays >= 0; // Ensure reasonable date range
+    } catch {
+      return false; // Handle any date parsing errors
+    }
+  }, [product.created_at]);
   return (
     <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
       <CardContent className="p-0">
-        <Link to="/products/$id" params={{ id: product.id }}>
+        <Link 
+          to="/products/$id" 
+          params={{ id: product.id }}
+          aria-label={`Ver detalhes do produto ${product.name}`}
+        >
           <div className="relative overflow-hidden rounded-t-lg">
             <img
-              src={product.images?.[0] || "/placeholder.svg"}
+              src={product.images?.[0] || DEFAULT_PLACEHOLDER_IMAGE}
               alt={product.name}
               loading="lazy"
               decoding="async"
               className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-contain"
-              onError={(e) => {
+              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                 const target = e.target as HTMLImageElement;
-                target.src = "/placeholder.svg";
+                target.src = DEFAULT_PLACEHOLDER_IMAGE;
               }}
             />
-            {isNewProduct() && (
-              <Badge className="absolute top-2 left-2 bg-muted text-green-600 font-bold shadow border border-border">
+            {isNewProduct && (
+              <Badge 
+                className="absolute top-2 left-2 bg-muted text-green-600 font-bold shadow border border-border"
+                aria-label="Produto novo"
+              >
                 Novo
               </Badge>
             )}
