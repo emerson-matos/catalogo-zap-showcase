@@ -10,10 +10,54 @@ import {
 } from "lucide-react";
 
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import { useEffect, useState } from "react";
+
+export const WelcomeMessage = () => {
+  const [displayText, setDisplayText] = useState("");
+  const fullText = "Bem vindo ao nosso site, aproveite as novidades!";
+  const [index, setIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const typingSpeed = isDeleting ? 50 : 150;
+    const pauseTime = 2000;
+
+    const timer = setTimeout(() => {
+      if (!isDeleting && index < fullText.length) {
+        setDisplayText(fullText.substring(0, index + 1));
+        setIndex(index + 1);
+      } else if (!isDeleting && index === fullText.length) {
+        setTimeout(() => setIsDeleting(true), pauseTime);
+      } else if (isDeleting && index > 0) {
+        setDisplayText(fullText.substring(0, index - 1));
+        setIndex(index - 1);
+      } else if (isDeleting && index === 0) {
+        setIsDeleting(false);
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [index, isDeleting, fullText]);
+
+  return (
+    <div className="flex items-center justify-center m-4 p-4">
+      <div className="text-center">
+        <div className="relative inline-block">
+          <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-8">
+            {displayText}
+            <span className="animate-pulse text-cyan-400">|</span>
+          </h1>
+          <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-3xl -z-10"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const Home = () => {
   return (
     <>
+      <WelcomeMessage />
       <Hero sectionId="hero" />
       <WhatsAppFloat />
       {/* Quick Navigation Section */}
