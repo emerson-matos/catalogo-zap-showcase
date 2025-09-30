@@ -28,13 +28,16 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
     return diffDays <= 7;
   };
 
-  const handleCardClick = () => {
-    if (cardRef.current) {
-      cardRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center'
-      });
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Only scroll if clicking on the card itself, not on buttons or links
+    if (e.target === e.currentTarget || (e.target as HTMLElement).closest('.card-content')) {
+      if (cardRef.current) {
+        cardRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center'
+        });
+      }
     }
   };
 
