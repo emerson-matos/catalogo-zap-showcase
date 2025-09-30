@@ -29,15 +29,16 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only scroll if clicking on the card itself, not on buttons or links
-    if (e.target === e.currentTarget || (e.target as HTMLElement).closest('.card-content')) {
-      if (cardRef.current) {
-        cardRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'center'
-        });
-      }
+    // Prevent default link behavior and scroll to center
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (cardRef.current) {
+      cardRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center'
+      });
     }
   };
 
@@ -47,58 +48,56 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
       className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105 overflow-hidden"
       onClick={handleCardClick}
     >
-      <CardContent className="p-0 overflow-hidden">
-        <Link to="/products/$id" params={{ id: product.id }} className="block">
-          <div className="relative overflow-hidden rounded-t-lg">
-            <img
-              src={product.images?.[0] || "/placeholder.svg"}
-              alt={product.name}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-contain bg-white"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "/placeholder.svg";
-              }}
-            />
-            {isNewProduct() && (
-              <Badge className="absolute top-2 left-2 bg-muted text-green-600 font-bold shadow border border-border z-10 max-w-[calc(100%-1rem)] truncate">
-                Novo
-              </Badge>
-            )}
-            {category?.name && (
-              <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground font-semibold shadow border border-border z-10 max-w-[calc(100%-1rem)] truncate">
-                {category.name}
-              </Badge>
+      <CardContent className="p-0 overflow-hidden" onClick={handleCardClick}>
+        <div className="relative overflow-hidden rounded-t-lg">
+          <img
+            src={product.images?.[0] || "/placeholder.svg"}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-contain bg-white"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/placeholder.svg";
+            }}
+          />
+          {isNewProduct() && (
+            <Badge className="absolute top-2 left-2 bg-muted text-green-600 font-bold shadow border border-border z-10 max-w-[calc(100%-1rem)] truncate">
+              Novo
+            </Badge>
+          )}
+          {category?.name && (
+            <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground font-semibold shadow border border-border z-10 max-w-[calc(100%-1rem)] truncate">
+              {category.name}
+            </Badge>
+          )}
+        </div>
+
+        <div className="p-6 overflow-hidden">
+          <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2 text-foreground break-words">
+            {product.name}
+          </h3>
+          <p className="text-muted-foreground mb-4 line-clamp-2 text-sm leading-relaxed break-words overflow-hidden">
+            {product.description}
+          </p>
+
+          <div className="flex items-center justify-between mb-4 gap-2">
+            <span className="text-2xl font-bold text-primary flex-shrink-0">
+              {formatPriceBRL(product.price)}
+            </span>
+            {product.rating && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full flex-shrink-0">
+                <Star className="size-4 text-accent-foreground" />
+                <span className="text-sm font-medium text-primary">
+                  {product.rating}
+                </span>
+              </div>
             )}
           </div>
-
-          <div className="p-6 overflow-hidden">
-            <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2 text-foreground break-words">
-              {product.name}
-            </h3>
-            <p className="text-muted-foreground mb-4 line-clamp-2 text-sm leading-relaxed break-words overflow-hidden">
-              {product.description}
-            </p>
-
-            <div className="flex items-center justify-between mb-4 gap-2">
-              <span className="text-2xl font-bold text-primary flex-shrink-0">
-                {formatPriceBRL(product.price)}
-              </span>
-              {product.rating && (
-                <div className="flex items-center gap-1 px-2 py-1 rounded-full flex-shrink-0">
-                  <Star className="size-4 text-accent-foreground" />
-                  <span className="text-sm font-medium text-primary">
-                    {product.rating}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        </Link>
+        </div>
       </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2 p-4 overflow-hidden">
+      <CardFooter className="flex flex-wrap gap-2 p-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <ProtectedComponent requiredRole="editor">
           <Button asChild size="sm" variant="outline" className="flex-shrink-0">
             <Link to="/admin/products" search={{ id: product.id }}>
@@ -107,13 +106,13 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
             </Link>
           </Button>
         </ProtectedComponent>
-        <WhatsAppButton product={product} className="flex-1 min-w-0 overflow-hidden" size="sm">
-          <span className="hidden sm:inline truncate">Consultar</span>
-          <span className="sm:hidden truncate">WhatsApp</span>
+        <WhatsAppButton product={product} className="flex-1 min-w-0" size="sm">
+          <span className="hidden sm:inline">Consultar</span>
+          <span className="sm:hidden">WhatsApp</span>
         </WhatsAppButton>
-        <AddToCartButton product={product} className="flex-1 min-w-0 overflow-hidden" size="sm">
-          <span className="hidden sm:inline truncate">Adicionar</span>
-          <span className="sm:hidden truncate">Carrinho</span>
+        <AddToCartButton product={product} className="flex-1 min-w-0" size="sm">
+          <span className="hidden sm:inline">Adicionar</span>
+          <span className="sm:hidden">Carrinho</span>
         </AddToCartButton>
       </CardFooter>
     </Card>
