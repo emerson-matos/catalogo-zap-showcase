@@ -39,16 +39,16 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
   };
 
   return (
-    <Card ref={cardRef} className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105 flex flex-col overflow-hidden">
-      <CardContent className="p-0 flex-1">
-        <Link to="/products/$id" params={{ id: product.id }} onClick={handleCardClick}>
-          <div className="relative overflow-hidden rounded-t-lg">
+    <Card ref={cardRef} className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105 flex flex-col">
+      <CardContent className="p-0 flex-1 flex flex-col">
+        <Link to="/products/$id" params={{ id: product.id }} onClick={handleCardClick} className="flex flex-col h-full">
+          <div className="relative overflow-hidden rounded-t-lg flex-1">
             <img
               src={product.images?.[0] || "/placeholder.svg"}
               alt={product.name}
               loading="lazy"
               decoding="async"
-              className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-contain"
+              className="w-full h-full transition-transform duration-300 group-hover:scale-110 object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/placeholder.svg";
