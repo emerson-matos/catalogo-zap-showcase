@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ShoppingCart, X, Plus, Minus, MessageCircle } from "lucide-react";
+import { MessageCircle, Minus, Plus, ShoppingCart, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/hooks/use-cart";
 import { formatPriceBRL } from "@/lib/utils";
 import { createCartWhatsAppUrl } from "@/lib/whatsapp";
 
