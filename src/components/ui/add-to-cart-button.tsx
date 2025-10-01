@@ -1,10 +1,10 @@
-import React from "react";
-import { ShoppingCart, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Product } from "@/types/product";
-import { useCart } from "@/contexts/CartContext";
+import { Plus, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/hooks/use-cart";
+import { cn } from "@/lib/utils";
+import type { Product } from "@/types/product";
 
 interface AddToCartButtonProps extends React.ComponentProps<typeof Button> {
   product: Product;
