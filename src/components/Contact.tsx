@@ -1,10 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
-import { WhatsAppButton } from "./ui/whatsapp-button";
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
+import { ContactCard } from "@/components/ContactCard";
+import { getContactCardsData, getAdditionalCardsData } from "@/constants/contactData";
 
 const Contact = ({ sectionId }: { sectionId: string }) => {
   const whatsappNumber = getWhatsAppNumber();
+  const contactCards = getContactCardsData(whatsappNumber);
+  const additionalCards = getAdditionalCardsData();
 
   return (
     <section id={sectionId} className="py-20 bg-card text-foreground">
@@ -20,101 +23,16 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Informações de Contato */}
           <div className="space-y-6">
-            <Card className="bg-card shadow-card border border-border">
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-whatsapp/10 p-3 rounded-lg">
-                    <MessageCircle className="w-6 h-6 text-whatsapp" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">WhatsApp</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Atendimento rápido e personalizado via WhatsApp
-                    </p>
-                    <WhatsAppButton className="w-full sm:w-auto px-6 py-2">
-                      Iniciar Conversa
-                    </WhatsAppButton>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card">
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="p-3 rounded-lg">
-                    <Phone className="size-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Telefone</h3>
-                    <p className="text-muted-foreground">
-                      {whatsappNumber
-                        ? `${whatsappNumber.replace(/(\d{2})?(\d{2})(\d{5})(\d{4})/, "($2) $3-$4")}`
-                        : "(11) 99999-9999"}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card">
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="p-3 rounded-lg">
-                    <Mail className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">E-mail</h3>
-                    <p className="text-muted-foreground">
-                      serenacosmeticos@hotmail.com
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {contactCards.map((card) => (
+              <ContactCard key={card.title} {...card} />
+            ))}
           </div>
 
           {/* Informações Adicionais */}
           <div className="space-y-6">
-            <Card className="shadow-card">
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className="p-3 rounded-lg">
-                    <Clock className="size-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">
-                      Horário de Atendimento
-                    </h3>
-                    <div className="space-y-1 text-muted-foreground">
-                      <p>Segunda a Sexta: 8h às 18h</p>
-                      <p>Sábado: 8h às 14h</p>
-                      <p>Domingo: Plantão via WhatsApp</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-card">
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className=" p-3 rounded-lg">
-                    <MapPin className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Localização</h3>
-                    <p className="text-muted-foreground">
-                      Av. Sorocaba, 961, Pq João Ramalho
-                      <br />
-                      Santo André - SP
-                      <br />
-                      Atendimento presencial sob agendamento
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {additionalCards.map((card) => (
+              <ContactCard key={card.title} {...card} />
+            ))}
 
             <Card className="bg-primary text-primary-foreground shadow-lg border border-border">
               <CardContent className="p-6 text-center">
