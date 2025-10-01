@@ -1,10 +1,10 @@
+import type { LucideIcon } from "lucide-react";
 import {
   BookOpen,
-  Users,
+  HomeIcon,
   MessageCircle,
   ShoppingBag,
-  HomeIcon,
-  type LucideIcon,
+  Users,
 } from "lucide-react";
 
 export interface NavigationItem {
