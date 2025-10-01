@@ -1,7 +1,7 @@
+import { Link } from "@tanstack/react-router";
 import heroImage from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
-import { WhatsAppButton } from "./ui/whatsapp-button";
-import { Link } from "@tanstack/react-router";
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 
 const Hero = ({ sectionId }: { sectionId: string }) => {
   return (

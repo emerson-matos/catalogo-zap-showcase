@@ -1,11 +1,12 @@
+import { Award, Heart, Star, Users } from "lucide-react";
+
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Users, Star, Award } from "lucide-react";
 
 const About = ({ sectionId }: { sectionId: string }) => {
   return (
-    <section id={sectionId} className="container">
-      <div className="mx-auto px-4">
-        <div className="text-center mb-12">
+    <section id={sectionId}>
+      <div className="mx-auto container px-4 py-8">
+        <div className="text-center m-12">
           <h2 className="text-4xl font-bold mb-4">Quem Somos</h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Conheça a história e os valores da SeRena Cosméticos
