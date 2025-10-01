@@ -1,4 +1,4 @@
-import { createContext, useEffect, useReducer} from 'react';
+import { createContext, useContext, useEffect, useReducer} from 'react';
 
 import type { CartContextType, CartItem, Product } from '@/types/product';
 
@@ -152,4 +152,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       {children}
     </CartContext.Provider>
   );
+}
+
+export function useCart() {
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
 }
