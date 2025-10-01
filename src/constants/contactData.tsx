@@ -35,7 +35,7 @@ export const getContactCardsData = (
     icon: Mail,
     title: "E-mail",
     content: (
-      <p className="text-muted-foreground">serenacosmeticos@hotmail.com</p>
+      <p className="text-muted-foreground break-all">serenacosmeticos@hotmail.com</p>
     ),
   },
 ];

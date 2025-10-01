@@ -24,9 +24,11 @@ export const ContactCard = ({
           <div className="p-3 rounded-lg bg-primary/10">
             <Icon className="size-6 text-primary" />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg mb-2">{title}</h3>
-            {content}
+            <div className="break-words">
+              {content}
+            </div>
           </div>
         </div>
       </CardContent>
