@@ -1,7 +1,10 @@
 import { ContactCard } from "@/components/ContactCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
-import { getAdditionalCardsData, getContactCardsData } from "@/constants/contactData";
+import {
+  getAdditionalCardsData,
+  getContactCardsData,
+} from "@/constants/contactData";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 const Contact = ({ sectionId }: { sectionId: string }) => {
@@ -10,7 +13,7 @@ const Contact = ({ sectionId }: { sectionId: string }) => {
   const additionalCards = getAdditionalCardsData();
 
   return (
-    <section id={sectionId} className="py-20 bg-card text-foreground">
+    <section id={sectionId} className="py-20 text-foreground">
       <div className="container mx-auto px-4">
         <div className="text-center m-6">
           <h2 className="text-4xl font-bold m-4">Entre em Contato</h2>
