@@ -7,10 +7,12 @@ import {
   MessageCircle,
   Package,
   BookOpen,
+  VideoIcon,
 } from "lucide-react";
 
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export const WelcomeMessage = () => {
   const [displayText, setDisplayText] = useState("");
@@ -134,6 +136,28 @@ export const Home = () => {
                 </Button>
               </div>
             </Link>
+            <div className="bg-gradient-card shadow-card rounded-lg p-8 text-center hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="bg-primary/10 p-4 rounded-lg w-fit mx-auto mb-4">
+                <VideoIcon className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="font-semibold text-xl mb-3">Vídeos</h3>
+              <p className="text-muted-foreground mb-4">Dicas de maquiagem</p>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    Ver vídeo <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </DialogTrigger>
+
+                <DialogContent className="max-w-3xl">
+                  <video controls autoPlay className="w-full rounded-lg">
+                    <source src="/meu-video.mp4" type="video/mp4" />
+                    Seu navegador não suporta o player de vídeo.
+                  </video>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
       </section>
