@@ -43,7 +43,7 @@ export const WelcomeMessage = () => {
     <div className="flex items-center justify-center m-4 p-4">
       <div className="text-center">
         <div className="relative inline-block">
-          <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-8">
+          <h1 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-8">
             {displayText}
             <span className="animate-pulse text-cyan-400">|</span>
           </h1>
