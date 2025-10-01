@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VideosRouteImport } from './routes/videos'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as FlipbookRouteImport } from './routes/flipbook'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -21,6 +22,11 @@ import { Route as ProductsSearchRouteImport } from './routes/products/search'
 import { Route as ProductsIdRouteImport } from './routes/products/$id'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 
+const VideosRoute = VideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
   '/products': typeof ProductsRouteWithChildren
+  '/videos': typeof VideosRoute
   '/admin/products': typeof AdminProductsRoute
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
+  '/videos': typeof VideosRoute
   '/admin/products': typeof AdminProductsRoute
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/flipbook': typeof FlipbookRoute
   '/products': typeof ProductsRouteWithChildren
+  '/videos': typeof VideosRoute
   '/admin/products': typeof AdminProductsRoute
   '/products/$id': typeof ProductsIdRoute
   '/products/search': typeof ProductsSearchRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/flipbook'
     | '/products'
+    | '/videos'
     | '/admin/products'
     | '/products/$id'
     | '/products/search'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/flipbook'
+    | '/videos'
     | '/admin/products'
     | '/products/$id'
     | '/products/search'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/flipbook'
     | '/products'
+    | '/videos'
     | '/admin/products'
     | '/products/$id'
     | '/products/search'
@@ -162,10 +174,18 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   FlipbookRoute: typeof FlipbookRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  VideosRoute: typeof VideosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/videos': {
+      id: '/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products': {
       id: '/products'
       path: '/products'
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   FlipbookRoute: FlipbookRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  VideosRoute: VideosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
