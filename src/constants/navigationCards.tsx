@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  FlaskConicalIcon,
   MessageCircle,
   Package,
   Users,
@@ -8,7 +9,7 @@ import {
 
 import type { NavigationCardProps } from "@/components/NavigationCard";
 
-export const navigationCardsData: NavigationCardProps[] = [
+export const navigationCardsData: (NavigationCardProps & { whatsappMessage?: string })[] = [
   {
     title: "Sobre Nós",
     description:
@@ -47,5 +48,13 @@ export const navigationCardsData: NavigationCardProps[] = [
     icon: VideoIcon,
     buttonText: "Ver vídeos",
     to: "/videos",
+  },
+  {
+    title: "Orçamento de Fórmula Magistral",
+    description:
+      "Faça o orçamento de suas fórmulas conosco, entre em contato e saiba mais.",
+    icon: FlaskConicalIcon,
+    buttonText: "Entrar em contato",
+    whatsappMessage: "Olá! Gostaria de saber mais informações sobre Fórmulas Magistral.",
   },
 ];

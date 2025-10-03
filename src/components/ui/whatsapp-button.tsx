@@ -11,10 +11,11 @@ export const WhatsAppButton = ({
   size,
   variant,
   product,
-}: React.ComponentProps<typeof Button> & { product?: Product }) => {
+  message,
+}: React.ComponentProps<typeof Button> & { product?: Product; message?: string }) => {
   const whatsappUrl = product
     ? createProductWhatsAppUrl(product.name)
-    : createWhatsAppUrl();
+    : createWhatsAppUrl({ message });
 
   const isIconOnly = !children || size === "icon";
 
