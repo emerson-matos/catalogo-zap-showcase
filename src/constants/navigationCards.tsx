@@ -9,7 +9,7 @@ import {
 
 import type { NavigationCardProps } from "@/components/NavigationCard";
 
-export const navigationCardsData: (NavigationCardProps & { whatsappMessage?: string })[] = [
+export const navigationCardsData: NavigationCardProps[] = [
   {
     title: "Sobre Nós",
     description:
@@ -55,6 +55,7 @@ export const navigationCardsData: (NavigationCardProps & { whatsappMessage?: str
       "Faça o orçamento de suas fórmulas conosco, entre em contato e saiba mais.",
     icon: FlaskConicalIcon,
     buttonText: "Entrar em contato",
-    whatsappMessage: "Olá! Gostaria de saber mais informações sobre Fórmulas Magistral.",
+    whatsappMessage:
+      "Olá! Gostaria de saber mais informações sobre Fórmulas Magistral.",
   },
 ];
