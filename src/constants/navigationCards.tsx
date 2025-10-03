@@ -56,6 +56,6 @@ export const navigationCardsData: NavigationCardProps[] = [
     icon: FlaskConicalIcon,
     buttonText: "Entrar em contato",
     whatsappMessage:
-      "Olá! Gostaria de saber mais informações sobre Fórmulas Magistral.",
+      "Olá! Gostaria de saber mais informações sobre Fórmula Magistral.",
   },
 ];
