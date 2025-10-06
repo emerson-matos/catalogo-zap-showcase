@@ -60,7 +60,7 @@ export function CartFloat() {
                     src={item.product.images?.[0] || "/placeholder.svg"}
                     alt={item.product.name}
                     className="w-12 h-12 rounded-lg object-cover"
-                    onError={(e: any) => {
+                    onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                       const target = e.target as HTMLImageElement;
                       target.src = "/placeholder.svg";
                     }}
