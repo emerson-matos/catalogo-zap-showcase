@@ -17,6 +17,8 @@ interface ProductCardProps {
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
   const { data: category } = useCategoryQuery(product.category_id || "");
+  const cardRef = React.useRef<HTMLDivElement>(null);
+  
   const isNewProduct = () => {
     if (!product.created_at) return false;
     const createdDate = new Date(product.created_at);
@@ -25,17 +27,28 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays <= 7;
   };
+
+  const handleCardClick = () => {
+    if (cardRef.current) {
+      cardRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
+  };
+
   return (
-    <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
-      <CardContent className="p-0">
-        <Link to="/products/$id" params={{ id: product.id }}>
-          <div className="relative overflow-hidden rounded-t-lg">
+    <Card ref={cardRef} className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105 flex flex-col">
+      <CardContent className="p-0 flex-1 flex flex-col">
+        <Link to="/products/$id" params={{ id: product.id }} onClick={handleCardClick} className="flex flex-col h-full">
+          <div className="relative overflow-hidden rounded-t-lg flex-1">
             <img
               src={product.images?.[0] || "/placeholder.svg"}
               alt={product.name}
               loading="lazy"
               decoding="async"
-              className="w-full h-64 transition-transform duration-300 group-hover:scale-110 object-contain"
+              className="w-full h-full transition-transform duration-300 group-hover:scale-110 object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/placeholder.svg";
@@ -78,7 +91,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
         </Link>
       </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2 p-4">
+      <CardFooter className="flex flex-wrap gap-2 p-4 mt-auto">
         <ProtectedComponent requiredRole="editor">
           <Button asChild size="sm" variant="outline" className="flex-shrink-0">
             <Link to="/admin/products" search={{ id: product.id }}>

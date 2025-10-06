@@ -30,7 +30,7 @@ const PageCover = React.forwardRef(
 const FlipbookPage = React.forwardRef(
   ({ product }: FlipbookPageProps, ref: React.ForwardedRef<HTMLDivElement>) => {
     return (
-      <div ref={ref} className="page page-content">
+      <div ref={ref} className="page page-content h-full w-full overflow-hidden">
         <ProductCard product={product} />
       </div>
     );
