@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useProduct } from "@/hooks/useProductsQuery";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Package } from "lucide-react";
+import { ArrowLeft, Package, AlertTriangle } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { formatPriceBRL } from "@/lib/utils";
 import { ImageGallery } from "@/components/ImageGallery";
 import { useCategoryQuery } from "@/hooks/useCategoryQuery";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/products/$id")({
   component: ProductDetailPage,
@@ -91,6 +92,30 @@ function ProductDetailPage() {
                     Categoria:{" "}
                   </span>
                   <span className="font-medium">{category.name}</span>
+                </div>
+              )}
+
+              {product.stock !== undefined && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Estoque:{" "}
+                  </span>
+                  {product.stock === 0 ? (
+                    <Badge variant="destructive" className="flex items-center gap-1">
+                      <Package className="size-3" />
+                      Sem estoque
+                    </Badge>
+                  ) : product.stock <= 10 ? (
+                    <Badge variant="outline" className="flex items-center gap-1 bg-yellow-50 text-yellow-700 border-yellow-300">
+                      <AlertTriangle className="size-3" />
+                      Estoque baixo ({product.stock} unidades)
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="flex items-center gap-1 bg-green-50 text-green-700 border-green-300">
+                      <Package className="size-3" />
+                      {product.stock} unidades
+                    </Badge>
+                  )}
                 </div>
               )}
             </div>

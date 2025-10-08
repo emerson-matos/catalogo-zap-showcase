@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { AddToCartButton } from "@/components/ui/add-to-cart-button";
-import { Edit, Star } from "lucide-react";
+import { Edit, Star, Package } from "lucide-react";
 import { formatPriceBRL } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/types/product";
@@ -25,6 +25,28 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays <= 7;
   };
+
+  const getStockBadge = () => {
+    const stock = product.stock ?? 0;
+    if (stock === 0) {
+      return (
+        <Badge variant="destructive" className="absolute bottom-2 left-2 flex items-center gap-1">
+          <Package className="size-3" />
+          Sem estoque
+        </Badge>
+      );
+    }
+    if (stock <= 10) {
+      return (
+        <Badge variant="outline" className="absolute bottom-2 left-2 flex items-center gap-1 bg-yellow-50 text-yellow-700 border-yellow-300">
+          <Package className="size-3" />
+          Estoque baixo ({stock})
+        </Badge>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
       <CardContent className="p-0">
@@ -51,6 +73,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
                 {category.name}
               </Badge>
             )}
+            {getStockBadge()}
           </div>
 
           <div className="p-6">
