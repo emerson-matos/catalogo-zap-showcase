@@ -1,6 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Toaster } from "@/components/ui/sonner";
@@ -26,7 +25,6 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           <Analytics />
           <SpeedInsights />
           <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
-          <TanStackRouterDevtools />
         </QueryClientProvider>
       </ThemeProvider>
     </ErrorBoundary>

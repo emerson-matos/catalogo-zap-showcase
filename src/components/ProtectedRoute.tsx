@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
@@ -15,11 +17,11 @@ export const ProtectedRoute = ({
   fallbackPath = "/",
 }: ProtectedRouteProps) => {
   const { user, isLoading, isAdmin, isEditor, isViewer } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && !user) {
-      navigate({ to: fallbackPath });
+      router.push(fallbackPath);
       return;
     }
 
@@ -30,7 +32,7 @@ export const ProtectedRoute = ({
         (requiredRole === "viewer" && (isViewer || isEditor || isAdmin));
 
       if (!hasPermission) {
-        navigate({ to: fallbackPath });
+        router.push(fallbackPath);
       }
     }
   }, [
@@ -40,7 +42,7 @@ export const ProtectedRoute = ({
     isEditor,
     isViewer,
     requiredRole,
-    navigate,
+    router,
     fallbackPath,
   ]);
 

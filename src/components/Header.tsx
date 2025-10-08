@@ -1,18 +1,21 @@
+"use client";
+
 import { useState } from "react";
 import { Menu, X, Rose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
-import { Link, useLocation } from "@tanstack/react-router";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { NavItem } from "@/components/NavItem";
 import { navigationItems } from "@/constants/navigationItems";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
 
   const isActiveRoute = (path: string) => {
-    return location.pathname === path;
+    return pathname === path;
   };
 
   return (

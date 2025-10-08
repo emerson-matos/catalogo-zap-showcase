@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export const NavItem = ({
     : "flex items-center gap-2";
 
   return (
-    <Link to={to} onClick={onClick}>
+    <Link href={to} onClick={onClick}>
       <Button
         variant="ghost"
         className={`${baseClasses} ${activeClasses} ${mobileClasses}`}

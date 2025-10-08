@@ -1,7 +1,7 @@
 import { MessageCircle, Phone, Mail, MapPin, Rose } from "lucide-react";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
 import { Button } from "./ui/button";
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 
 const Footer = () => {
   const whatsappNumber = getWhatsAppNumber();

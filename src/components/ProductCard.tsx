@@ -5,7 +5,7 @@ import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { AddToCartButton } from "@/components/ui/add-to-cart-button";
 import { Edit, Star } from "lucide-react";
 import { formatPriceBRL } from "@/lib/utils";
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import type { Product } from "@/types/product";
 import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 import { Button } from "./ui/button";
@@ -28,7 +28,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
   return (
     <Card className="group h-full shadow-lg border border-border transition-all duration-300 hover:scale-105">
       <CardContent className="p-0">
-        <Link to="/products/$id" params={{ id: product.id }}>
+        <Link href={`/products/${product.id}`}>
           <div className="relative overflow-hidden rounded-t-lg">
             <img
               src={product.images?.[0] || "/placeholder.svg"}
@@ -81,7 +81,7 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
       <CardFooter className="flex flex-wrap gap-2 p-4">
         <ProtectedComponent requiredRole="editor">
           <Button asChild size="sm" variant="outline" className="flex-shrink-0">
-            <Link to="/admin/products" search={{ id: product.id }}>
+            <Link href={`/admin/products?id=${product.id}`}>
               <Edit className="size-4 mr-1" />
               <span className="hidden sm:inline">Editar</span>
             </Link>

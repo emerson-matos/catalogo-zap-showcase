@@ -1,3 +1,5 @@
+"use client";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -38,7 +40,7 @@ import {
   Upload,
   ImageIcon,
 } from "lucide-react";
-import { useCanGoBack, useRouter } from "@tanstack/react-router";
+import { useRouter } from "next/navigation";
 import z from "zod";
 import { useProduct } from "@/hooks/useProductsQuery";
 import { useEffect, useCallback, useMemo } from "react";
@@ -76,7 +78,6 @@ export function AddProductForm({ id }: { id?: string }) {
     updateProductWithImages,
     isMutating,
   } = useAdminProducts();
-  const canGoBack = useCanGoBack();
   const router = useRouter();
 
   // Memoize existingImages to prevent infinite re-renders
@@ -171,7 +172,7 @@ export function AddProductForm({ id }: { id?: string }) {
     try {
       await deleteProduct(product?.id || "");
       toast.success("Produto deletado com sucesso!");
-      router.history.back();
+      router.back();
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Erro ao deletar produto",
@@ -444,8 +445,7 @@ export function AddProductForm({ id }: { id?: string }) {
                   <Button
                     type="button"
                     variant="outline"
-                    disabled={!canGoBack}
-                    onClick={() => router.history.back()}
+                    onClick={() => router.back()}
                   >
                     <X />
                     Voltar

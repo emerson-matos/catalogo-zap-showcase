@@ -2,7 +2,7 @@ import { PencilIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import ProductGrid from "./ProductGrid";
 import { Button } from "./ui/button";
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 
 export const AdminPanel = () => {
   const { user } = useAuth();
@@ -19,7 +19,7 @@ export const AdminPanel = () => {
               </p>
             </div>
             <Button asChild>
-              <Link to="/admin/products">
+              <Link href="/admin/products">
                 <PencilIcon className="size-4" />
                 cadastrar
               </Link>

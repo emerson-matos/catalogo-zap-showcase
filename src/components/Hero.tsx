@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import heroImage from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
@@ -37,7 +37,7 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
                 className="text-lg px-8 py-4 h-auto"
                 asChild
               >
-                <Link to="/products">Ver Produtos</Link>
+                <Link href="/products">Ver Produtos</Link>
               </Button>
             </div>
           </div>

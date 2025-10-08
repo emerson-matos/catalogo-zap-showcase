@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { ArrowRight, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -64,7 +64,7 @@ export const NavigationCard = ({
 
   if (to && !dialogContent) {
     return (
-      <Link to={to} className="h-full block">
+      <Link href={to} className="h-full block">
         {cardContent}
       </Link>
     );
