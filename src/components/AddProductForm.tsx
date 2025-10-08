@@ -62,6 +62,7 @@ const productSchema = z.object({
   price: z.number().min(0, "Preço deve ser maior ou igual a 0"),
   category_id: z.string().min(1, "Categoria é obrigatória"),
   rating: z.number().int().min(0).max(5).default(3),
+  stock: z.number().int().min(0, "Estoque deve ser maior ou igual a 0").default(0),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -119,6 +120,7 @@ export function AddProductForm({ id }: { id?: string }) {
     resolver: zodResolver(productSchema),
     defaultValues: {
       rating: 3,
+      stock: 0,
     },
   });
 
@@ -130,6 +132,7 @@ export function AddProductForm({ id }: { id?: string }) {
         price: product.price,
         category_id: product.category_id,
         rating: product.rating,
+        stock: product.stock || 0,
       });
     }
   }, [product, form, isCategoriesLoading, categories]);
@@ -247,6 +250,26 @@ export function AddProductForm({ id }: { id?: string }) {
                           step="0.01"
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value) || 0)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="stock"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Estoque</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          step="1"
+                          onChange={(e) =>
+                            field.onChange(parseInt(e.target.value) || 0)
                           }
                         />
                       </FormControl>

@@ -24,6 +24,7 @@ export interface Database {
           category_id?: string;
           rating?: number;
           is_new?: boolean;
+          stock?: number;
           created_at: string;
           updated_at: string;
           created_by: string;
@@ -36,6 +37,7 @@ export interface Database {
           images: string[]; // Array of image URLs
           category_id?: string;
           rating?: number;
+          stock?: number;
         };
         Update: {
           id?: string;
@@ -45,6 +47,7 @@ export interface Database {
           images?: string[]; // Array of image URLs
           category_id?: string;
           rating?: number;
+          stock?: number;
           updated_at?: string;
         };
       };
