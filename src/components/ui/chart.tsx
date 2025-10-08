@@ -295,7 +295,7 @@ function ChartLegendContent({
 
           return (
             <div
-              key={item.value}
+              key={String((item as unknown as {value?: unknown}).value || Math.random())}
               className={cn(
                 "[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3"
               )}
@@ -306,7 +306,7 @@ function ChartLegendContent({
                 <div
                   className="h-2 w-2 shrink-0 rounded-[2px]"
                   style={{
-                    backgroundColor: item.color,
+                    backgroundColor: (item as unknown as { color?: string }).color,
                   }}
                 />
               )}
