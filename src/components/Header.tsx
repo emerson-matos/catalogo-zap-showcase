@@ -24,7 +24,7 @@ const Header = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link
-            to="/"
+            href="/"
             className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
           >
             <Rose className="size-8" />

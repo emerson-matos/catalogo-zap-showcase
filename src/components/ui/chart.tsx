@@ -125,6 +125,11 @@ function ChartTooltipContent({
     indicator?: "line" | "dot" | "dashed"
     nameKey?: string
     labelKey?: string
+    payload?: Array<Record<string, unknown>>
+    label?: string
+    active?: boolean
+    labelFormatter?: (value: unknown) => string
+    formatter?: (value: unknown) => string
   }) {
   const { config } = useChart()
 
@@ -184,10 +189,12 @@ function ChartTooltipContent({
           .map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
-            const indicatorColor = color || item.payload.fill || item.color
+            // @ts-expect-error - recharts payload types are not fully compatible
+            const indicatorColor = color || item.payload?.fill || item.color
 
             return (
               <div
+                // @ts-expect-error - recharts item types are not fully compatible
                 key={item.dataKey}
                 className={cn(
                   "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
@@ -195,6 +202,7 @@ function ChartTooltipContent({
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
+                  // @ts-expect-error - recharts formatter types are not fully compatible
                   formatter(item.value, item.name, item, index, item.payload)
                 ) : (
                   <>
@@ -231,12 +239,13 @@ function ChartTooltipContent({
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
                         <span className="text-muted-foreground">
+                          {/* @ts-expect-error - recharts item types are not fully compatible */}
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
-                      {item.value && (
+                      {(item as unknown as { value?: number }).value && (
                         <span className="text-foreground font-mono font-medium tabular-nums">
-                          {item.value.toLocaleString()}
+                          {(item as unknown as { value: number }).value.toLocaleString()}
                         </span>
                       )}
                     </div>
@@ -258,10 +267,11 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
-}: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+}: React.ComponentProps<"div"> & {
     hideIcon?: boolean
     nameKey?: string
+    payload?: Array<Record<string, unknown>>
+    verticalAlign?: string
   }) {
   const { config } = useChart()
 

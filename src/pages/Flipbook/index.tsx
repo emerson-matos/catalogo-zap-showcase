@@ -1,3 +1,5 @@
+"use client";
+
 import { useProductsQuery } from "@/hooks/useProductsQuery";
 import Flipbook from "@/components/Flipbook";
 import { BookOpen, Loader2 } from "lucide-react";
@@ -58,3 +60,5 @@ export const FlipbookPage = () => {
     </div>
   );
 };
+
+export default FlipbookPage;

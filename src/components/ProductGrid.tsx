@@ -1,3 +1,5 @@
+"use client";
+
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -58,7 +60,7 @@ export const ProductGrid = ({ showStatistics = true }: ProductGridProps) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={refetch}
+                  onClick={() => refetch()}
                   disabled={isFetching}
                 >
                   {isFetching ? (

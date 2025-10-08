@@ -43,7 +43,7 @@ const Hero = ({ sectionId }: { sectionId: string }) => {
           </div>
           <div className=" w-full aspect-video overflow-clip">
             <img
-              src={heroImage}
+              src={heroImage.src}
               alt="SeRena Cosméticos Logo"
               className="border-4 bg-white-500 w-full h-70 sm:h-150 object-cover object-center"
             />

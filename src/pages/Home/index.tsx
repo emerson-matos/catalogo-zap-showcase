@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 import Hero from "@/components/Hero";
@@ -74,3 +76,5 @@ export const Home = () => {
     </>
   );
 };
+
+export default Home;

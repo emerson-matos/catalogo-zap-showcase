@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 
-export const Page404 = () => {
+const Page404 = () => {
   return (
     <div className="grid gap-4 md:flex md:min-h-[60vh] md:items-center">
       <div className="text-center">
@@ -16,10 +16,13 @@ export const Page404 = () => {
         <div className="grid gap-2">
           <p>It&apos;s Okay!</p>
           <div>
-            <Link to="/">Let&apos;s Head Back</Link>
+            <Link href="/">Let&apos;s Head Back</Link>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+export { Page404 };
+export default Page404;

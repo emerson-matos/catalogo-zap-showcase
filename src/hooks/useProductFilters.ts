@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useMemo } from "react";
 import type { Product } from "@/types/product";
 import { useCategoriesQuery, useCategoryQuery } from "./useCategoryQuery";

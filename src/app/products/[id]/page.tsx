@@ -1,5 +1,6 @@
 "use client";
 
+import { use } from "react";
 import { useProduct } from "@/hooks/useProductsQuery";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Package } from "lucide-react";
@@ -11,9 +12,10 @@ import { useCategoryQuery } from "@/hooks/useCategoryQuery";
 export default function ProductDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { data: product, isLoading, error } = useProduct(params.id || "");
+  const { id } = use(params);
+  const { data: product, isLoading, error } = useProduct(id || "");
   const { data: category, isLoading: isCategoryLoading } = useCategoryQuery(
     product?.category_id || "",
   );

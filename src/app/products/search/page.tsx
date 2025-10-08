@@ -11,12 +11,12 @@ import { useSearchParams } from "next/navigation";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
-  const q = searchParams.get("q") || "";
-  const category = searchParams.get("category") || undefined;
-  const minPrice = searchParams.get("minPrice")
+  const q = searchParams?.get("q") || "";
+  const category = searchParams?.get("category") || undefined;
+  const minPrice = searchParams?.get("minPrice")
     ? Number(searchParams.get("minPrice"))
     : undefined;
-  const maxPrice = searchParams.get("maxPrice")
+  const maxPrice = searchParams?.get("maxPrice")
     ? Number(searchParams.get("maxPrice"))
     : undefined;
 

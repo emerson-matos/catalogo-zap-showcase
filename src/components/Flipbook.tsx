@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 import logoImage from "@/assets/logo.png";
@@ -56,6 +58,7 @@ const Flipbook = ({ products }: FlipbookProps) => {
   return (
     <div className="container m-auto">
       <div className="flex justify-center">
+        {/* @ts-expect-error - react-pageflip types are not compatible with React 19 */}
         <HTMLFlipBook
           width={300}
           height={500}
@@ -68,7 +71,7 @@ const Flipbook = ({ products }: FlipbookProps) => {
           <PageCover>
             <div className=" w-full aspect-video overflow-clip">
               <img
-                src={logoImage}
+                src={logoImage.src}
                 alt="SeRena Cosméticos Logo"
                 className="border-4 bg-white-500 w-full h-70 sm:h-150 object-fill md:object-fill object-center"
               />
